@@ -8,6 +8,7 @@ var ola = 'open-layers';
 var obl = 'open-blocks';
 var ful = 'fullscreen';
 var prv = 'preview';
+var build_component = 'build-component';
 
 module.exports = {
   stylePrefix: 'pn-',
@@ -37,6 +38,11 @@ module.exports = {
       command: ful,
       context: ful,
       attributes: { title: 'Fullscreen' },
+    },{
+      id: build_component,
+      className: 'fa fa-building',
+      command: build_component,
+      attributes: { title: 'Build Components' },
     },{
       id: expt,
       className: 'fa fa-code',

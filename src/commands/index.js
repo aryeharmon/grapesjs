@@ -93,6 +93,7 @@ module.exports = () => {
       defaultCommands['text-comp'] = require('./view/TextComponent');
       defaultCommands['insert-custom'] = require('./view/InsertCustom');
       defaultCommands['export-template'] = require('./view/ExportTemplate');
+      defaultCommands['build-component'] = require('./view/BuildComponent');
       defaultCommands['sw-visibility'] = require('./view/SwitchVisibility');
       defaultCommands['open-layers'] = require('./view/OpenLayers');
       defaultCommands['open-sm'] = require('./view/OpenStyleManager');
@@ -118,6 +119,35 @@ module.exports = () => {
           sel.destroy();
           ed.trigger('component:update', sel);
           ed.editor.set('selectedComponent', null);
+        },
+      };
+
+      defaultCommands['save'] = {
+        run(ed) {
+          var sel = ed.getSelected();
+          var html = sel.toHTML()
+          var label = prompt("Please enter a label name", "");
+
+          if (html && label) {
+
+
+            $.ajax({
+              type: "POST",
+              url: '/save-layout',
+              data: {
+                html: html,
+                label: label,
+              },
+              success: function(data) {
+                editor.BlockManager.add(data, {
+                  label: label,
+                  content: html,
+                  category: 'Custom Layouts',
+                });
+              }
+            });
+          }
+
         },
       };
 

@@ -3,11 +3,13 @@
   <head>
     <meta charset="utf-8">
     <title>GrapesJS</title>
-    <link rel="stylesheet" href="dist/css/grapes.min.css">
-    <script src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="dist/grapes.min.js"></script>
-    <script src="node_modules/grapesjs-navbar/dist/grapesjs-navbar.min.js"></script>
-
+    <link rel="stylesheet" href="css/grapes.min.css">
+    <script src="jquery/dist/jquery.min.js"></script>
+    <script src="grapes.min.js"></script>
+    <script src="modules/grapesjs-navbar/dist/grapesjs-navbar.min.js"></script>
+    <script>
+    window.components = {{{toJSON components}}};
+    </script>
   </head>
   <style>
     body, html{ height: 100%; margin: 0;}
@@ -1034,15 +1036,20 @@
               type: 'map',
               style: {height: '350px'}
             },
-          },{
-            id: 'custom',
-            label: 'custom',
+          }
+          {{#each components}}
+          ,{
+            id: '{{@key}}',
+            label: '{{ tagName }}',
             category: 'Custom Components',
             attributes: {class:'fa fa-thermometer-full'},
             content: {
-              type: 'cutom-element-type',
+              type: '{{ tagName }}',
             },
-          }, {
+          }
+          {{/each}}
+
+          ,{
             id: 'video',
             label: 'Video',
             category: 'Basic',
@@ -1055,7 +1062,19 @@
                 width: '615px',
               }
             },
-          }],
+          }
+
+          {{#each layouts}}
+          ,{
+            id: '{{@key}}',
+            label: '{{label}}',
+            category: 'Custom Layouts',
+            content: '{{{html}}}',
+            attributes: {class:''}
+          }
+          {{/each}}
+
+          ],
       },
 
       styleManager : {
@@ -1369,55 +1388,27 @@ var defaultType = comps.getType('default');
 var defaultModel = defaultType.model;
 var defaultView = defaultType.view;
 
-aryeh = defaultModel.prototype.defaults;
-
-comps.addType('cutom-element-type', {
+{{#each components}}
+comps.addType('{{tagName}}', {
   model: defaultModel.extend({
     defaults: Object.assign({}, defaultModel.prototype.defaults, {
       style: {
         "min-height": '40px',
         "display": 'block',
       },
-      tagName: 'cutom-element-type',
+      tagName: '{{tagName}}',
       classes: ['cutom-element-type'],
       stylable: 'false',
       draggable: '*',
       droppable: true,
       saveable: true,
-      traits: [
-        'JSON API URL',
-        {
-          type: 'checkbox',
-          label: 'Repeater',
-          name: 'Repeater',
-        },
-        {
-          type: 'number',
-          label: 'Max',
-          name: 'Max',
-          default: 0,
-          value: 10,
-        },
-        {
-          type: 'select',
-          label: 'Each Line',
-          name: 'line_count',
-          options: [
-            {value: 'col-xs-12', name: '1'},
-            {value: 'col-xs-6', name: '2'},
-            {value: 'col-xs-4', name: '3'},
-            {value: 'col-xs-3', name: '4'},
-            {value: 'col-xs-2', name: '6'},
-            {value: 'col-xs-1', name: '12'},
-          ],
-        },      
-      ],
+      traits: {{{toJSON traits}}},
     }),
   },
   {
     isComponent: function(el) {
-      if(el.tagName == 'CUTOM-ELEMENT-TYPE'){
-        return {type: 'cutom-element-type'};
+      if(el.tagName == '{{toUpperCase tagName}}'){
+        return {type: '{{tagName}}'};
       }
     },
   }),
@@ -1425,7 +1416,7 @@ comps.addType('cutom-element-type', {
   // Define the View
   view: defaultType.view,
 });
-
+{{/each}}
 
 
 
