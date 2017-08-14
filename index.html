@@ -7,7 +7,11 @@
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="dist/grapes.min.js"></script>
     <script src="node_modules/grapesjs-navbar/dist/grapesjs-navbar.min.js"></script>
-
+    <script src="node_modules/grapesjs-plugin-export/dist/grapesjs-plugin-export.min.js"></script>
+    <script src="node_modules/grapesjs-blocks-basic/dist/grapesjs-blocks-basic.min.js"></script>
+    <script src="node_modules/grapesjs-plugin-forms/dist/grapesjs-plugin-forms.min.js"></script>
+    <script src="node_modules/grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.min.js"></script>
+    <script src="node_modules/grapesjs-mjml/dist/grapesjs-mjml.min.js"></script>
   </head>
   <style>
     body, html{ height: 100%; margin: 0;}
@@ -830,9 +834,14 @@
 
     var editor  = grapesjs.init(
 
-
     {
-      plugins: ['gjs-navbar'],
+      plugins: [
+        'gjs-navbar',
+        'gjs-plugin-export',
+        'gjs-blocks-basic',
+        'gjs-plugin-forms',
+        'gjs-preset',
+      ],
       pluginsOpts: {
         'gjs-navbar': {/* ...options */}
       },

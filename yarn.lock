@@ -2756,7 +2756,7 @@ is-date-object@^1.0.1:
 
 is-decimal@^1.0.0:
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/is-decimal/-/is-decimal-1.0.0.tgz#940579b6ea63c628080a69e62bda88c8470b4fe0"
+  resolved "https://registry.yarnpkg.com/is-decimal/-/is-decimal-1.0.0.tgz#940579b6ea63c628086a69e62bda88c8470b4fe0"
 
 is-dotfile@^1.0.0:
   version "1.0.2"

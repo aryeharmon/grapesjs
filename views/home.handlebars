@@ -4,11 +4,25 @@
     <meta charset="utf-8">
     <title>GrapesJS</title>
     <link rel="stylesheet" href="css/grapes.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="jquery/dist/jquery.min.js"></script>
     <script src="grapes.min.js"></script>
-    <script src="modules/grapesjs-navbar/dist/grapesjs-navbar.min.js"></script>
+    <script src="/grapesjs-navbar/dist/grapesjs-navbar.min.js"></script>
+    <script src="/grapesjs-plugin-export/dist/grapesjs-plugin-export.min.js"></script>
+    <script src="/grapesjs-blocks-basic/dist/grapesjs-blocks-basic.min.js"></script>
+    <script src="/grapesjs-plugin-forms/dist/grapesjs-plugin-forms.min.js"></script>
+    <script src="/grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.min.js"></script>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="/bootstrap-select/dist/css/bootstrap-select.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+
+
     <script>
     window.components = {{{toJSON components}}};
+    window.categories = {{{toJSON categories}}};
     </script>
   </head>
   <style>
@@ -834,9 +848,15 @@
 
 
     {
-      plugins: ['gjs-navbar'],
+      plugins: [
+        'gjs-navbar',
+        'gjs-plugin-export',
+        'gjs-blocks-basic',
+        'gjs-plugin-forms',
+        'gjs-preset',
+      ], 
       pluginsOpts: {
-        'gjs-navbar': {/* ...options */}
+        'gjs-navbar': {/* ...options */},
       },
       allowScripts: 1,
       showOffsets: 1,
@@ -1041,8 +1061,8 @@
           ,{
             id: '{{@key}}',
             label: '{{ tagName }}',
-            category: 'Custom Components',
-            attributes: {class:'fa fa-thermometer-full'},
+            category: '{{ lookup ../categories category 'name' }}',
+            attributes: {class:'fa {{ icon }}'},
             content: {
               type: '{{ tagName }}',
             },
