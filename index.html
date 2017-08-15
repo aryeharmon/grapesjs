@@ -1394,7 +1394,13 @@ comps.addType('cutom-element-type', {
       droppable: true,
       saveable: true,
       traits: [
-        'JSON API URL',
+        {
+          type: 'text',
+          label: 'test',
+          name: 'test',
+          default: 'test',
+          value: 'test',
+        },
         {
           type: 'checkbox',
           label: 'Repeater',

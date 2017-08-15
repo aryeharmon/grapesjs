@@ -76,6 +76,7 @@ module.exports = Backbone.View.extend({
     this.em.runDefault();
 
     if (model && model.get) {
+
       if(model.get('activeOnRender')) {
         model.trigger('active');
         model.set('activeOnRender', 0);
@@ -83,6 +84,20 @@ module.exports = Backbone.View.extend({
 
       // Register all its components (eg. for the Undo Manager)
       this.em.initChildrenComp(model);
+
+      for (var i = 0; i < model.attributes.traits.models.length; i++) {
+        var trait = model.attributes.traits.models[i];
+        (function(trait) {
+          setTimeout(function() {
+            var value = trait.get('value');
+            alert(value);
+            trait.set('value', 0);
+            trait.set('value', value);
+          }, 3000)
+        })(trait)
+      }
+
+
     }
     this.em.trigger('block:drag:stop', model);
   },

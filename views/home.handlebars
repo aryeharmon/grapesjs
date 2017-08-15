@@ -871,6 +871,8 @@
         autoload: 0,
         storeComponents: 1,
         storeStyles: 1,
+        autosave: true,
+        type: 'remote',
       },
 
       commands:     {
@@ -1093,6 +1095,16 @@
             attributes: {class:''}
           }
           {{/each}}
+
+          ,{
+            id: 'repeat',
+            label: 'Repeat',
+            category: 'Angular',
+            content: {
+              type: 'repeat',
+            },
+            attributes: {class:''},
+          }
 
           ],
       },
@@ -1375,10 +1387,23 @@
 
     // Store and load events
     editor.on('storage:load', function(e) {
-      console.log('LOAD ', e);
-    })
+
+    });
+
     editor.on('storage:store', function(e) {
-      console.log('STORE ', e);
+      // /storage/load
+       
+
+      // $.ajax({
+      //   type: "POST",
+      //   url: '/storage/store',
+      //   data: e,
+      //   success: function(data) {
+      //     alert('123')
+      //   },
+      //   dataType: 'json'
+      // });
+
     })
 
     editor.on('styleManager:change:text-shadow', function(view) {
@@ -1413,16 +1438,16 @@ comps.addType('{{tagName}}', {
   model: defaultModel.extend({
     defaults: Object.assign({}, defaultModel.prototype.defaults, {
       style: {
-        "min-height": '40px',
+        // "min-height": '40px',
         "display": 'block',
       },
       tagName: '{{tagName}}',
       classes: ['cutom-element-type'],
-      stylable: 'false',
+      stylable: false,
       draggable: '*',
       droppable: true,
       saveable: true,
-      traits: {{{toJSON traits}}},
+      traits: {{{toJSON (add_default traits)}}},
     }),
   },
   {
@@ -1439,20 +1464,37 @@ comps.addType('{{tagName}}', {
 {{/each}}
 
 
+comps.addType('repeat', {
+  model: defaultModel.extend({
+    defaults: Object.assign({}, defaultModel.prototype.defaults, {
+      style: {
+        // "min-height": '40px',
+        "display": 'block',
+      },
+      tagName: 'repeat',
+      classes: [],
+      stylable: false,
+      draggable: '*',
+      droppable: true,
+      saveable: true,
+      traits: [{
+        name: 'ng-repeat',
+        value: 'e in data track by $index',
+        editable: false,
+      }],
+    }),
+  },
+  {
+    isComponent: function(el) {
+      if(el.tagName == 'REPEAT'){
+        return {type: 'repeat'};
+      }
+    },
+  }),
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // Define the View
+  view: defaultType.view,
+});
 
 
     editor.render();

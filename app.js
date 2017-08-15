@@ -4,6 +4,11 @@ var bodyParser = require('body-parser')
 const app = express();
 const uuidv1 = require('uuid/v1');
 var jsonfile = require('jsonfile');
+var camelCase = require('camelcase');
+
+var fs = require('fs');
+
+var storage_file = './storage.json';
 
 var layouts_file = './layouts.json';
 var components_file = './components.json';
@@ -57,6 +62,16 @@ app.engine('handlebars', exphbs({
                 }
             }
             return obj;
+        },
+        add_default: function (array) {
+        	var array = array || [];
+        	
+        	return array.concat([
+			{
+				name: 'ng-transclude',
+				value: 'ng-transclude',
+				default: 'ng-transclude',
+			}]);
         },
 	},
 }));
@@ -131,6 +146,47 @@ app.post('/remove-category', function (req, res) {
 
 	jsonfile.writeFile(categories_file, categories, function (err) {
 		res.send(req.body.id);
+	});
+});
+
+app.get('/storage/load', function (req, res) {
+	jsonfile.readFile(storage_file, function(err, obj) {
+		res.json(obj);
+	});
+});
+app.post('/storage/store', function (req, res) {
+	jsonfile.writeFile(storage_file, res.body, function (err) {
+		res.send({success: true});
+	});
+});
+
+app.post('/storage/html', function (req, res) {
+	fs.writeFile("./html.html", req.body.html, function(err) {
+	    if(err) {
+	        return console.log(err);
+	    }
+
+	    console.log("html file saved");
+	});
+	fs.writeFile("./css.css", req.body.css, function(err) {
+	    if(err) {
+	        return console.log(err);
+	    }
+
+	    console.log("css file saved");
+	});
+	res.json({success: true});
+});
+app.get('/view', function (req, res) {
+	fs.readFile('./html.html', 'utf8', function (err, html) {
+		fs.readFile('./css.css', 'utf8', function (err, css) {
+			res.locals.html = html;
+			res.locals.css = css;
+			res.locals.components = Object.keys(components).map(function(key) {
+				return camelCase(components[key].tagName);
+			});
+			res.render('view', {layout: false})
+		});
 	});
 });
 
