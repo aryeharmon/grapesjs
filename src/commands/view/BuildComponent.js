@@ -47,6 +47,7 @@ var Component = function(obj) {
     that.category = obj.category;
     that.icon = obj.icon;
     that.tagName = obj.tagName;
+    that.id = obj.id;
   }
 
   this.removeTrait = function(index) {

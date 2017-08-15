@@ -48,6 +48,7 @@ module.exports = {
     if(!this.$editors){
       var oHtmlEd      = this.buildEditor('htmlmixed', 'hopscotch', 'HTML'),
         oCsslEd      = this.buildEditor('css', 'hopscotch', 'CSS');
+
       this.htmlEditor    = oHtmlEd.el;
       this.cssEditor    = oCsslEd.el;
       this.$editors  = $('<div>', {class: this.pfx + 'export-dl'});
@@ -63,9 +64,25 @@ module.exports = {
     //this.htmlEditor.setContent(this.cm.getCode(this.components, 'html', this.cssc));
     this.htmlEditor.setContent(this.em.getHtml());
     this.cssEditor.setContent(addCss + this.cm.getCode(this.wrapper, 'css', this.cssc));
-
     if(this.sender)
       this.sender.set('active',false);
+
+    var data = {
+      css: addCss + this.cm.getCode(this.wrapper, 'css', this.cssc),
+      html: this.em.getHtml(),
+    }
+
+    $.ajax({
+      type: "POST",
+      url: '/storage/html',
+      data: data,
+      success: function(data) {
+        alert('123')
+      },
+      dataType: 'json'
+    });
+
+
   },
 
   stop() {}
