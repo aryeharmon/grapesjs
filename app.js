@@ -24,12 +24,10 @@ jsonfile.readFile(categories_file, function(err, obj) {
 });
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 1000000 }))
 
 // parse application/json
-app.use(bodyParser.json())
-
-
+app.use(bodyParser.json({limit: '50mb', parameterLimit: 1000000}))
 
 app.engine('handlebars', exphbs({
 	defaultLayout: 'main',
