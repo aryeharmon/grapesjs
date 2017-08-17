@@ -77,7 +77,7 @@ module.exports = {
       url: '/storage/html',
       data: data,
       success: function(data) {
-        alert('123')
+        console.log('saved template.')
       },
       dataType: 'json'
     });
