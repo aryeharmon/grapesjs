@@ -187,5 +187,17 @@ app.get('/view', function (req, res) {
 		});
 	});
 });
+app.get('/amp-view', function (req, res) {
+	fs.readFile('./html.html', 'utf8', function (err, html) {
+		fs.readFile('./css.css', 'utf8', function (err, css) {
+			res.locals.html = html;
+			res.locals.css = css;
+			res.locals.components = Object.keys(components).map(function(key) {
+				return camelCase(components[key].tagName);
+			});
+			res.render('amp-view', {layout: false})
+		});
+	});
+});
 
 app.listen(3000);
