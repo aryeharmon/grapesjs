@@ -82,7 +82,15 @@ app.get('/', function (req, res) {
 	res.locals.layouts = layouts;
 	res.locals.components = components;
 	res.locals.categories = categories;
-    res.render('home');
+
+	fs.readFile('./html.html', 'utf8', function (err, html) {
+		fs.readFile('./css.css', 'utf8', function (err, css) {
+			res.locals.html = html;
+			res.locals.css = css;
+    		res.render('home');
+		});
+	});
+
 });
 
 app.post('/save-component', function (req, res) {
