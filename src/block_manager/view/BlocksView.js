@@ -90,7 +90,6 @@ module.exports = Backbone.View.extend({
         (function(trait) {
           setTimeout(function() {
             var value = trait.get('value');
-            alert(value);
             trait.set('value', 0);
             trait.set('value', value);
           }, 3000)
