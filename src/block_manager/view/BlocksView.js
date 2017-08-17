@@ -85,18 +85,20 @@ module.exports = Backbone.View.extend({
       // Register all its components (eg. for the Undo Manager)
       this.em.initChildrenComp(model);
 
-      for (var i = 0; i < model.attributes.traits.models.length; i++) {
-        var trait = model.attributes.traits.models[i];
-        (function(trait) {
-          setTimeout(function() {
-            var value = trait.get('value');
-            trait.set('value', 0);
-            trait.set('value', value);
-          }, 3000)
-        })(trait)
+      var selected_model = editor.getSelected();
+      if(selected_model){
+        selected_model.set('status', '');
       }
 
+      model.set('status', 'selected');
+      this.em.set('selectedComponent', model);
 
+      for (var i = 0; i < model.attributes.traits.models.length; i++) {
+        var trait = model.attributes.traits.models[i];
+        var value = trait.get('value');
+        trait.set('value', '0'); // change to another value and then change back
+        trait.set('value', value);
+      }
     }
     this.em.trigger('block:drag:stop', model);
   },
