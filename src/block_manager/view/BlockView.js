@@ -3,7 +3,7 @@ var Backbone = require('backbone');
 module.exports = Backbone.View.extend({
 
   events: {
-    mousedown: 'onDrag',
+    mousedown: 'startDrag',
     contextmenu: 'onRightClick',
   },
 
@@ -30,7 +30,7 @@ module.exports = Backbone.View.extend({
   },
 
   initialize(o, config) {
-    _.bindAll(this, 'onDrop');
+    _.bindAll(this, 'endDrag');
     this.config = config || {};
     this.ppfx = this.config.pStylePrefix || '';
     this.listenTo(this.model, 'destroy remove', this.remove);
@@ -41,7 +41,7 @@ module.exports = Backbone.View.extend({
    * Start block dragging
    * @private
    */
-  onDrag(e) {
+  startDrag(e) {
     //Right or middel click
     if (e.button !== 0) {
       return;
@@ -56,16 +56,23 @@ module.exports = Backbone.View.extend({
     sorter.setDragHelper(this.el, e);
     sorter.startSort(this.el);
     sorter.setDropContent(this.model.get('content'));
-    this.doc.on('mouseup', this.onDrop);
+    this.doc.on('mouseup', this.endDrag);
   },
 
   /**
    * Drop block
    * @private
    */
-  onDrop() {
-    this.doc.off('mouseup', this.onDrop);
-    this.config.getSorter().endMove();
+  endDrag(e) {
+    this.doc.off('mouseup', this.endDrag);
+    const sorter = this.config.getSorter();
+
+    // After dropping the block in the canvas the mouseup event is not yet
+    // triggerd on 'this.doc' and so clicking outside, the sorter, tries to move
+    // things (throws false positives). As this method just need to drop away
+    // the block helper I use the trick of 'moved = 0' to void those errors.
+    sorter.moved = 0;
+    sorter.endMove();
   },
 
   render() {
