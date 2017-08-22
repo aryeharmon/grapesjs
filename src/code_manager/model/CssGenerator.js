@@ -24,12 +24,17 @@ module.exports = Backbone.Model.extend({
     }
 
     if(style && Object.keys(style).length !== 0) {
-      code += '#' + model.getId() + '{';
-      for(var prop in style){
-        if(style.hasOwnProperty(prop))
-          code += prop + ':' + style[prop] + ';';
+
+      var has_id = /^c([0-9]){4}$/.test(model.getId());
+
+      if (!has_id) {      
+        code += '#' + model.getId() + '{';
+        for(var prop in style){
+          if(style.hasOwnProperty(prop))
+            code += prop + ':' + style[prop] + ';';
+        }
+        code += '}';
       }
-      code += '}';
     }
 
     return code;
@@ -117,9 +122,12 @@ module.exports = Backbone.Model.extend({
 
     // Get string of selectors
     selectors.each(selector => {
-      strSel += '.' + selector.get('name');
-      if(compCls.indexOf(selector.get('name')) > -1)
-        found = 1;
+      var has_class = /^c([0-9]){4}$/.test(selector.get('name'));
+      if (!has_class) {      
+        strSel += '.' + selector.get('name');
+        if(compCls.indexOf(selector.get('name')) > -1)
+          found = 1;
+      }
     });
 
     // With 'found' will skip rules which selectors are not found in

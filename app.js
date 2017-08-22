@@ -5,6 +5,7 @@ const app = express();
 const uuidv1 = require('uuid/v1');
 var jsonfile = require('jsonfile');
 var camelCase = require('camelcase');
+var async = require('async');
 
 var fs = require('fs');
 
@@ -13,10 +14,20 @@ var storage_file = './storage.json';
 var layouts_file = './layouts.json';
 var components_file = './components.json';
 var categories_file = './categories.json';
+var pages_file = './pages.json';
 
 var layouts = {};
 var components = {};
 var categories = {};
+var pages = {};
+
+
+var routerObj = express.Router();
+
+app.use(function (req, res, next) {
+	routerObj(req, res, next)
+});
+
 
 jsonfile.readFile(layouts_file, function(err, obj) {
 	layouts = obj;
@@ -26,6 +37,14 @@ jsonfile.readFile(components_file, function(err, obj) {
 });
 jsonfile.readFile(categories_file, function(err, obj) {
 	categories = obj;
+});
+jsonfile.readFile(pages_file, function(err, obj) {
+	pages = obj;
+
+	create_routes(routerObj, function() {
+		// console.log(123)
+	});
+
 });
 
 // parse application/x-www-form-urlencoded
@@ -71,12 +90,22 @@ app.engine('handlebars', exphbs({
 				default: 'ng-transclude',
 			}]);
         },
+        keys: function (obj) {
+        	return Object.keys(obj);
+        },
+        join: function (array, string) {
+        	return array.join(string);
+        },
+        filter: function (obj, property, value) {
+        	// return array.join(string);
+        },
 	},
 }));
 app.set('view engine', 'handlebars');
 
 app.use(express.static('dist'))
 app.use(express.static('node_modules'))
+
 
 app.get('/', function (req, res) {
 	res.locals.layouts = layouts;
@@ -90,7 +119,6 @@ app.get('/', function (req, res) {
     		res.render('home');
 		});
 	});
-
 });
 
 app.post('/save-component', function (req, res) {
@@ -167,14 +195,14 @@ app.post('/storage/store', function (req, res) {
 });
 
 app.post('/storage/html', function (req, res) {
-	fs.writeFile("./html.html", req.body.html, function(err) {
+	fs.writeFile("./pages/html/" + req.body._id + ".html", req.body.html, function(err) {
 	    if(err) {
 	        return console.log(err);
 	    }
 
 	    console.log("html file saved");
 	});
-	fs.writeFile("./css.css", req.body.css, function(err) {
+	fs.writeFile("./style.css", req.body.css.replace(new RegExp('cutom-element-type', 'g'), 'dskjfhskjghs'), function(err) {
 	    if(err) {
 	        return console.log(err);
 	    }
@@ -205,6 +233,83 @@ app.get('/amp-view', function (req, res) {
 			});
 			res.render('amp-view', {layout: false})
 		});
+	});
+});
+
+app.all('/admin', function (req, res) {
+	res.locals.pages = pages;
+	res.render('admin');
+});
+app.get('/admin/page/delete/:id', function (req, res) {
+	delete pages[req.params.id];
+
+	jsonfile.writeFile(pages_file, pages, function (err) {
+		routerObj = express.Router();
+		create_routes(routerObj, function() {
+			res.redirect('/admin');
+		})
+	});
+});
+
+
+var create_routes = function(routerObj, callback) {
+	async.each(pages, function(page, callback) {
+		routerObj.get('/edit/' + page.slug, function (req, res) {
+			res.locals.layouts = layouts;
+			res.locals.components = components;
+			res.locals.categories = categories;
+
+			fs.readFile('./pages/html/' + page._id + '.html', 'utf8', function (err, html) {
+				fs.readFile('./style.css', 'utf8', function (err, css) {
+					res.locals.html = html;
+					res.locals.css = css;
+					res.locals.page = page;
+		    		res.render('home');
+				});
+			});
+		});
+
+
+		routerObj.get('/' + page.slug, function (req, res) {
+			fs.readFile('./pages/html/' + page._id + '.html', 'utf8', function (err, html) {
+				fs.readFile('./style.css', 'utf8', function (err, css) {
+					res.locals.html = html;
+					res.locals.css = css;
+					res.locals.components = Object.keys(components).map(function(key) {
+						return camelCase(components[key].tagName);
+					});
+					res.render('amp-view', {layout: false})
+				});
+			});
+		});
+
+		callback();
+	}, function() {
+		callback();
+	});
+}
+
+app.post('/admin/save/page', function (req, res) {
+	var id = req.body._id || uuidv1();
+
+	pages[id] = {
+		_id: id,
+		page_name: req.body.page_name,
+		alt_name: req.body.alt_name,
+		slug: req.body.slug,
+	};
+
+	fs.writeFile("./pages/html/" + id + ".html", '', function(err) {
+	    if (err) {
+	        return console.log(err);
+	    }
+	});
+
+	jsonfile.writeFile(pages_file, pages, function (err) {
+		routerObj = express.Router();
+		create_routes(routerObj, function() {
+			res.redirect('/admin');
+		})
 	});
 });
 

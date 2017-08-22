@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <title>GrapesJS</title>
-    <link rel="stylesheet" href="css/grapes.min.css">
+    <link rel="stylesheet" href="/css/grapes.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="jquery/dist/jquery.min.js"></script>
-    <script src="grapes.min.js"></script>
+    <script src="/jquery/dist/jquery.min.js"></script>
+    <script src="/grapes.min.js"></script>
     <script src="/grapesjs-navbar/dist/grapesjs-navbar.min.js"></script>
     <script src="/grapesjs-plugin-export/dist/grapesjs-plugin-export.min.js"></script>
     <script src="/grapesjs-blocks-basic/dist/grapesjs-blocks-basic.min.js"></script>
@@ -39,6 +39,38 @@
     </div>
 
     <script type="text/javascript">
+
+      var page = {{{ toJSON page }}};
+
+      {{#each components}}
+        $('{{ tagName }}').each(function() {
+          var width = $(this).attr('width');
+          var height = $(this).attr('height');
+          var src = $(this).attr('src');
+          var layout = $(this).attr('layout');
+          
+          if (width) {
+            $(this).css('width', width);
+            $(this).css('display', "inline-block");
+          }
+          if (height) {
+            $(this).css('height', height);
+            $(this).css('display', "block");
+            $(this).css('overflow', "hidden");
+          }
+          if (src) {
+            $(this).css('background-image', "url(" + src + ")");
+
+            $(this).css('max-width', "100%");
+            $(this).css('background-size', "100% 100%");
+          }
+          if (layout === 'responsive') {
+            $(this).css('width', '100%');
+            // $(this).css('height', 'auto');
+          }
+        });
+    {{/each}}
+
     var blkStyle = '.blk-row::after{ content: ""; clear: both; display: block;} .blk-row{padding: 10px;}';
 
 

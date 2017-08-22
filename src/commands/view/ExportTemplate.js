@@ -70,6 +70,7 @@ module.exports = {
     var data = {
       css: addCss + this.cm.getCode(this.wrapper, 'css', this.cssc),
       html: this.em.getHtml(),
+      _id: window.page._id,
     }
 
     $.ajax({
