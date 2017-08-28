@@ -61,6 +61,9 @@ app.use(bodyParser.json({limit: '50mb', parameterLimit: 1000000}))
 app.engine('handlebars', exphbs({
 	defaultLayout: 'main',
 	helpers: {
+	    equal: function(a,b) {
+	        return a == b;
+	    },
 	    toLowerCase: function(str){
 	        return str.toLowerCase();
 	    },
