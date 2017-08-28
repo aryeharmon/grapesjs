@@ -1,0 +1,28 @@
+<div class="container">
+	<div class="row">
+		<h2>Add a new menu</h3>
+
+		<form action="" method="POST">
+			<input type="hidden" name="_id" value=""/>
+			<div class="form-group">
+				<label>Name</label>
+				<input type="text" class="form-control" name="name">
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+	<div class="row">
+		<h2>Menu List</h3>
+
+		<ul>
+			{{#each menues}}
+				<li>
+					{{ name }}
+
+					<a href="/admin/menu/delete/{{@key}}" class="btn btn-danger">Delete</a>
+					<a href="/admin/menu/edit/{{@key}}" target="_blank" class="btn btn-primary">Edit</a>
+				</li>
+			{{/each}}
+		</ul>
+	</div>
+</div>

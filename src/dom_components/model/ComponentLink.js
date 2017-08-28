@@ -6,6 +6,7 @@ module.exports = Component.extend({
       type: 'link',
       tagName: 'a',
       traits: ['title', 'href', 'target'],
+      droppable: true,
   }),
 
   /**
