@@ -674,7 +674,7 @@ comps.addType('{{tagName}}', {
       },
       tagName: '{{tagName}}',
       classes: ['cutom-element-type'],
-      stylable: false,
+      stylable: [],
       draggable: '*',
       droppable: true,
       saveable: true,
@@ -689,11 +689,26 @@ comps.addType('{{tagName}}', {
     },
   }),
 
-  // Define the View
   view: defaultType.view,
 });
 {{/each}}
 
+domc.addType('template', {
+      model: defaultModel.extend({}, {
+        isComponent: function(el) {
+          if (el.tagName == 'TEMPLATE') {
+            // as template.children will return an empty array the traverser
+            // will skip all nodes, therefore attach them as a string (they 
+            // will be processed later)
+            return {type: 'template', components: el.innerHTML}
+          }
+        }
+      }),
+      view: defaultView.extend({
+        // '<template>' can't be shown so in canvas use another tag
+        tagName: 'div'
+      }),
+    });
 
 comps.addType('repeat', {
   model: defaultModel.extend({
