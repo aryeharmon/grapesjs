@@ -6,6 +6,7 @@ const uuidv1 = require('uuid/v1');
 var jsonfile = require('jsonfile');
 var camelCase = require('camelcase');
 var async = require('async');
+var _ = require('lodash');
 
 var fs = require('fs');
 
@@ -105,6 +106,20 @@ app.engine('handlebars', exphbs({
         	return array.join(string);
         },
         filter: function (obj, property, value) {
+        	// return array.join(string);
+        },
+        getComponentClassByHtml: function (html) {
+        	
+        	var regex = new RegExp(/^<(\S*)/, 'g');
+        	var result = html.match(regex);
+
+			var tagName = _.find(components, function(obj) {
+			    return '<' + obj.tagName === (result[0] || '');
+			});
+			if (tagName) {
+				return tagName.icon;
+			}
+        	return '';
         	// return array.join(string);
         },
 	},
@@ -363,5 +378,16 @@ app.post('/admin/save/page', function (req, res) {
 		})
 	});
 });
+
+
+var htmlToJson = require('html-to-json');
+var promise = htmlToJson.parse('<div>content</div>', {
+		// 'text': function ($doc) {
+		// 	return $doc.find('div').text();
+		// }
+	}, function (err, result) {
+		console.log(promise);
+	}
+);
 
 app.listen(3000);
