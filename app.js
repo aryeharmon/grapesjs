@@ -117,8 +117,8 @@ app.engine('handlebars', exphbs({
         },
         getComponentClassByHtml: function (html) {
         	
-        	var regex = new RegExp(/^<(\S*)/, 'g');
-        	var result = html.match(regex);
+        	// var regex = new RegExp(/^<(\S*)/, 'g');
+        	var result = html.match(/^<(\S*)/);
 
 			var tagName = _.find(components, function(obj) {
 			    return '<' + obj.tagName === (result[0] || '');
