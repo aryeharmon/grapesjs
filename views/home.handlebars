@@ -270,7 +270,14 @@
             category: 'Typography',
             content: '<blockquote class="quote">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore ipsum dolor sit</blockquote>',
             attributes: {class:'fa fa-quote-right'}
-          },{
+          }          ,{
+            id: '5bf63c90-87d4-11e7-9f7e-8dbefbb68d40',
+            label: 'aryeh test',
+            category: 'Custom Layouts',
+            content: '<amp-list class="cutom-element-type c5343 c10204 c2694" width="auto" height="100" ng-transclude="ng-transclude" layout="fixed-height" src="https://ampbyexample.com/json/examples.json"><template class="cutom-element-type c6566 c10205 c2695" ng-transclude="ng-transclude" type="amp-mustache" id="amp-template-id"><div class="c2774">Insert your text here</div></template></amp-list>',
+            attributes: {class:''}
+          }
+,{
             id: 'link',
             label: 'Link',
             category: 'Basic',
@@ -694,6 +701,22 @@ comps.addType('{{tagName}}', {
 });
 {{/each}}
 
+domc.addType('template', {
+      model: defaultModel.extend({}, {
+        isComponent: function(el) {
+          if (el.tagName == 'TEMPLATE') {
+            // as template.children will return an empty array the traverser
+            // will skip all nodes, therefore attach them as a string (they 
+            // will be processed later)
+            return {type: 'template', components: el.innerHTML}
+          }
+        }
+      }),
+      view: defaultView.extend({
+        // '<template>' can't be shown so in canvas use another tag
+        tagName: 'div'
+      }),
+    });
 
 comps.addType('repeat', {
   model: defaultModel.extend({

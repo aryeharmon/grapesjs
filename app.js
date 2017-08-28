@@ -15,11 +15,13 @@ var layouts_file = './layouts.json';
 var components_file = './components.json';
 var categories_file = './categories.json';
 var pages_file = './pages.json';
+var menues_file = './menues.json';
 
 var layouts = {};
 var components = {};
 var categories = {};
 var pages = {};
+var menues = {};
 
 
 var routerObj = express.Router();
@@ -37,6 +39,9 @@ jsonfile.readFile(components_file, function(err, obj) {
 });
 jsonfile.readFile(categories_file, function(err, obj) {
 	categories = obj;
+});
+jsonfile.readFile(menues_file, function(err, obj) {
+	menues = obj;
 });
 jsonfile.readFile(pages_file, function(err, obj) {
 	pages = obj;
@@ -238,7 +243,7 @@ app.get('/amp-view', function (req, res) {
 
 app.all('/admin', function (req, res) {
 	res.locals.pages = pages;
-	res.render('admin');
+	res.render('admin', {layout: 'admin'});
 });
 app.get('/admin/page/delete/:id', function (req, res) {
 	delete pages[req.params.id];
@@ -251,6 +256,48 @@ app.get('/admin/page/delete/:id', function (req, res) {
 	});
 });
 
+app.get('/admin/menu', function (req, res) {
+	res.locals.menues = menues;
+	
+	res.render('menu', {layout: 'admin'});
+});
+app.post('/admin/menu', function (req, res) {
+
+	var id = req.body._id || uuidv1();
+
+	menues[id] = {
+		_id: id,
+		name: req.body.name,
+	};
+
+	jsonfile.writeFile(menues_file, menues, function (err) {
+		res.redirect('/admin/menu');
+	});
+
+});
+app.get('/admin/menu/delete/:id', function (req, res) {
+	delete menues[req.params.id];
+
+	jsonfile.writeFile(menues_file, menues, function (err) {
+		res.redirect('/admin/menu');
+	});
+});
+app.get('/admin/menu/edit/:id', function (req, res) {
+	res.locals.menues = menues;
+
+	res.locals.menu = menues[req.params.id];
+	
+	res.render('menu-edit', {layout: 'admin'});
+});
+app.get('/menu/:id', function (req, res) {
+	res.json(menues[req.params.id]);
+});
+app.post('/admin/menu/edit/:id', function (req, res) {
+	req.body.menu = JSON.parse(req.body.menu);
+
+	menues[req.params.id].menu = req.body.menu;
+	res.redirect('/admin/menu/edit/' + req.params.id);
+});
 
 var create_routes = function(routerObj, callback) {
 	async.each(pages, function(page, callback) {
