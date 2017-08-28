@@ -108,6 +108,13 @@ app.engine('handlebars', exphbs({
         filter: function (obj, property, value) {
         	// return array.join(string);
         },
+        "string-exists": function (html, string) {
+        	if (html.indexOf(string) > -1) {
+        		return true;
+        	} else {
+        		return false;
+        	}
+        },
         getComponentClassByHtml: function (html) {
         	
         	var regex = new RegExp(/^<(\S*)/, 'g');
@@ -378,16 +385,5 @@ app.post('/admin/save/page', function (req, res) {
 		})
 	});
 });
-
-
-var htmlToJson = require('html-to-json');
-var promise = htmlToJson.parse('<div>content</div>', {
-		// 'text': function ($doc) {
-		// 	return $doc.find('div').text();
-		// }
-	}, function (err, result) {
-		console.log(promise);
-	}
-);
 
 app.listen(3000);

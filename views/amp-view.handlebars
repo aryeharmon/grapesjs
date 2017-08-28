@@ -2,76 +2,287 @@
 <html>
 	<head>
 		<script async src="//cdn.ampproject.org/v0.js"></script>
+
+		{{#if (string-exists html '</amp-ad')}}
 		<script async custom-element="amp-ad" src="//cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+		{{/if}}
+
+		
+		{{#if (string-exists html 'amp-ad-exit')}}
 		<script async custom-element="amp-ad-exit" src="//cdn.ampproject.org/v0/amp-ad-exit-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-analytics')}}
 		<script async custom-element="amp-analytics" src="//cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-auto-ads')}}
 		<script async custom-element="amp-auto-ads" src="//cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-call-tracking')}}
 		<script async custom-element="amp-call-tracking" src="//cdn.ampproject.org/v0/amp-call-tracking-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-experiment')}}
 		<script async custom-element="amp-experiment" src="//cdn.ampproject.org/v0/amp-experiment-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-access')}}
 		<script async custom-element="amp-access" src="//cdn.ampproject.org/v0/amp-access-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-sticky-ad')}}
 		<script async custom-element="amp-sticky-ad" src="//cdn.ampproject.org/v0/amp-sticky-ad-1.0.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-analytics')}}
 		<script async custom-element=s"amp-analytics" src="//cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-access-laterpay')}}
 		<script async custom-element="amp-access-laterpay" src="//cdn.ampproject.org/v0/amp-access-laterpay-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-access')}}
 		<script async custom-element="amp-access" src="//cdn.ampproject.org/v0/amp-access-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-bind')}}
 		<script async custom-element="amp-bind" src="//cdn.ampproject.org/v0/amp-bind-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-access')}}
 		<script async custom-element="amp-access" src="//cdn.ampproject.org/v0/amp-access-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-analytics')}}
 		<script async custom-element="amp-analytics" src="//cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-bind')}}
 		<script async custom-element="amp-bind" src="//cdn.ampproject.org/v0/amp-bind-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-form')}}
 		<script async custom-element="amp-form" src="//cdn.ampproject.org/v0/amp-form-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-gist')}}
 		<script async custom-element="amp-gist" src="//cdn.ampproject.org/v0/amp-gist-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-install-serviceworker')}}
 		<script async custom-element="amp-install-serviceworker" src="//cdn.ampproject.org/v0/amp-install-serviceworker-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-list')}}
 		<script async custom-element="amp-list" src="//cdn.ampproject.org/v0/amp-list-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-live-list')}}
 		<script async custom-element="amp-live-list" src="//cdn.ampproject.org/v0/amp-live-list-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-mustache')}}
 		<script async custom-template="amp-mustache" src="//cdn.ampproject.org/v0/amp-mustache-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-selector')}}
 		<script async custom-element="amp-selector" src="//cdn.ampproject.org/v0/amp-selector-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-user-notification')}}
 		<script async custom-element="amp-user-notification" src="//cdn.ampproject.org/v0/amp-user-notification-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-accordion')}}
 		<script async custom-element="amp-accordion" src="//cdn.ampproject.org/v0/amp-accordion-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-app-banner')}}
 		<script async custom-element="amp-app-banner" src="//cdn.ampproject.org/v0/amp-app-banner-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-carousel')}}
 		<script async custom-element="amp-carousel" src="//cdn.ampproject.org/v0/amp-carousel-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-fx-flying-carpet')}}
 		<script async custom-element="amp-fx-flying-carpet" src="//cdn.ampproject.org/v0/amp-fx-flying-carpet-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-fx-parallax')}}
 		<script async custom-element="amp-fx-parallax" src="//cdn.ampproject.org/v0/amp-fx-parallax-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-iframe')}}
 		<script async custom-element="amp-iframe" src="//cdn.ampproject.org/v0/amp-iframe-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-lightbox')}}
 		<script async custom-element="amp-lightbox" src="//cdn.ampproject.org/v0/amp-lightbox-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-sidebar')}}
 		<script async custom-element="amp-sidebar" src="//cdn.ampproject.org/v0/amp-sidebar-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-3q-player')}}
 		<script async custom-element="amp-3q-player" src="//cdn.ampproject.org/v0/amp-3q-player-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-anim')}}
 		<script async custom-element="amp-anim" src="//cdn.ampproject.org/v0/amp-anim-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-apester-media')}}
 		<script async custom-element="amp-apester-media" src="//cdn.ampproject.org/v0/amp-apester-media-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-audio')}}
 		<script async custom-element="amp-audio" src="//cdn.ampproject.org/v0/amp-audio-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-brid-player')}}
 		<script async custom-element="amp-brid-player" src="//cdn.ampproject.org/v0/amp-brid-player-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-brightcove')}}
 		<script async custom-element="amp-brightcove" src="//cdn.ampproject.org/v0/amp-brightcove-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-dailymotion')}}
 		<script async custom-element="amp-dailymotion" src="//cdn.ampproject.org/v0/amp-dailymotion-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-google-vrview-image')}}
 		<script async custom-element="amp-google-vrview-image" src="//cdn.ampproject.org/v0/amp-google-vrview-image-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-hulu')}}
 		<script async custom-element="amp-hulu" src="//cdn.ampproject.org/v0/amp-hulu-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-ima-video')}}
 		<script async custom-element="amp-ima-video" src="//cdn.ampproject.org/v0/amp-ima-video-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-image-lightbox')}}
 		<script async custom-element="amp-image-lightbox" src="//cdn.ampproject.org/v0/amp-image-lightbox-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-izlesene')}}
 		<script async custom-element="amp-izlesene" src="//cdn.ampproject.org/v0/amp-izlesene-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-jwplayer')}}
 		<script async custom-element="amp-jwplayer" src="//cdn.ampproject.org/v0/amp-jwplayer-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-kaltura-player')}}
 		<script async custom-element="amp-kaltura-player" src="//cdn.ampproject.org/v0/amp-kaltura-player-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-nexxtv-player')}}
 		<script async custom-element="amp-nexxtv-player" src="//cdn.ampproject.org/v0/amp-nexxtv-player-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-o2-player')}}
 		<script async custom-element="amp-o2-player" src="//cdn.ampproject.org/v0/amp-o2-player-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-ooyala-player')}}
 		<script async custom-element="amp-ooyala-player" src="//cdn.ampproject.org/v0/amp-ooyala-player-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-playbuzz')}}
 		<script async custom-element="amp-playbuzz" src="//cdn.ampproject.org/v0/amp-playbuzz-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-reach-player')}}
 		<script async custom-element="amp-reach-player" src="//cdn.ampproject.org/v0/amp-reach-player-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-soundcloud')}}
 		<script async custom-element="amp-soundcloud" src="//cdn.ampproject.org/v0/amp-soundcloud-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-springboard-player')}}
 		<script async custom-element="amp-springboard-player" src="//cdn.ampproject.org/v0/amp-springboard-player-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-video')}}
 		<script async custom-element="amp-video" src="//cdn.ampproject.org/v0/amp-video-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-youtube')}}
 		<script async custom-element="amp-youtube" src="//cdn.ampproject.org/v0/amp-youtube-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-animation')}}
 		<script async custom-element="amp-animation" src="//cdn.ampproject.org/v0/amp-animation-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-dynamic-css-classes')}}
 		<script async custom-element="amp-dynamic-css-classes" src="//cdn.ampproject.org/v0/amp-dynamic-css-classes-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-fit-text')}}
 		<script async custom-element="amp-fit-text" src="//cdn.ampproject.org/v0/amp-fit-text-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-font')}}
 		<script async custom-element="amp-font" src="//cdn.ampproject.org/v0/amp-font-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-timeago')}}
 		<script async custom-element="amp-timeago" src="//cdn.ampproject.org/v0/amp-timeago-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-viz-vega')}}
 		<script async custom-element="amp-viz-vega" src="//cdn.ampproject.org/v0/amp-viz-vega-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-facebook-comments')}}
 		<script async custom-element="amp-facebook-comments" src="//cdn.ampproject.org/v0/amp-facebook-comments-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-facebook-like')}}
 		<script async custom-element="amp-facebook-like" src="//cdn.ampproject.org/v0/amp-facebook-like-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-facebook')}}
 		<script async custom-element="amp-facebook" src="//cdn.ampproject.org/v0/amp-facebook-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-gfycat')}}
 		<script async custom-element="amp-gfycat" src="//cdn.ampproject.org/v0/amp-gfycat-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-instagram')}}
 		<script async custom-element="amp-instagram" src="//cdn.ampproject.org/v0/amp-instagram-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-pinterest')}}
 		<script async custom-element="amp-pinterest" src="//cdn.ampproject.org/v0/amp-pinterest-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-reddit')}}
 		<script async custom-element="amp-reddit" src="//cdn.ampproject.org/v0/amp-reddit-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-social-share')}}
 		<script async custom-element="amp-social-share" src="//cdn.ampproject.org/v0/amp-social-share-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-twitter')}}
 		<script async custom-element="amp-twitter" src="//cdn.ampproject.org/v0/amp-twitter-0.1.js"></script>
+		{{/if}}
+		
+		{{#if (string-exists html 'amp-vine')}}
 		<script async custom-element="amp-vine" src="//cdn.ampproject.org/v0/amp-vine-0.1.js"></script>
+		{{/if}}
 		<style amp-boilerplate>
 			{{{ css }}}
 		</style>
