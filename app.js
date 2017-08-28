@@ -7,6 +7,7 @@ var jsonfile = require('jsonfile');
 var camelCase = require('camelcase');
 var async = require('async');
 var _ = require('lodash');
+var cheerio = require('cheerio');
 
 var fs = require('fs');
 
@@ -135,21 +136,6 @@ app.set('view engine', 'handlebars');
 
 app.use(express.static('dist'))
 app.use(express.static('node_modules'))
-
-
-app.get('/', function (req, res) {
-	res.locals.layouts = layouts;
-	res.locals.components = components;
-	res.locals.categories = categories;
-
-	fs.readFile('./html.html', 'utf8', function (err, html) {
-		fs.readFile('./css.css', 'utf8', function (err, css) {
-			res.locals.html = html;
-			res.locals.css = css;
-    		res.render('home');
-		});
-	});
-});
 
 app.post('/save-component', function (req, res) {
 	var id = req.body.id || uuidv1();
@@ -311,7 +297,7 @@ app.get('/admin/menu/edit/:id', function (req, res) {
 	res.locals.menues = menues;
 
 	res.locals.menu = menues[req.params.id];
-	
+
 	res.render('menu-edit', {layout: 'admin'});
 });
 app.get('/menu/:id', function (req, res) {
@@ -322,7 +308,11 @@ app.post('/admin/menu/edit/:id', function (req, res) {
 	req.body.menu = JSON.parse(req.body.menu);
 
 	menues[req.params.id].menu = req.body.menu;
-	res.redirect('/admin/menu/edit/' + req.params.id);
+
+	jsonfile.writeFile(menues_file, menues, function (err) {
+		res.redirect('/admin/menu/edit/' + req.params.id);
+	});
+	
 });
 
 var create_routes = function(routerObj, callback) {
@@ -346,6 +336,9 @@ var create_routes = function(routerObj, callback) {
 		routerObj.get('/' + page.slug, function (req, res) {
 			fs.readFile('./pages/html/' + page._id + '.html', 'utf8', function (err, html) {
 				fs.readFile('./style.css', 'utf8', function (err, css) {
+
+					var re = new RegExp("<mustach-loop (.*)insatnce=\"([^\"]+)\"[^>]*>((.|\n)*?)<\/mustach-loop>", "g");
+					html = html.replace(re, "{{#$2}}$3{{/$2}}");
 					res.locals.html = html;
 					res.locals.css = css;
 					res.locals.components = Object.keys(components).map(function(key) {
