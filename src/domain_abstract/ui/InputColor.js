@@ -31,6 +31,7 @@ module.exports = Input.extend({
     var colorEl = this.getColorEl();
     // If no color selected I will set white for the picker
     value = value === 'none' ? '#fff' : value;
+    console.log("colorEl "+JSON.stringify(colorEl),"value "+value);
      colorEl.spectrum('set', value);
      colorEl.get(0).style.backgroundColor = value;
   },
@@ -45,7 +46,7 @@ module.exports = Input.extend({
       var colorEl = $('<div>', {class: this.colorCls});
       var cpStyle = colorEl.get(0).style;
       var elToAppend = this.target && this.target.config ? this.target.config.el : '';
-
+      console.log("elToAppend", elToAppend)
       if (typeof colorEl.spectrum == 'undefined') {
         throw 'Spectrum missing, probably you load jQuery twice';
       }
@@ -63,11 +64,14 @@ module.exports = Input.extend({
         move(color) {
           var c  = color.getAlpha() == 1 ? color.toHexString() : color.toRgbString();
           cpStyle.backgroundColor = c;
+         //console.log("+++++++++++++++++",c);
+         // console.log(document.getElementById('gjs-clm-tag-label'));
 
         },
         change(color) {
           var c  = color.getAlpha() == 1 ? color.toHexString() : color.toRgbString();
           c = c.replace(/ /g,'');
+          console.log("-------------",colorEl)
           cpStyle.backgroundColor = c;
           model.set('value', c);
         }
