@@ -18,7 +18,6 @@ module.exports = Input.extend({
     this.colorCls = ppfx + 'field-color-picker';
     this.inputClass = ppfx + 'field ' + ppfx + 'field-color';
     this.colorHolderClass = ppfx + 'field-colorp-c';
-
     this.listenTo(this.model, 'change:value', this.handleModelChange);
   },
 
@@ -30,11 +29,10 @@ module.exports = Input.extend({
 
     var value = this.model.get('value');
     var colorEl = this.getColorEl();
-
     // If no color selected I will set white for the picker
     value = value === 'none' ? '#fff' : value;
-    colorEl.spectrum('set', value);
-    colorEl.get(0).style.backgroundColor = value;
+     colorEl.spectrum('set', value);
+     colorEl.get(0).style.backgroundColor = value;
   },
 
   /**
@@ -58,11 +56,14 @@ module.exports = Input.extend({
         showPalette: true,
         showAlpha:   true,
         chooseText: 'Ok',
-        cancelText: '⨯',
-        palette: [],
+        cancelText: 'x',
+        showSelectionPalette: true,
+        palette: [ ],
+        localStorageKey: "spectrum.homepage",
         move(color) {
           var c  = color.getAlpha() == 1 ? color.toHexString() : color.toRgbString();
           cpStyle.backgroundColor = c;
+
         },
         change(color) {
           var c  = color.getAlpha() == 1 ? color.toHexString() : color.toRgbString();
@@ -78,6 +79,7 @@ module.exports = Input.extend({
 
   render(...args) {
     Input.prototype.render.apply(this, args);
+    //console.log("00000000000000000000000000000",this.$el)
     this.$el.find('.' + this.colorHolderClass).html(this.getColorEl());
     return this;
   }
