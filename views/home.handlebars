@@ -9,7 +9,6 @@
     <script src="/grapes.min.js"></script>
     <script src="/grapesjs-navbar/dist/grapesjs-navbar.min.js"></script>
     <script src="/grapesjs-plugin-export/dist/grapesjs-plugin-export.min.js"></script>
-    <script src="/grapesjs-blocks-basic/dist/grapesjs-blocks-basic.min.js"></script>
     <script src="/grapesjs-plugin-forms/dist/grapesjs-plugin-forms.min.js"></script>
     <script src="/grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.min.js"></script>
 <!-- Latest compiled and minified CSS -->
@@ -35,6 +34,14 @@
       {{{ html }}}
       <style>
       {{{ css }}}
+
+    .flex-start {    
+      display: -webkit-flex;
+      display: flex;
+      width: 100%;
+      min-height: 25px;
+      /*background-color: lightgrey;*/
+    }
       </style>
     </div>
 
@@ -156,94 +163,6 @@
 
       blockManager: {
         blocks: [{
-            id: 'b1',
-            label: '1 Block',
-            category: 'Basic',
-            attributes: {class:'gjs-fonts gjs-f-b1'},
-            content: `<div class="row" data-gjs-droppable=".cell" data-gjs-custom-name="Row">
-                <div class="cell" data-gjs-draggable=".row" data-gjs-custom-name="Cell"></div>
-              </div>`
-          },{
-            id: 'b2',
-            label: '2 Blocks',
-            category: 'Basic',
-            attributes: {class:'gjs-fonts gjs-f-b2'},
-            content: `<div class="row" data-gjs-droppable=".cell" data-gjs-custom-name="Row">
-                <div class="cell" data-gjs-draggable=".row" data-gjs-custom-name="Cell"></div>
-                <div class="cell" data-gjs-draggable=".row" data-gjs-custom-name="Cell"></div>
-              </div>`
-          },{
-            id: 'b3',
-            label: '3 Blocks',
-            category: 'Basic',
-            attributes: {class:'gjs-fonts gjs-f-b3'},
-            content: `<div class="row" data-gjs-droppable=".cell" data-gjs-custom-name="Row">
-                <div class="cell" data-gjs-draggable=".row" data-gjs-custom-name="Cell"></div>
-                <div class="cell" data-gjs-draggable=".row" data-gjs-custom-name="Cell"></div>
-                <div class="cell" data-gjs-draggable=".row" data-gjs-custom-name="Cell"></div>
-              </div>`
-          },{
-            id: 'b4',
-            label: '3/7 Block',
-            category: 'Basic',
-            attributes: {class:'gjs-fonts gjs-f-b37'},
-            content: `<div class="row" data-gjs-droppable=".cell" data-gjs-custom-name="Row">
-                <div class="cell cell30" data-gjs-draggable=".row" data-gjs-custom-name="Cell"></div>
-                <div class="cell cell70" data-gjs-draggable=".row" data-gjs-custom-name="Cell"></div>
-              </div>`,
-          },{
-            id: 'hero',
-            label: 'Hero section',
-            category: 'Section',
-            content: '<header class="header-banner"> <div class="container-width">'+
-                '<div class="logo-container"><div class="logo">GrapesJS</div></div>'+
-                '<nav class="navbar">'+
-                  '<div class="menu-item">BUILDER</div><div class="menu-item">TEMPLATE</div><div class="menu-item">WEB</div>'+
-                '</nav><div class="clearfix"></div>'+
-                '<div class="lead-title">Build your templates without coding</div>'+
-                '<div class="lead-btn">Try it now</div></div></header>',
-            attributes: {class:'gjs-fonts gjs-f-hero'}
-          },{
-            id: 'h1p',
-            label: 'Text section',
-            category: 'Typography',
-            content: `<div>
-              <h1 class="heading">Insert title here</h1>
-              <p class="paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</p>
-              </div>`,
-            attributes: {class:'gjs-fonts gjs-f-h1p'}
-          },{
-            id: '3ba',
-            label: 'Badges',
-            category: 'Section',
-            content: '<div class="badges">'+
-              '<div class="badge">'+
-                '<div class="badge-header"></div>'+
-                '<img class="badge-avatar" src="img/team1.jpg">'+
-                '<div class="badge-body">'+
-                  '<div class="badge-name">Adam Smith</div><div class="badge-role">CEO</div><div class="badge-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore ipsum dolor sit</div>'+
-                '</div>'+
-                '<div class="badge-foot"><span class="badge-link">f</span><span class="badge-link">t</span><span class="badge-link">ln</span></div>'+
-              '</div>'+
-              '<div class="badge">'+
-                '<div class="badge-header"></div>'+
-                '<img class="badge-avatar" src="img/team2.jpg">'+
-                '<div class="badge-body">'+
-                  '<div class="badge-name">John Black</div><div class="badge-role">Software Engineer</div><div class="badge-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore ipsum dolor sit</div>'+
-                '</div>'+
-                '<div class="badge-foot"><span class="badge-link">f</span><span class="badge-link">t</span><span class="badge-link">ln</span></div>'+
-              '</div>'+
-              '<div class="badge">'+
-                '<div class="badge-header"></div>'+
-                '<img class="badge-avatar" src="img/team3.jpg">'+
-                '<div class="badge-body">'+
-                  '<div class="badge-name">Jessica White</div><div class="badge-role">Web Designer</div><div class="badge-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore ipsum dolor sit</div>'+
-                '</div>'+
-                '<div class="badge-foot"><span class="badge-link">f</span><span class="badge-link">t</span><span class="badge-link">ln</span>'+
-                '</div>'+
-              '</div></div>',
-            attributes: {class:'gjs-fonts gjs-f-3ba'}
-          },{
             id: 'text',
             label: 'Text',
             attributes: {class:'gjs-fonts gjs-f-text'},
@@ -270,14 +189,22 @@
             category: 'Typography',
             content: '<blockquote class="quote">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore ipsum dolor sit</blockquote>',
             attributes: {class:'fa fa-quote-right'}
-          }          ,{
-            id: '5bf63c90-87d4-11e7-9f7e-8dbefbb68d40',
-            label: 'aryeh test',
-            category: 'Custom Layouts',
-            content: '<amp-list class="cutom-element-type c5343 c10204 c2694" width="auto" height="100" ng-transclude="ng-transclude" layout="fixed-height" src="https://ampbyexample.com/json/examples.json"><template class="cutom-element-type c6566 c10205 c2695" ng-transclude="ng-transclude" type="amp-mustache" id="amp-template-id"><div class="c2774">Insert your text here</div></template></amp-list>',
-            attributes: {class:''}
+          } ,{
+            id: 'Box',
+            label: 'Box',
+            category: 'Box',
+            content: `        <div>
+          <div class="card-title" id="c2077" ng-transclude="ng-transclude">Title one
+          </div>
+          <div class="card-sub-title" id="c2080" ng-transclude="ng-transclude">Subtitle one
+          </div>
+          <div class="card-desc" id="c2083" ng-transclude="ng-transclude">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+          </div>
+        </div>
+`,
+            attributes: {class:'fa fa-trello'}
           }
-,{
+          ,{
             id: 'link',
             label: 'Link',
             category: 'Basic',
@@ -748,6 +675,36 @@ comps.addType('repeat', {
   // Define the View
   view: defaultType.view,
 });
+
+  comps.addType('FlexRow', {
+    model: defaultModel.extend({
+      defaults: Object.assign({}, defaultModel.prototype.defaults, {
+        tagName: 'div',
+        classes: [],
+        stylable: false,
+        draggable: '*',
+        droppable: true,
+        saveable: true,
+        traits: [{
+          name: 'ng-repeat',
+          value: 'e in data track by $index',
+          editable: false,
+        }],
+      }),
+    }, {
+      isComponent: function(el) {
+        if (el.tagName == 'DIV' && $(el).attr('class') && $(el).attr('class').indexOf('flex-start') > -1) {
+          return {
+            type: 'Flex Row'
+          };
+        }
+      },
+    }),
+
+    // Define the View
+    view: defaultType.view,
+  });
+
 
 
     editor.render();

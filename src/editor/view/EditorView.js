@@ -50,7 +50,6 @@ module.exports = Backbone.View.extend({
 
     contEl.addClass(conf.stylePrefix + 'editor-cont');
     contEl.html(this.$el);
-
     return this;
   }
 });

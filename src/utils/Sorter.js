@@ -797,6 +797,8 @@ module.exports = Backbone.View.extend({
    * @param {Object} pos Object with position coordinates
    * */
   move(dst, src, pos) {
+    window.aryeh = [dst, pos];
+
     var em = this.em;
     em && em.trigger('component:dragEnd:before', dst, src, pos);
     var warns = [];
@@ -827,6 +829,20 @@ module.exports = Backbone.View.extend({
         opts.silent = false;
         opts.avoidUpdateStyle = 1;
       }
+
+      // aryeh edit
+      if (dst.parentNode.tagName === 'BODY') {
+        // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
+        // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
+        window.aryeh123 = targetCollection.add("<div class='flex-start'></div>", opts);
+        window.john1 = $(dst);
+        window.john2 = opts.at;
+        
+        var targetCollection = $(john1.children()[john2]).data('collection');
+
+        opts.at++;
+      }
+      // end aryeh edit
 
       created = targetCollection.add(modelToDrop, opts);
 

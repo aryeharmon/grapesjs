@@ -62,22 +62,21 @@ module.exports = Backbone.Collection.extend({
         });
       }
     }
-
     return Backbone.Collection.prototype.add.apply(this, [models, opt]);
   },
 
   onAdd(model, c, opts) {
-    var style = model.get('style');
-    var em = this.editor;
+    // var style = model.get('style');
+    // var em = this.editor;
 
-    if(!_.isEmpty(style) && em && em.get('Config').forceClass){
-      var cssC = this.editor.get('CssComposer');
-      var newClass = this.editor.get('SelectorManager').add(model.cid);
-      model.set({style:{}});
-      model.get('classes').add(newClass);
-      var rule = cssC.add(newClass);
-      rule.set('style', style);
-    }
+    // if(!_.isEmpty(style) && em && em.get('Config').forceClass){
+    //   var cssC = this.editor.get('CssComposer');
+    //   // var newClass = this.editor.get('SelectorManager').add(model.cid);
+    //   // model.set({style:{}});
+    //   // model.get('classes').add(newClass);
+    //   // var rule = cssC.add(newClass);
+    //   // rule.set('style', style);
+    // }
   },
 
 });
