@@ -115,8 +115,26 @@ module.exports = () => {
             return;
           }
 
+          // aryeh edit
+          var element = sel.view.$el[0];
+
+          if (element.parentElement.childElementCount === 1) {
+            function removeParent(element) {
+              if (element.parentElement.childElementCount === 1) {
+                removeParent(element.parentElement);
+              } else {
+                $(element).data('collection').parent.destroy();
+              }
+            }
+            removeParent(element);
+          } else {
+            sel.destroy();
+          }
+          // end aryeh edit
+
+                  
           sel.set('status', '');
-          sel.destroy();
+
           ed.trigger('component:update', sel);
           ed.editor.set('selectedComponent', null);
         },

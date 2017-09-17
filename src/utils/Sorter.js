@@ -831,18 +831,24 @@ module.exports = Backbone.View.extend({
       }
 
       // aryeh edit
-      if (dst.parentNode.tagName === 'BODY') {
+      if (dst.parentNode.tagName === 'BODY' || dst.className.indexOf('flex-start') === -1) {
         // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
         // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
         window.aryeh123 = targetCollection.add("<div class='flex-start'></div>", opts);
-        window.john1 = $(dst);
-        window.john2 = opts.at;
         
-        var targetCollection = $(john1.children()[john2]).data('collection');
+        var targetCollection = $($(dst).children()[opts.at]).data('collection');
+        // targetCollection.add("<div></div>", opt);
+
+        targetCollection.add("<div></div>", opts);
+        var targetCollection = $($($(dst).children()[opts.at]).find('div')).data('collection');
 
         opts.at++;
+      } else {
+        targetCollection.add("<div></div>", opts);
+        var targetCollection = $($(dst).children()[opts.at]).data('collection');
       }
       // end aryeh edit
+      
 
       created = targetCollection.add(modelToDrop, opts);
 

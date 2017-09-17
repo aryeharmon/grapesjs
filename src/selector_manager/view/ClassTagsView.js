@@ -133,8 +133,11 @@ module.exports = Backbone.View.extend({
     if(this.compTarget)
       this.getStates().val(this.compTarget.get('state'));
     var models = this.compTarget ? this.compTarget.get('classes').models : [];
+    // window.gggggg = models;
+    // window.ggggggmmmmmm = $(window.mmmmmmmm.target).data('model');
+    // this.collection.reset([window.ggggggmmmmmm]);
     this.collection.reset(models);
-    this.updateStateVis();
+    // this.updateStateVis();
   },
 
   /**

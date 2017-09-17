@@ -239,6 +239,7 @@ module.exports = {
     var s  = m.get('stylable');
     if(!(s instanceof Array) && !s)
       return;
+    window.mmmmmmmm = e;
     this.onSelect(e, e.target);
   },
 
@@ -304,6 +305,7 @@ module.exports = {
    * */
   onSelect(e, el) {
     e.stopPropagation();
+    // var el = el.parentElement.parentElement;
     var model = $(el).data('model');
 
     if (model) {

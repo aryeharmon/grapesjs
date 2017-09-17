@@ -13,8 +13,8 @@ module.exports = Backbone.View.extend({
     _.extend(this.propTarget, Backbone.Events);
     this.listenTo( this.collection, 'add', this.addTo);
     this.listenTo( this.collection, 'reset', this.render);
-    this.listenTo( this.target, 'change:selectedComponent targetClassAdded targetClassRemoved targetClassUpdated ' +
-      'targetStateUpdated targetStyleUpdated change:device', this.targetUpdated);
+    // this.listenTo( this.target, 'change:selectedComponent targetClassAdded targetClassRemoved targetClassUpdated ' +
+    //   'targetStateUpdated targetStyleUpdated change:device', this.targetUpdated);
 
   },
 
@@ -35,7 +35,6 @@ module.exports = Backbone.View.extend({
   targetUpdated() {
     var em = this.target;
     var el = em.get('selectedComponent');
-
     if(!el)
       return;
 
