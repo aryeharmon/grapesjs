@@ -132,22 +132,24 @@ module.exports = Backbone.Model.extend({
 
     // With 'found' will skip rules which selectors are not found in
     // canvas components.
-    if ((strSel && found) || selectorsAdd) {
-      strSel += state ? ':' + state : '';
-      strSel += selectorsAdd ? (strSel ? ', ' : '') + selectorsAdd : '';
-      var strStyle = '';
+    // if ((strSel && found) || selectorsAdd) {
+    strSel += state ? ':' + state : '';
+    strSel += selectorsAdd ? (strSel ? ', ' : '') + selectorsAdd : '';
+    var strStyle = '';
 
-      // Get string of style properties
-      if(ruleStyle && Object.keys(ruleStyle).length !== 0){
-        for(var prop2 in ruleStyle){
-          if(ruleStyle.hasOwnProperty(prop2))
-            strStyle += prop2 + ':' + ruleStyle[prop2] + ';';
+    // Get string of style properties
+    if(ruleStyle && Object.keys(ruleStyle).length !== 0){
+      for(var prop2 in ruleStyle){
+        if(ruleStyle.hasOwnProperty(prop2)){
+          strStyle += prop2 + ':' + ruleStyle[prop2] + ';';
         }
       }
-
-      if(strStyle)
-        result += strSel + '{' + strStyle + '}';
     }
+
+    if(strStyle) {
+      result += strSel + '{' + strStyle + '}';
+    }
+    // }
 
     return result;
   },
