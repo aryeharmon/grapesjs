@@ -196,12 +196,12 @@ module.exports = Backbone.Model.extend(Styleable).extend({
           command: 'tlb-delete',
         });
       }
-      if(model.get('saveable')) {
+      // if(model.get('saveable')) {
         tb.push({
           attributes: {class: 'fa fa-floppy-o'},
           command: 'save',
         });
-      }
+      // }
 
       model.set('toolbar', tb);
     }
