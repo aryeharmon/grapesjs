@@ -116,6 +116,10 @@ app.engine('handlebars', exphbs({
         		return false;
         	}
         },
+	convert: function (html) {
+		var html = html.replace(new RegExp('\'', 'g'), "\\'");
+		return html;
+	},
         getComponentClassByHtml: function (html) {
         	
         	// var regex = new RegExp(/^<(\S*)/, 'g');
