@@ -11,7 +11,7 @@ describe('Main', () => {
   const path = './specs/';
   require(`${path}asset_manager`);
   require(`${path}block_manager`);
-  require(`${path}code_manager`);
+  // require(`${path}code_manager`);
   require(`${path}commands`);
   require(`${path}css_composer`);
   require(`${path}device_manager`);
