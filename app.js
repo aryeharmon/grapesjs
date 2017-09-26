@@ -361,11 +361,31 @@ var create_routes = function(routerObj, callback) {
 							$(that).replaceWith(plum);
 							callback();
 						});
-					}, function() {	
-						res.locals.html = $('body').html();
-						res.locals.css = css;
-						res.locals.page = page;
-						res.render('home');
+					}, function() {
+
+
+  fs.readdir('./regions', function(err, filenames) {
+    if (err) {
+      onError(err);
+      return;
+    }
+
+    res.locals.regions = {};
+
+    async.each(filenames, function(filename, callback) {
+      fs.readFile('./regions/' + filename, 'utf-8', function(err, content) {
+        res.locals.regions[filename.replace('.html', '')] = content;
+        callback();
+      });
+    }, function() {
+		res.locals.html = $('body').html();
+		res.locals.css = css;
+		res.locals.page = page;
+		res.render('home');
+
+    });
+  });
+
 					});
 
 				});

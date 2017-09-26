@@ -48,6 +48,14 @@
     img {
         width: 100%;
     }
+    region {
+      display: block;
+      min-height: 30px;
+      transition: background-color 0.5s ease;
+    }
+    region:hover {
+      background-color: #b3d0e8;
+    }
     .text {    
       padding: 10px;
     }
@@ -186,10 +194,20 @@
             id: 'image',
             label: 'Image',
             category: 'Basic',
-            attributes: {class:'gjs-fonts gjs-f-image'},
+            attributes: {class:'fa fa-window-maximize'},
             content: {
               style: {color: 'black'},
               type:'image',
+              activeOnRender: 1
+            },
+          },{
+            id: 'region',
+            label: 'Region',
+            category: 'Region',
+            attributes: {class:'gjs-fonts gjs-f-image'},
+            content: {
+              style: {color: 'black'},
+              type:'region',
               activeOnRender: 1
             },
           },{
@@ -267,6 +285,14 @@
             category: 'Custom Layouts',
             content: `{{{convert html}}}`,
             attributes: {class:'fa {{ getComponentClassByHtml html }}'}
+          }
+          {{/each}}
+          {{#each regions}}
+          ,{
+            id: '{{@key}}',
+            label: '{{@key}}',
+            category: 'Region',
+            content: `{{{convert .}}}`
           }
           {{/each}}
 
