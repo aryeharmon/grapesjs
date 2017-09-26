@@ -797,7 +797,7 @@ module.exports = Backbone.View.extend({
    * @param {Object} pos Object with position coordinates
    * */
   move(dst, src, pos) {
-    window.aryeh = [dst, pos];
+    window.aryeh = [dst, pos, src];
 
     var em = this.em;
     em && em.trigger('component:dragEnd:before', dst, src, pos);
@@ -831,25 +831,28 @@ module.exports = Backbone.View.extend({
       }
 
       // aryeh edit
-      if (dst.parentNode.tagName === 'BODY' || dst.className.indexOf('flex-start') === -1) {
-        // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
-        // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
-        window.aryeh123 = targetCollection.add("<div class='flex-start'></div>", opts);
-        
-        var targetCollection = $($(dst).children()[opts.at]).data('collection');
-        // targetCollection.add("<div></div>", opt);
+      if ($('.gjs-pn-btn.fa.fa-bars.gjs-pn-active').length === 0) {
+        if (modelToDrop.type !== 'region') {
+          if (dst.parentNode.tagName === 'BODY' || dst.className.indexOf('flex-start') === -1) {
+            // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
+            // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
+            targetCollection.add("<div class='flex-start'></div>", opts);
+            
+            var targetCollection = $($(dst).children()[opts.at]).data('collection');
+            // targetCollection.add("<div></div>", opt);
 
-        targetCollection.add("<div></div>", opts);
-        var targetCollection = $($($(dst).children()[opts.at]).find('div')).data('collection');
+            targetCollection.add("<div></div>", opts);
+            var targetCollection = $($($(dst).children()[opts.at]).find('div')).data('collection');
 
-        opts.at++;
-      } else {
-        targetCollection.add("<div></div>", opts);
-        var targetCollection = $($(dst).children()[opts.at]).data('collection');
+            opts.at++;
+          } else {
+            targetCollection.add("<div></div>", opts);
+            var targetCollection = $($(dst).children()[opts.at]).data('collection');
+          }
+        }
       }
       // end aryeh edit
       
-
       created = targetCollection.add(modelToDrop, opts);
 
       if (!dropContent) {

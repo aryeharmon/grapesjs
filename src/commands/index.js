@@ -100,6 +100,7 @@ module.exports = () => {
       defaultCommands['open-tm'] = require('./view/OpenTraitManager');
       defaultCommands['open-blocks'] = require('./view/OpenBlocks');
       defaultCommands['open-assets'] = require('./view/OpenAssets');
+      defaultCommands['open-region-editor'] = require('./view/OpenRegionEditor');
       defaultCommands['show-offset'] = require('./view/ShowOffset');
       defaultCommands.fullscreen = require('./view/Fullscreen');
       defaultCommands.preview = require('./view/Preview');

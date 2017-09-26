@@ -25,6 +25,8 @@ var categories = {};
 var pages = {};
 var menues = {};
 
+var cheerio = require('cheerio');
+
 
 var routerObj = express.Router();
 
@@ -215,21 +217,41 @@ app.post('/storage/store', function (req, res) {
 });
 
 app.post('/storage/html', function (req, res) {
-	fs.writeFile("./pages/html/" + req.body._id + ".html", req.body.html, function(err) {
-	    if(err) {
-	        return console.log(err);
-	    }
+	
+	var $ = cheerio.load(req.body.html);
 
-	    console.log("html file saved");
-	});
-	fs.writeFile("./style.css", req.body.css.replace(new RegExp('cutom-element-type', 'g'), 'dskjfhskjghs'), function(err) {
-	    if(err) {
-	        return console.log(err);
-	    }
+	async.each($('region'), function(that, callback) {
+		var region_name = $(that).attr('name');
 
-	    console.log("css file saved");
+		var plum = $('<region class="region" name="'+region_name+'"></region>');
+		$(that).replaceWith(plum);
+
+		fs.writeFile("./regions/" + region_name + ".html", $.html(that), function(err) {
+		    if(err) {
+		        return console.log(err);
+		    }
+
+			callback();
+		});
+
+	}, function() {	
+		fs.writeFile("./pages/html/" + req.body._id + ".html", $('body').html(), function(err) {
+		    if(err) {
+		        return console.log(err);
+		    }
+
+		    console.log("html file saved");
+		});
+		fs.writeFile("./style.css", req.body.css.replace(new RegExp('cutom-element-type', 'g'), 'dskjfhskjghs'), function(err) {
+		    if(err) {
+		        return console.log(err);
+		    }
+
+		    console.log("css file saved");
+		});
+		res.json({success: true});
+
 	});
-	res.json({success: true});
 });
 app.get('/view', function (req, res) {
 	fs.readFile('./html.html', 'utf8', function (err, html) {
@@ -328,10 +350,24 @@ var create_routes = function(routerObj, callback) {
 
 			fs.readFile('./pages/html/' + page._id + '.html', 'utf8', function (err, html) {
 				fs.readFile('./style.css', 'utf8', function (err, css) {
-					res.locals.html = html;
-					res.locals.css = css;
-					res.locals.page = page;
-		    		res.render('home');
+					
+
+					var $ = cheerio.load(html);
+
+					async.each($('region'), function(that, callback) {
+						var region_name = $(that).attr('name');
+						fs.readFile('./regions/' + region_name + '.html', 'utf8', function (err, html) {
+							var plum = $(html);
+							$(that).replaceWith(plum);
+							callback();
+						});
+					}, function() {	
+						res.locals.html = $('body').html();
+						res.locals.css = css;
+						res.locals.page = page;
+						res.render('home');
+					});
+
 				});
 			});
 		});
@@ -343,12 +379,27 @@ var create_routes = function(routerObj, callback) {
 
 					var re = new RegExp("<mustach-loop (.*)insatnce=\"([^\"]+)\"[^>]*>((.|\n)*?)<\/mustach-loop>", "g");
 					html = html.replace(re, "{{#$2}}$3{{/$2}}");
-					res.locals.html = html;
-					res.locals.css = css;
-					res.locals.components = Object.keys(components).map(function(key) {
-						return camelCase(components[key].tagName);
+
+					var $ = cheerio.load(html);
+
+					async.each($('region'), function(that, callback) {
+						var region_name = $(that).attr('name');
+						fs.readFile('./regions/' + region_name + '.html', 'utf8', function (err, html) {
+							var plum = $(html);
+							$(that).replaceWith(plum);
+							callback();
+						});
+					}, function() {	
+						res.locals.html = $('body').html();
+						res.locals.css = css;
+						res.locals.components = Object.keys(components).map(function(key) {
+							return camelCase(components[key].tagName);
+						});
+						res.render('amp-view', {layout: false})
 					});
-					res.render('amp-view', {layout: false})
+
+
+
 				});
 			});
 		});
