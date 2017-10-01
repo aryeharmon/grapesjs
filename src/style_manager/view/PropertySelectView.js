@@ -25,6 +25,7 @@ module.exports = PropertyView.extend({
 
       if (this.list && this.list.length) {
         _.each(this.list, el => {
+          console.log(el, 676666666666);
           var name = el.name ? el.name : el.value;
           var style = el.style ? el.style.replace(/"/g,'&quot;') : '';
           var styleAttr = style ? 'style="' + style + '"' : '';

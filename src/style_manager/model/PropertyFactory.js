@@ -56,6 +56,7 @@ module.exports = () => ({
         case 'transition-property': case 'transition-timing-function':
         case 'cursor':
         case 'overflow':
+        case 'color':
           obj.type = 'select';
           break;
         case 'top': case 'right': case 'bottom': case 'left':
@@ -81,7 +82,7 @@ module.exports = () => ({
         case 'transform':
           obj.type = 'composite';
           break;
-        case 'color': case 'text-shadow-color':
+        case 'text-shadow-color':
         case 'background-color': case 'border-color': case 'box-shadow-color':
           obj.type = 'color';
           break;
@@ -141,9 +142,12 @@ module.exports = () => ({
         case 'letter-spacing': case 'line-height':
           obj.defaults = 'normal';
           break;
-        case 'color': case 'text-shadow-color':
+        case 'text-shadow-color':
         case 'border-color': case 'box-shadow-color':
           obj.defaults = 'black';
+          break;
+        case 'color':
+          obj.defaults = 'var(--BU0)';
           break;
         case 'text-align':
           obj.defaults = 'left';
@@ -418,6 +422,20 @@ module.exports = () => ({
              { value : 'hidden'},
              { value : 'scroll'},
              { value : 'auto'}
+          ];
+          break;
+        case 'color':
+          obj.list = [
+             { value : 'var(--BU0)', name: 'BU0'},
+             { value : 'var(--BU1)', name: 'BU1'},
+             { value : 'var(--BU2)', name: 'BU2'},
+             { value : 'var(--BU3)', name: 'BU3'},
+             { value : 'var(--BU4)', name: 'BU4'},
+             { value : 'var(--BU5)', name: 'BU5'},
+             { value : 'var(--BU6)', name: 'BU6'},
+             { value : 'var(--BU7)', name: 'BU7'},
+             { value : 'var(--BU8)', name: 'BU8'},
+             { value : 'var(--BU9)', name: 'BU9'},
           ];
           break;
       }
