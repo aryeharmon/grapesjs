@@ -21,17 +21,6 @@ module.exports = require('./PropertyView').extend({
     if (!this.$input) {
       let optionsStr = '';
 
-<<<<<<< HEAD
-      if (this.list && this.list.length) {
-        _.each(this.list, el => {
-          console.log(el, 676666666666);
-          var name = el.name ? el.name : el.value;
-          var style = el.style ? el.style.replace(/"/g,'&quot;') : '';
-          var styleAttr = style ? 'style="' + style + '"' : '';
-          input += '<option value="'+el.value.replace(/"/g,'&quot;')+'" ' + styleAttr + '>'+name+'</option>';
-        });
-      }
-=======
       options.forEach(option => {
         let name = option.name || option.value;
         let style = option.style ? option.style.replace(/"/g,'&quot;') : '';
@@ -39,7 +28,6 @@ module.exports = require('./PropertyView').extend({
         let value = option.value.replace(/"/g,'&quot;');
         optionsStr += `<option value="${value}" ${styleAttr}>${name}</option>`;
       });
->>>>>>> 010f98a7920e532e66939288c4be8e5aa780c273
 
       this.$input = $(`<select>${optionsStr}</select>`);
       this.input = this.$input.get(0);
