@@ -69,6 +69,7 @@ module.exports = Backbone.View.extend({
         // #268
         um.stopTracking();
         iContainer = cssC.add(valid, state, mediaText);
+
         iContainer.set('style', el.get('style'));
         el.set('style', {});
         um.startTracking();

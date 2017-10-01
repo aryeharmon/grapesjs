@@ -308,7 +308,7 @@ module.exports = Backbone.View.extend({
     }
 
     if (onChange) {
-      onChange(target, this, opt);
+      onChange(target, this, opt, model.getFullValue());
     } else {
       this.updateTargetStyle(value, null, opt);
     }

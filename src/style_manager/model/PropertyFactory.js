@@ -86,6 +86,9 @@ module.exports = () => ({
         case 'background-color': case 'border-color': case 'box-shadow-color':
           obj.type = 'color';
           break;
+        case 'main-color':
+          obj.type = 'main-color';
+          break;
         case 'text-shadow': case 'box-shadow': case 'background':
         case 'transition':
           obj.type = 'stack';
@@ -148,6 +151,8 @@ module.exports = () => ({
           break;
         case 'color':
           obj.defaults = 'var(--BU0)';
+        case 'main-color':
+          obj.defaults = '#000';
           break;
         case 'text-align':
           obj.defaults = 'left';

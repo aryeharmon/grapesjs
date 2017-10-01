@@ -40,6 +40,15 @@ module.exports = require('backbone').Collection.extend(TypeableCollection).exten
         }
       }
     },{
+      id: 'main-color',
+      model: Property,
+      view: require('./../view/PropertyMainColorView'),
+      isType(value) {
+        if (value && value.type == 'main-color') {
+          return value;
+        }
+      }
+    },{
       id: 'select',
       model: require('./PropertyRadio'),
       view: require('./../view/PropertySelectView'),

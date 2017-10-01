@@ -68,9 +68,9 @@ module.exports = {
       this.sender.set('active',false);
 
     var data = {
-      css: addCss + this.cm.getCode(this.wrapper, 'css', this.cssc),
+      css: addCss + em.getCss(),
       html: this.em.getHtml(),
-      _id: window.page._id,
+      _id: window.page ? window.page._id : 'ggggggg',
     }
 
     $.ajax({

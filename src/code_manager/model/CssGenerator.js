@@ -36,8 +36,8 @@ module.exports = Backbone.Model.extend({
           if(style.hasOwnProperty(prop))
             code += prop + ':' + style[prop] + ';';
         }
-      }
       code += '}';
+      }
     }
 
     return code;
@@ -142,19 +142,18 @@ module.exports = Backbone.Model.extend({
     var strStyle = '';
 
     // Get string of style properties
-    if(ruleStyle && Object.keys(ruleStyle).length !== 0){
+    // if(ruleStyle && Object.keys(ruleStyle).length !== 0){
       for(var prop2 in ruleStyle){
         if(ruleStyle.hasOwnProperty(prop2)){
           strStyle += prop2 + ':' + ruleStyle[prop2] + ';';
         }
       }
-    }
+    // }
 
     if(strStyle) {
       result += strSel + '{' + strStyle + '}';
     }
     // }
-
     return result;
   },
 

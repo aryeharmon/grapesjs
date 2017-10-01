@@ -258,7 +258,6 @@ module.exports = () => {
           var model = this.add(newSels, rule.state, rule.mediaText, rule);
           var updateStyle = !modelExists || !opts.avoidUpdateStyle;
           const style = rule.style || {};
-
           if (updateStyle) {
             let styleUpdate = opts.extend ?
               Object.assign({}, model.get('style'), style) : style;

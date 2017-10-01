@@ -33,8 +33,23 @@
     <div id="gjs" style="height:0px; overflow:hidden;">
       {{{ html }}}
       <style>
+    :root {
+      --BU0: brown;
+      --BU1: red;
+      --BU2: blue;
+      --BU3: orange;
+      --BU4: green;
+      --BU5: brown;
+      --BU6: brown;
+      --BU7: brown;
+      --BU8: brown;
+      --BU9: brown;
+    }
       {{{ css }}}
 
+    .text {    
+      
+    }
     .flex-start {    
       display: -webkit-flex;
       display: flex;
@@ -58,6 +73,7 @@
     }
     .text {    
       padding: 10px;
+      color: var(--BU0);
     }
       </style>
     </div>
@@ -310,7 +326,64 @@
       },
 
       styleManager : {
-        sectors: [{
+        sectors: [
+                {
+                    name : 'Main Colors',
+                    open: false,
+                    properties : [
+                        {
+                            name      : 'BU0',
+                            property  : '--BU0',
+                            type      : 'main-color'
+                        },
+                        {
+                            name      : 'BU1',
+                            property  : '--BU1',
+                            type      : 'main-color'
+                        },
+                        {
+                            name      : 'BU2',
+                            property  : '--BU2',
+                            type      : 'main-color'
+                        },
+                        {
+                            name      : 'BU3',
+                            property  : '--BU3',
+                            type      : 'main-color'
+                        },
+                        {
+                            name      : 'BU4',
+                            property  : '--BU4',
+                            type      : 'main-color'
+                        },
+                        {
+                            name      : 'BU5',
+                            property  : '--BU5',
+                            type      : 'main-color'
+                        },
+                        {
+                            name      : 'BU6',
+                            property  : '--BU6',
+                            type      : 'main-color'
+                        },
+                        {
+                            name      : 'BU7',
+                            property  : '--BU7',
+                            type      : 'main-color'
+                        },
+                        {
+                            name      : 'BU8',
+                            property  : '--BU8',
+                            type      : 'main-color'
+                        },
+                        {
+                            name      : 'BU9',
+                            property  : '--BU9',
+                            type      : 'main-color'
+                        },
+                    ]
+                  },
+        {
           name: 'General',
           open: false,
           buildProps: ['float', 'display', 'position', 'top', 'right', 'left', 'bottom'],
@@ -504,7 +577,8 @@
                         title    : 'Center',
                         className : 'icons-flex icon-al-center',
                       }],
-            }]
+            },
+            ]
           }
 
         ],
@@ -605,19 +679,6 @@
       // });
 
     })
-
-    editor.on('styleManager:change:text-shadow', function(view) {
-      var model = view.model;
-      let targetValue = view.getTargetValue({ignoreDefault: 1});
-      let computedValue = view.getComputedValue();
-      let defaultValue = view.getDefaultValue();
-      console.log('Style of ', model.get('property'), 'Target: ', targetValue, 'Computed:', computedValue, 'Default:', defaultValue);
-    })
-
-
-
-
-
 
 
 
