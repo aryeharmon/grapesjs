@@ -1,40 +1,34 @@
-var Backbone = require('backbone');
-var PropertyView = require('./PropertyView');
+const PropertyView = require('./PropertyView');
 
 module.exports = PropertyView.extend({
 
-  template: _.template(`
-  <div class="<%= pfx %>field <%= pfx %>composite">
-  	<span id='<%= pfx %>input-holder'></span>
-  </div>
-  <div style="clear:both"></div>`),
-
-  initialize(o) {
-    PropertyView.prototype.initialize.apply(this, arguments);
-    _.bindAll(this, 'build');
-    this.config = o.config || {};
-    this.className = this.className + ' '+ this.pfx +'composite';
+  templateInput() {
+    const pfx = this.pfx;
+    return `
+      <div class="${pfx}field ${pfx}composite">
+        <span id="${pfx}input-holder"></span>
+      </div>
+    `;
   },
 
-  /**
-   * Fired when the input value is updated
-   */
-  valueUpdated(...args) {
+  inputValueChanged(...args) {
     if(!this.model.get('detached'))
-      PropertyView.prototype.valueUpdated.apply(this, args);
+      PropertyView.prototype.inputValueChanged.apply(this, args);
   },
 
   /**
    * Renders input
    * */
-  renderInput() {
+  onRender() {
     var model = this.model;
     var props = model.get('properties') || [];
     var self = this;
 
     if (props.length) {
-      if(!this.$input)
+      if (!this.$input) {
         this.$input = $('<input>', {value: 0, type: 'hidden' });
+        this.input = this.$input.get(0);
+      }
 
       if (!this.props) {
         this.props = model.get('properties');
@@ -65,6 +59,7 @@ module.exports = PropertyView.extend({
    */
   getPropsConfig(opts) {
     var that = this;
+    const model = this.model;
 
     var result = {
       config: this.config,
@@ -73,8 +68,7 @@ module.exports = PropertyView.extend({
       propTarget: this.propTarget,
       // On any change made to children I need to update composite value
       onChange(el, view, opts) {
-        var result = that.build();
-        that.model.set('value', result, opts);
+        model.set('value', model.getFullValue(), opts);
       },
       // Each child property will receive a full composite string, eg. '0px 0px 10px 0px'
       // I need to extract from that string the corresponding one to that property.
@@ -84,22 +78,11 @@ module.exports = PropertyView.extend({
     };
 
     // If detached let follow its standard flow
-    if(this.model.get('detached'))
+    if (model.get('detached')) {
       delete result.onChange;
+    }
 
     return result;
-  },
-
-  /**
-   * Get default value of the property
-   * @return {string}
-   * */
-  getDefaultValue() {
-    var str = '';
-    this.props.each((prop, index) => {
-      str += prop.get('defaults') + prop.get('unit') + ' ';
-    });
-    return this.model.get('defaults') || str.replace(/ +$/,'');
   },
 
   /**
@@ -109,38 +92,24 @@ module.exports = PropertyView.extend({
    * @return {string}
    * */
   valueOnIndex(index, view) {
-    var result = null;
-    var a = this.getComponentValue().split(' ');
-    if(a.length && a[index]){
-      result = a[index];
-      if(view && view.model && view.model.get('functionName')){
-        var v = this.fetchFromFunction(result);
-        if(v)
-          result = v;
-      }
+    let value;
+    const targetValue = this.getTargetValue({ignoreDefault: 1});
+
+    // If the target value of the composite is not empty I'll fetch
+    // the corresponding value from the requested index, otherwise try
+    // to get the value of the sub-property
+    if (targetValue) {
+      const values = targetValue.split(' ');
+      value = values[index];
+    } else {
+      value = view && view.getTargetValue({ignoreCustomValue: 1, ignoreDefault: 1});
     }
-    return result;
-  },
 
-  /**
-   * Build composite value
-   * @param {Object} selectedEl Selected element
-   * @param {Object} propertyView Property view
-   * @param {Object} opts Options
-   * @return {string}
-   * */
-  build(selectedEl, propertyView, opts) {
-    var result = '';
-    this.model.get('properties').each(prop => {
-      var v = prop.getValue();
-      var func = prop.get('functionName');
+    if (view) {
+      value = view.model.parseValue(value);
+    }
 
-      if(func)
-        v =  func + '(' + v + ')';
-
-      result   += v + ' ';
-    });
-    return result.replace(/ +$/,'');
+    return value;
   },
 
 });

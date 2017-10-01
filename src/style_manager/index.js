@@ -1,12 +1,16 @@
 /**
  *
- * - [addSector](#addsector)
- * - [getSector](#getsector)
- * - [getSectors](#getsectors)
- * - [addProperty](#addproperty)
- * - [getProperty](#getproperty)
- * - [getProperties](#getproperties)
- * - [render](#render)
+ * * [addSector](#addsector)
+ * * [getSector](#getsector)
+ * * [getSectors](#getsectors)
+ * * [addProperty](#addproperty)
+ * * [getProperty](#getproperty)
+ * * [getProperties](#getproperties)
+ * * [getModelToStyle](#getmodeltostyle)
+ * * [addType](#addtype)
+ * * [getType](#gettype)
+ * * [getTypes](#gettypes)
+ * * [render](#render)
  *
  * With Style Manager you basically build categories (called sectors) of CSS properties which could
  * be used to custom components and classes.
@@ -51,7 +55,9 @@ module.exports = () => {
   var c = {},
   defaults = require('./config/config'),
   Sectors = require('./model/Sectors'),
+  Properties = require('./model/Properties'),
   SectorsView = require('./view/SectorsView');
+  let properties;
   var sectors, SectView;
 
   return {
@@ -87,6 +93,7 @@ module.exports = () => {
       if(ppfx)
         c.stylePrefix = ppfx + c.stylePrefix;
 
+      properties = new Properties();
       sectors = new Sectors(c.sectors);
       SectView   = new SectorsView({
         collection: sectors,
@@ -240,17 +247,53 @@ module.exports = () => {
         var state = !previewMode ? model.get('state') : '';
         var deviceW = device && !previewMode ? device.get('width') : '';
         var cssC = c.em.get('CssComposer');
-
-        var valid = _.filter(classes.models, item => item.get('active'));
-
+        var valid = classes.getStyleable();
         var CssRule = cssC.get(valid, state, deviceW);
 
-        if(CssRule) {
+        if(CssRule && valid.length) {
           return CssRule;
         }
       }
 
       return model;
+    },
+
+    /**
+     * Add new property type
+     * @param {string} id Type ID
+     * @param {Object} definition Definition of the type. Each definition contains
+     *                            `model` (business logic), `view` (presentation logic)
+     *                            and `isType` function which recognize the type of the
+     *                            passed entity
+     * addType('my-type', {
+     *  model: {},
+     *  view: {},
+     *  isType: (value) => {
+     *    if (value && value.type == 'my-type') {
+     *      return value;
+     *    }
+     *  },
+     * })
+     */
+    addType(id, definition) {
+      properties.addType(id, definition);
+    },
+
+    /**
+     * Get type
+     * @param {string} id Type ID
+     * @return {Object} Type definition
+     */
+    getType(id) {
+      return properties.getType(id);
+    },
+
+    /**
+     * Get all types
+     * @return {Array}
+     */
+    getTypes() {
+      return properties.getTypes();
     },
 
     /**

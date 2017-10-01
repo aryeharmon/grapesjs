@@ -5,20 +5,24 @@ var LayersView = require('./LayersView');
 
 module.exports = PropertyCompositeView.extend({
 
-  template: _.template(`
-  <div class="<%= pfx %>field <%= pfx %>stack">
-    <button type="button" id='<%= pfx %>add'>+</button>
-    <span id='<%= pfx %>input-holder'></span>
-  </div>
-  <div style="clear:both"></div>`),
+  templateInput() {
+    const pfx = this.pfx;
+    const ppfx = this.ppfx;
+    return `
+      <div class="${pfx}field ${pfx}stack">
+        <button type="button" id="${pfx}add">+</button>
+        <span id="${pfx}input-holder"></span>
+      </div>
+    `;
+  },
 
-  initialize(o) {
-    PropertyCompositeView.prototype.initialize.apply(this, arguments);
-    this.model.set('stackIndex', null);
-    this.className   = this.pfx  + 'property '+ this.pfx +'stack';
-    this.events['click #'+this.pfx+'add']  = 'addLayer';
-    this.listenTo( this.model ,'change:stackIndex', this.indexChanged);
-    this.listenTo( this.model ,'updateValue', this.valueUpdated);
+  init() {
+    const model = this.model;
+    const pfx = this.pfx;
+    model.set('stackIndex', null);
+    this.events[`click #${pfx}add`] = 'addLayer';
+    this.listenTo(model, 'change:stackIndex', this.indexChanged);
+    this.listenTo(model, 'updateValue', this.inputValueChanged);
     this.delegateEvents();
   },
 
@@ -57,9 +61,7 @@ module.exports = PropertyCompositeView.extend({
     var model = this.model;
     var layer  = this.getLayers().at(model.get('stackIndex'));
     layer.set('props', this.$props);
-    model.get('properties').each(prop => {
-      prop.trigger('targetUpdated');
-    });
+    model.get('properties').each(prop => prop.trigger('targetUpdated'));
   },
 
   /**
@@ -72,26 +74,30 @@ module.exports = PropertyCompositeView.extend({
 
   /** @inheritDoc */
   getPropsConfig(opts) {
-    var that = this;
+    const model = this.model;
+    const detached = model.get('detached');
     var result = PropertyCompositeView.prototype.getPropsConfig.apply(this, arguments);
 
     result.onChange = (el, view, opt) => {
-      var model = view.model;
-      var result = that.build();
+      const subModel = view.model;
+      const subProperty = subModel.get('property');
+      this.build();
 
-      if(that.model.get('detached')){
+      if (detached) {
         var propVal = '';
-        var index = model.collection.indexOf(model);
+        var index = subModel.collection.indexOf(subModel);
 
-        that.getLayers().each(layer => {
-          var val = layer.get('values')[model.get('property')];
-          if(val)
+        this.getLayers().each(layer => {
+          var val = layer.get('values')[subProperty];
+          if (val) {
             propVal += (propVal ? ',' : '') + val;
+          }
         });
 
         view.updateTargetStyle(propVal, null, opt);
-      }else
-        that.model.set('value', result, opt);
+      } else {
+        model.set('value', model.getFullValue(), opt);
+      }
     };
 
     return result;
@@ -105,16 +111,18 @@ module.exports = PropertyCompositeView.extend({
    * @private
    * */
   valueOnIndex(index, propView) {
-    var result = null;
-    var layerIndex = this.model.get('stackIndex');
+    let result;
+    const model = this.model;
+    const propModel = propView && propView.model;
+    const layerIndex = model.get('stackIndex');
 
     // If detached the value in this case is stacked, eg. substack-prop: 1px, 2px, 3px...
-    if (this.model.get('detached')) {
+    if (model.get('detached')) {
       var targetValue = propView.getTargetValue({ignoreCustomValue: 1});
       var valist = (targetValue + '').split(',');
       result = valist[layerIndex];
-      result = result ? result.trim() : propView.getDefaultValue();
-      result = propView.tryFetchFromFunction(result);
+      result = result ? result.trim() : propModel.getDefaultValue();
+      result = propModel.parseValue(result);
     } else {
       var aStack = this.getStackValues();
       var strVar = aStack[layerIndex];
@@ -134,57 +142,49 @@ module.exports = PropertyCompositeView.extend({
    * @private
    * */
   build(...args) {
-    var stackIndex = this.model.get('stackIndex');
-    if(stackIndex === null)
+    let value = '';
+    let values = {};
+    const model = this.model;
+    const stackIndex = model.get('stackIndex');
+    const properties = model.get('properties');
+
+    if (stackIndex === null) {
       return;
-    var result = PropertyCompositeView.prototype.build.apply(this, args);
-    var model = this.getLayers().at(stackIndex);
-    if(!model)
-      return;
+    }
 
     // Store properties values inside layer, in this way it's more reliable
-    //  to fetch them later
-    var valObj = {};
-    this.model.get('properties').each(prop => {
-      var v    = prop.getValue(),
-        func  = prop.get('functionName');
-      if(func)
-        v =  func + '(' + v + ')';
-      valObj[prop.get('property')] = v;
+    // to fetch them later
+    properties.each(prop => {
+      const propValue = prop.getFullValue();
+      values[prop.get('property')] = propValue;
+      value += `${propValue} `;
     });
-    model.set('values', valObj);
 
-    model.set('value', result);
-    return this.createValue();
+    const layerModel = this.getLayers().at(stackIndex);
+    layerModel && layerModel.set({values, value});
   },
 
   /**
-   * Add layer
-   * @param Event
-   *
-   * @return Object
+   * Add new layer
    * */
-  addLayer(e) {
-    if(this.getTarget()){
-      var layers = this.getLayers();
-      var layer  = layers.add({ name : 'test' });
-      var index  = layers.indexOf(layer);
-      layer.set('value', this.getDefaultValue());
+  addLayer() {
+    if (this.getTarget()) {
+      const layers = this.getLayers();
+      const layer = layers.add({name: 'New'});
+      const index = layers.indexOf(layer);
+      const model = this.model;
+      layer.set('value', model.getDefaultValue(1));
 
-      // In detached mode valueUpdated will add new 'layer value'
+      // In detached mode inputValueChanged will add new 'layer value'
       // to all subprops
-      this.valueUpdated();
+      this.inputValueChanged();
 
       // This will set subprops with a new default values
-      this.model.set('stackIndex', index);
-      return layer;
+      model.set('stackIndex', index);
     }
   },
 
-  /**
-   * Fired when the input value is updated
-   */
-  valueUpdated() {
+  inputValueChanged() {
     var model = this.model;
 
     if (!model.get('detached')) {
@@ -209,8 +209,9 @@ module.exports = PropertyCompositeView.extend({
    * @return self
    * */
   renderLayers() {
-    if(!this.$field)
-      this.$field = this.$el.find('> .' + this.pfx + 'field');
+    if (!this.fieldEl) {
+      this.fieldEl = this.el.querySelector(`.${this.pfx}field`);
+    }
 
     if(!this.$layers)
       this.$layers = new LayersView({
@@ -220,15 +221,8 @@ module.exports = PropertyCompositeView.extend({
         config: this.config
       });
 
-    this.$field.append(this.$layers.render().el);
+    this.fieldEl.appendChild(this.$layers.render().el);
     this.$props.hide();
-    return this;
-  },
-
-  /** @inheritdoc */
-  renderInput(...args) {
-    PropertyCompositeView.prototype.renderInput.apply(this, args);
-    this.refreshLayers();
   },
 
   /**
@@ -278,9 +272,8 @@ module.exports = PropertyCompositeView.extend({
       fieldName = 'values';
       a = this.getLayersFromTarget();
     } else {
-      //var v  = this.getComponentValue();
       var v = this.getTargetValue();
-      var vDef = this.getDefaultValue();
+      var vDef = this.model.getDefaultValue();
       v = v == vDef ? '' : v;
       if (v) {
         // Remove spaces inside functions:
@@ -308,19 +301,16 @@ module.exports = PropertyCompositeView.extend({
 
     // Avoid updating with detached as it will cause issues on next change
     if (!detached) {
-      this.valueUpdated();
+      this.inputValueChanged();
     }
 
     this.model.set({stackIndex: null}, {silent: true});
   },
 
-  render() {
-    this.renderLabel();
-    this.renderField();
+  onRender(...args) {
+    PropertyCompositeView.prototype.onRender.apply(this, args);
+    this.refreshLayers();
     this.renderLayers();
-    this.$el.attr('class', this.className);
-    this.updateStatus();
-    return this;
   },
 
 });

@@ -331,6 +331,7 @@ module.exports = {
     var resizeClass = pfx + 'resizing';
     var model = em.get('selectedComponent');
     var resizable = model.get('resizable');
+    var options = {};
     var modelToStyle;
 
     var toggleBodyClass = (method, e, opts) => {
@@ -342,8 +343,9 @@ module.exports = {
       }
     };
 
+
     if (editor && resizable) {
-      let options = {
+      options = {
         onStart(e, opts) {
           toggleBodyClass('addClass', e, opts);
           modelToStyle = em.get('StyleManager').getModelToStyle(model);
@@ -358,15 +360,25 @@ module.exports = {
           editor.trigger('change:canvasOffset');
           showOffsets = 1;
         },
-        updateTarget(el, rect, store) {
+        updateTarget(el, rect, options = {}) {
           if (!modelToStyle) {
             return;
           }
 
+          const {store, selectedHandler} = options;
+          const onlyHeight = ['tc', 'bc'].indexOf(selectedHandler) >= 0;
+          const onlyWidth = ['cl', 'cr'].indexOf(selectedHandler) >= 0;
           const unit = 'px';
           const style = modelToStyle.getStyle();
-          style.width = rect.w + unit;
-          style.height = rect.h + unit;
+
+          if (!onlyHeight) {
+            style.width = rect.w + unit;
+          }
+
+          if (!onlyWidth) {
+            style.height = rect.h + unit;
+          }
+
           modelToStyle.setStyle(style, {avoidStore: 1});
           em.trigger('targetStyleUpdated');
 
@@ -394,17 +406,24 @@ module.exports = {
   updateToolbar(mod) {
     var em = this.config.em;
     var model = mod == em ? em.get('selectedComponent') : mod;
-    if(!model){
-      return;
-    }
-    var toolbar = model.get('toolbar');
-    var ppfx = this.ppfx;
-    var showToolbar = em.get('Config').showToolbar;
     var toolbarEl = this.canvas.getToolbarEl();
     var toolbarStyle = toolbarEl.style;
 
+    if (!model) {
+      // By putting `toolbarStyle.display = 'none'` will cause kind
+      // of freezed effect with component selection (probably by iframe
+      // switching)
+      toolbarStyle.opacity = 0;
+      return;
+    }
+
+    var toolbar = model.get('toolbar');
+    var ppfx = this.ppfx;
+    var showToolbar = em.get('Config').showToolbar;
+
     if (showToolbar && toolbar && toolbar.length) {
-      toolbarStyle.display = 'flex';
+      toolbarStyle.opacity = '';
+      toolbarStyle.display = '';
       if(!this.toolbar) {
         toolbarEl.innerHTML = '';
         this.toolbar = new Toolbar(toolbar);

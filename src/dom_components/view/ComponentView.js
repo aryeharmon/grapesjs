@@ -152,8 +152,9 @@ module.exports = Backbone.View.extend({
     var attributes = {},
       attr = model.get("attributes");
     for(var key in attr) {
-        if(attr.hasOwnProperty(key))
+        if (key && attr.hasOwnProperty(key)) {
           attributes[key] = attr[key];
+        }
     }
 
     // Update src
@@ -302,7 +303,6 @@ module.exports = Backbone.View.extend({
     var view = new ComponentsView({
       collection: this.model.get('components'),
       config: this.config,
-      defaultTypes: this.opts.defaultTypes,
       componentTypes: this.opts.componentTypes,
     });
 

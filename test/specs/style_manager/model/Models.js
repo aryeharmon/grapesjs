@@ -140,14 +140,6 @@ module.exports = {
         expect(obj.has('property')).toEqual(true);
       });
 
-      it('Has no properties', () => {
-        expect(obj.get('properties').length).toEqual(0);
-      });
-
-      it('Has no layers', () => {
-        expect(obj.get('layers').length).toEqual(0);
-      });
-
     });
 
     describe('Properties', () => {
@@ -654,7 +646,7 @@ module.exports = {
                   property: 'box-shadow-blur',
                   type: 'integer',
                   units: ['px'],
-                  defaults: 5,
+                  defaults: '5px',
                   min: 0,
                 },{
                   property: 'box-shadow-spread',

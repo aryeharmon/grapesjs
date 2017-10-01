@@ -1,9 +1,4 @@
 /********* Input style **********/
-$inputFontColor: $mainLhlColor; /* #d5d5d5 */
-$arrowColor: $mainLhlColor; /* b1b1b1 */
-$darkTextShadow: $mainDkColor; /* #252525 */
-$darkBorder: rgba(0, 0, 0, 0.15); /* 303030 */
-$colorpSize: 22px;
 
 @mixin rangeThumbStyle() {
   height: 10px;
@@ -16,46 +11,88 @@ $colorpSize: 22px;
 
 @mixin rangeTrackStyle() {
   background-color: $mainDkColor;
-  border: 1px solid $darkBorder;
   border-radius: 1px;
-  height: 2px;
+  margin-top: 3px;
+  height: 3px;
 }
 
-.#{$app-prefix}label {
-  line-height: 18px;
+.#{$app-prefix} {
+  &label {
+    line-height: 18px;
+  }
+
+  &fields {
+    display: flex;
+  }
+
+  &select {
+    padding: 0;
+    width: 100%;
+
+    select {
+      padding-right: 10px;
+    }
+  }
+
+  &select:-moz-focusring,
+  &select select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 $mainLhlColor;
+  }
+
+  &input:focus,
+  &button:focus,
+  &btn-prim:focus,
+  &select:focus,
+  &select select:focus {
+    outline: none;
+  }
+
+  &field {
+    &-range {
+      flex: 9 1 auto;
+    }
+  }
+}
+
+.#{$app-prefix}select option,
+.#{$clm-prefix}select option,
+.#{$sm-prefix}select option,
+.#{$sm-prefix}unit option {
+  @extend .#{$app-prefix}bg-main;
 }
 
 .#{$app-prefix}field {
   background-color: $mainDkColor;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 1px 1px 0 $mainLhColor;
+  border: none;
+  box-shadow: none;
   border-radius: 2px;
   box-sizing: border-box;
   padding: 0;
   position: relative;
+  color: $inputFontColor;
 
   input,
   select,
   textarea {
     @include appearance(none);
 
-    color: $inputFontColor;
+    color: inherit;
     border: none;
     background-color: transparent;
     box-sizing: border-box;
     width: 100%;
     position: relative;
-    padding: 3px 4px 4px;
+    padding: $inputPadding;
     z-index: 1;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   textarea {
     resize: vertical;
-  }
-
-  select {
-    height: 20px;
-    padding-right: 12px;
   }
 
   option {
@@ -72,7 +109,10 @@ $colorpSize: 22px;
   }
 
   .#{$app-prefix}d-s-arrow {
-    bottom: 7px;
+    bottom: 0;
+    top: 0;
+    margin: auto;
+    right: $inputPadding;
     border-top: 4px solid $arrowColor;
     position: absolute;
     height: 0;
@@ -80,6 +120,22 @@ $colorpSize: 22px;
     border-left: 3px solid transparent;
     border-right: 4px solid transparent;
     cursor: pointer;
+  }
+
+  .#{$app-prefix}field-number {
+    padding-right: 30px;
+  }
+
+  &-arrows {
+    position: absolute;
+    cursor: ns-resize;
+    margin: auto;
+    height: 20px;
+    width: 9px;
+    z-index: 10;
+    bottom: 0;
+    right: $inputPadding - 2px;
+    top: 0;
   }
 }
 
@@ -174,17 +230,15 @@ $colorpSize: 22px;
 .#{$app-prefix}radio-item-label {
   cursor: pointer;
   display: block;
-  padding: 5px;
+  padding: $inputPadding;
 }
 
 .#{$app-prefix}field-units {
   position: absolute;
-  right: 0;
+  margin: auto;
+  right: 10px;
+  bottom: 0;
   top: 0;
-
-  select {
-    padding: 0 12px 0 0;
-  }
 }
 
 .#{$app-prefix}field-unit {
@@ -194,16 +248,6 @@ $colorpSize: 22px;
   font-size: 10px;
   color: $arrowColor;
   cursor: pointer;
-}
-
-.#{$app-prefix}field-arrows {
-  z-index: 10;
-  cursor: ns-resize;
-  height: 100%;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 9px;
 }
 
 .#{$app-prefix}field-arrow-u,
@@ -240,33 +284,54 @@ $colorpSize: 22px;
 
   input {
     margin: 0;
+    height: 100%;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::-webkit-slider-thumb {
+     -webkit-appearance: none;
+     margin-top: -4px;
+
+     @include rangeThumbStyle();
+    }
+
+    &::-moz-range-thumb {
+     @include rangeThumbStyle();
+    }
+
+    &::-ms-thumb {
+     @include rangeThumbStyle();
+    }
+
+    /* -moz-range-progress */
+    &::-moz-range-track {
+     @include rangeTrackStyle();
+    }
+
+    &::-webkit-slider-runnable-track {
+     @include rangeTrackStyle();
+    }
+
+    &::-ms-track {
+     @include rangeTrackStyle();
+    }
   }
+}
 
-  input::-moz-range-thumb {
-    @include rangeThumbStyle();
-  }
+.#{$app-prefix}btn-prim {
+  @extend .#{$app-prefix}color-main;
 
-  input::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    margin-top: -5px;
+  background-color: $mainLhColor;
+  border-radius: 2px;
+  padding: 3px 6px;
+  padding: $inputPadding;
+  cursor: pointer;
+  border: none;
 
-    @include rangeThumbStyle();
-  }
-
-  input::-ms-thumb {
-    @include rangeThumbStyle();
-  }
-
-  input::-moz-range-track {
-    @include rangeTrackStyle();
-  }
-
-  input::-webkit-slider-runnable-track {
-    @include rangeTrackStyle();
-  }
-
-  input::-ms-track {
-    @include rangeTrackStyle();
+  &:active {
+    background-color: $mainLhColor;
   }
 }
 

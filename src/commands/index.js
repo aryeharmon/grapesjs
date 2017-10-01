@@ -102,6 +102,7 @@ module.exports = () => {
       defaultCommands['open-assets'] = require('./view/OpenAssets');
       defaultCommands['open-region-editor'] = require('./view/OpenRegionEditor');
       defaultCommands['show-offset'] = require('./view/ShowOffset');
+      defaultCommands['select-parent'] = require('./view/SelectParent');
       defaultCommands.fullscreen = require('./view/Fullscreen');
       defaultCommands.preview = require('./view/Preview');
       defaultCommands.resize = require('./view/Resize');
@@ -134,8 +135,8 @@ module.exports = () => {
           // end aryeh edit
 
                   
-          sel.set('status', '');
-
+          ed.select(null);
+          sel.destroy();
           ed.trigger('component:update', sel);
           ed.editor.set('selectedComponent', null);
         },

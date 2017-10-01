@@ -1,5 +1,6 @@
 const PropertyCompositeView = require('style_manager/view/PropertyCompositeView');
 const Property = require('style_manager/model/Property');
+const PropertyComposite = require('style_manager/model/PropertyComposite');
 const Component = require('dom_components/model/Component');
 
 module.exports = {
@@ -16,15 +17,14 @@ module.exports = {
         var propName = 'testprop';
         var propValue = 'test1value';
         var defValue = 'test2value';
-        var properties = [
-          {property: 'subprop1'},
-          {
+        var properties = [{
+            property: 'subprop1'
+          },{
             type: 'integer',
             property: 'subprop2',
             defaults: 0,
             units: ['%', 'px']
-          },
-          {
+          },{
             type: 'select',
             property: 'subprop3',
             defaults: 'val2',
@@ -33,8 +33,7 @@ module.exports = {
               {value:'val2'},
               {value:'val3'},
             ]
-          },
-        ];
+        }];
 
         before(() => {
           $fixtures  = $("#fixtures");
@@ -45,7 +44,7 @@ module.exports = {
           target = new Component();
           component = new Component();
           target.model = component;
-          model = new Property({
+          model = new PropertyComposite({
             type: 'composite',
             property: propName,
             properties
@@ -54,7 +53,8 @@ module.exports = {
             model
           });
           $fixture.empty().appendTo($fixtures);
-          $fixture.html(view.render().el);
+          view.render();
+          $fixture.html(view.el);
         });
 
         afterEach(() => {
@@ -93,12 +93,13 @@ module.exports = {
         });
 
         it('Input value is empty', () => {
-          expect(view.model.get('value')).toNotExist();
+          expect(model.getFullValue()).toEqual('0% val2');
         });
 
         it('Update input on value change', () => {
           view.model.set('value', propValue);
-          expect(view.$input.val()).toEqual(propValue);
+          // Fetch always values from properties
+          expect(view.getInputValue()).toEqual('0% val2');
         });
 
         describe('With target setted', () => {
@@ -112,7 +113,7 @@ module.exports = {
           var $prop3;
 
           beforeEach(() => {
-            model = new Property({
+            model = new PropertyComposite({
               type: 'composite',
               property: propName,
               properties
@@ -122,10 +123,11 @@ module.exports = {
               propTarget: target
             });
             $fixture.empty().appendTo($fixtures);
-            $fixture.html(view.render().el);
-            prop3Val = properties[2].list[2].value;
+            view.render();
+            $fixture.html(view.el);
             prop2Val = properties[1].defaults;
             prop2Unit = properties[1].units[0];
+            prop3Val = properties[2].list[2].value;
             finalResult = propValue + ' ' + prop2Val + prop2Unit +' ' + prop3Val;
             $prop1 = view.$props.find('#' + properties[0].property + ' input');
             $prop2 = view.$props.find('#' + properties[1].property + ' input');
@@ -135,7 +137,7 @@ module.exports = {
           it('Update model on input change', () => {
             $prop1.val(propValue).trigger('change');
             $prop3.val(prop3Val).trigger('change');
-            expect(view.model.get('value')).toEqual(finalResult);
+            expect(model.getFullValue()).toEqual(finalResult);
           });
 
           it('Update value on models change', () => {
@@ -153,7 +155,7 @@ module.exports = {
           });
 
           it('Update target on detached value change', () => {
-            model = new Property({
+            model = new PropertyComposite({
               type: 'composite',
               property: propName,
               properties,
@@ -163,7 +165,8 @@ module.exports = {
               model,
               propTarget: target
             });
-            $fixture.html(view.render().el);
+            view.render();
+            $fixture.html(view.el);
             $prop1 = view.$props.find('#' + properties[0].property + ' input');
             $prop1.val(propValue).trigger('change');
             var compStyle = view.getTarget().get('style');
@@ -206,7 +209,7 @@ module.exports = {
           it('Build value from properties', () => {
             view.model.get('properties').at(0).set('value', propValue);
             view.model.get('properties').at(2).set('value', prop3Val);
-            expect(view.build()).toEqual(finalResult);
+            expect(model.getFullValue()).toEqual(finalResult);
           });
 
         })
@@ -214,7 +217,7 @@ module.exports = {
         describe('Init property', () => {
 
           beforeEach(() => {
-            model = new Property({
+            model = new PropertyComposite({
               type: 'composite',
               property: propName,
               properties,
@@ -224,7 +227,8 @@ module.exports = {
               model
             });
             $fixture.empty().appendTo($fixtures);
-            $fixture.html(view.render().el);
+            view.render();
+            $fixture.html(view.el);
           });
 
           it('Value as default', () => {

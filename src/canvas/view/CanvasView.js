@@ -64,7 +64,8 @@ module.exports = Backbone.View.extend({
     var em = this.config.em;
     if(wrap) {
       var ppfx = this.ppfx;
-      var body = this.frame.$el.contents().find('body');
+      //var body = this.frame.$el.contents().find('body');
+      var body = $(this.frame.el.contentWindow.document.body);
       var cssc = em.get('CssComposer');
       var conf = em.get('Config');
       var confCanvas = this.config;
@@ -101,30 +102,69 @@ module.exports = Backbone.View.extend({
       // For the moment I give the priority to Firefox as it might be
       // CKEditor's issue
 
+      // I need all this styles to make the editor work properly
+      var frameCss = `
+        ${baseCss}
 
-      let layoutCss = `
-        .${ppfx}comp-selected{
+        .${ppfx}dashed :not([contenteditable]) > *[data-highlightable] {
+          outline: 1px dashed rgba(170,170,170,0.7);
+          outline-offset: -2px
+        }
+
+        .${ppfx}comp-selected {
           outline: 3px solid #3b97e3 !important
         }
-        .${ppfx}comp-selected-parent{
+
+        .${ppfx}comp-selected-parent {
           outline: 2px solid ${colorWarn} !important
         }
-      `;
 
-      // I need all this styles to make the editor work properly
-      var frameCss = baseCss +
-        '.' + ppfx + 'dashed :not([contenteditable]) > *[data-highlightable]{outline: 1px dashed rgba(170,170,170,0.7); outline-offset: -2px}' +
-        layoutCss +
-        '.' + ppfx + 'no-select{user-select: none; -webkit-user-select:none; -moz-user-select: none}'+
-        '.' + ppfx + 'freezed{opacity: 0.5; pointer-events: none}' +
-        '.' + ppfx + 'no-pointer{pointer-events: none}' +
-        '.' + ppfx + 'plh-image{background:#f5f5f5; border:none; height:50px; width:50px; display:block; outline:3px solid #ffca6f; cursor:pointer}' +
-        '.' + ppfx + 'grabbing{cursor: grabbing; cursor: -webkit-grabbing}' +
-        '* ::-webkit-scrollbar-track {background: rgba(0, 0, 0, 0.1)}' +
-        '* ::-webkit-scrollbar-thumb {background: rgba(255, 255, 255, 0.2)}' +
-        '* ::-webkit-scrollbar {width: 10px}' +
-        (conf.canvasCss || '');
-      frameCss += protCss || '';
+        .${ppfx}no-select {
+          user-select: none;
+          -webkit-user-select:none;
+          -moz-user-select: none;
+        }
+
+        .${ppfx}freezed {
+          opacity: 0.5;
+          pointer-events: none;
+        }
+
+        .${ppfx}no-pointer {
+          pointer-events: none;
+        }
+
+        .${ppfx}plh-image {
+          background: #f5f5f5;
+          border: none;
+          height: 50px;
+          width: 50px;
+          display: block;
+          outline: 3px solid #ffca6f;
+          cursor: pointer;
+          outline-offset: -2px
+        }
+
+        .${ppfx}grabbing {
+          cursor: grabbing;
+          cursor: -webkit-grabbing;
+        }
+
+        * ::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.1)
+        }
+
+        * ::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.2)
+        }
+
+        * ::-webkit-scrollbar {
+          width: 10px
+        }
+
+        ${conf.canvasCss || ''}
+        ${protCss || ''}
+      `;
 
       if (externalStyles) {
         body.append(externalStyles);
@@ -139,13 +179,30 @@ module.exports = Backbone.View.extend({
 
       // When the iframe is focused the event dispatcher is not the same so
       // I need to delegate all events to the parent document
-      var doc = document;
-      var fdoc = this.frame.el.contentDocument;
+      const doc = document;
+      const fdoc = this.frame.el.contentDocument;
+
+      // Unfortunately just creating `KeyboardEvent(e.type, e)` is not enough,
+      // the keyCode/which will be always `0`. Even if it's an old/deprecated
+      // property keymaster (and many others) still use it... using `defineProperty`
+      // hack seems the only way
+      const createCustomEvent = (e) => {
+        var oEvent = new KeyboardEvent(e.type, e);
+        oEvent.keyCodeVal = e.keyCode;
+        ['keyCode', 'which'].forEach(prop => {
+          Object.defineProperty(oEvent, prop, {
+            get() {
+              return this.keyCodeVal;
+            }
+          });
+        });
+        return oEvent;
+      }
       fdoc.addEventListener('keydown', e => {
-        doc.dispatchEvent(new KeyboardEvent(e.type, e));
+        doc.dispatchEvent(createCustomEvent(e));
       });
       fdoc.addEventListener('keyup', e => {
-        doc.dispatchEvent(new KeyboardEvent(e.type, e));
+        doc.dispatchEvent(createCustomEvent(e));
       });
     }
   },
