@@ -112,7 +112,7 @@ app.engine('handlebars', exphbs({
         	// return array.join(string);
         },
         "string-exists": function (html, string) {
-        	if (html.indexOf(string) > -1) {
+        	if (html && html.indexOf(string) > -1) {
         		return true;
         	} else {
         		return false;
