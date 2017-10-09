@@ -407,7 +407,189 @@
         },{
           name: 'Decorations',
           open: false,
-          buildProps: ['border-radius-c', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
+          buildProps: ['border-radius-c', 'background-color', 'box-shadow', 'background'],
+                    properties : [
+                        {
+                            name      : 'border top width',
+                            property  : 'border-top-width',
+                            defaults  : '0',
+                            unit      :  'px',
+                            type:     'integer',
+                        },{
+                            name    : 'border top style',
+                            property  : 'border-top-style',
+                            type    : 'select',
+                            defaults  : 'none',
+                            list    : [{
+                                      value     : 'none',
+                                      name   : 'none',
+                                    },{
+                                      value   : 'solid',
+                                      name   : 'solid',
+                                    },{
+                                      value   : 'dotted',
+                                      name   : 'dotted',
+                                    },{
+                                      value   : 'dashed',
+                                      name   : 'dashed',
+                                    },{
+                                      value   : 'double',
+                                      name   : 'double',
+                                    },{
+                                      value   : 'groove',
+                                      name   : 'groove',
+                                    },{
+                                      value   : 'ridge',
+                                      name   : 'ridge',
+                                    },{
+                                      value   : 'inset',
+                                      name   : 'inset',
+                                    },{
+                                      value   : 'outset',
+                                      name   : 'outset',
+                                    }],
+                        },{
+                             name      : 'border top color',
+                             property  : 'border-top-color',
+                             defaults  : '#ffffff',
+                             type      : 'color'
+                         },
+                        {
+                            name      : 'border right width',
+                            property  : 'border-right-width',
+                            defaults  : '0',
+                            unit      :  'px',
+                            type:     'integer',
+                        },{
+                            name    : 'border right style',
+                            property  : 'border-right-style',
+                            type    : 'select',
+                            defaults  : 'none',
+                            list    : [{
+                                      value     : 'none',
+                                      name   : 'none',
+                                    },{
+                                      value   : 'solid',
+                                      name   : 'solid',
+                                    },{
+                                      value   : 'dotted',
+                                      name   : 'dotted',
+                                    },{
+                                      value   : 'dashed',
+                                      name   : 'dashed',
+                                    },{
+                                      value   : 'double',
+                                      name   : 'double',
+                                    },{
+                                      value   : 'groove',
+                                      name   : 'groove',
+                                    },{
+                                      value   : 'ridge',
+                                      name   : 'ridge',
+                                    },{
+                                      value   : 'inset',
+                                      name   : 'inset',
+                                    },{
+                                      value   : 'outset',
+                                      name   : 'outset',
+                                    }],
+                        },{
+                             name      : 'border right color',
+                             property  : 'border-right-color',
+                             defaults  : '#ffffff',
+                             type      : 'color'
+                         },
+                        {
+                            name      : 'border bottom width',
+                            property  : 'border-bottom-width',
+                            defaults  : '0',
+                            unit      :  'px',
+                            type:     'integer',
+                        },{
+                            name    : 'border bottom style',
+                            property  : 'border-bottom-style',
+                            type    : 'select',
+                            defaults  : 'none',
+                            list    : [{
+                                      value     : 'none',
+                                      name   : 'none',
+                                    },{
+                                      value   : 'solid',
+                                      name   : 'solid',
+                                    },{
+                                      value   : 'dotted',
+                                      name   : 'dotted',
+                                    },{
+                                      value   : 'dashed',
+                                      name   : 'dashed',
+                                    },{
+                                      value   : 'double',
+                                      name   : 'double',
+                                    },{
+                                      value   : 'groove',
+                                      name   : 'groove',
+                                    },{
+                                      value   : 'ridge',
+                                      name   : 'ridge',
+                                    },{
+                                      value   : 'inset',
+                                      name   : 'inset',
+                                    },{
+                                      value   : 'outset',
+                                      name   : 'outset',
+                                    }],
+                        },{
+                             name      : 'border bottom color',
+                             property  : 'border-bottom-color',
+                             defaults  : '#ffffff',
+                             type      : 'color'
+                         },
+                        {
+                            name      : 'border left width',
+                            property  : 'border-left-width',
+                            defaults  : '0',
+                            unit      :  'px',
+                            type:     'integer',
+                        },{
+                            name    : 'border left style',
+                            property  : 'border-left-style',
+                            type    : 'select',
+                            defaults  : 'none',
+                            list    : [{
+                                      value     : 'none',
+                                      name   : 'none',
+                                    },{
+                                      value   : 'solid',
+                                      name   : 'solid',
+                                    },{
+                                      value   : 'dotted',
+                                      name   : 'dotted',
+                                    },{
+                                      value   : 'dashed',
+                                      name   : 'dashed',
+                                    },{
+                                      value   : 'double',
+                                      name   : 'double',
+                                    },{
+                                      value   : 'groove',
+                                      name   : 'groove',
+                                    },{
+                                      value   : 'ridge',
+                                      name   : 'ridge',
+                                    },{
+                                      value   : 'inset',
+                                      name   : 'inset',
+                                    },{
+                                      value   : 'outset',
+                                      name   : 'outset',
+                                    }],
+                        },{
+                             name      : 'border left color',
+                             property  : 'border-left-color',
+                             defaults  : '#ffffff',
+                             type      : 'color'
+                         }
+                    ]
         },{
           name: 'Extra',
           open: false,
@@ -651,7 +833,7 @@
         defaults: Object.assign({}, defaultModel.prototype.defaults, {
           traits: [{
             name: 'title',
-            label: 'Título',
+            label: 'T??tulo',
             placeholder: 'Insira um texto aqui'
           }]
         }),
