@@ -112,7 +112,7 @@ app.engine('handlebars', exphbs({
         	// return array.join(string);
         },
         "string-exists": function (html, string) {
-        	if (html.indexOf(string) > -1) {
+        	if (html && html.indexOf(string) > -1) {
         		return true;
         	} else {
         		return false;
@@ -454,4 +454,6 @@ app.post('/admin/save/page', function (req, res) {
 	});
 });
 
-app.listen(3000);
+//app.listen(3000);
+app.set('port', process.env.PORT || 3000);
+app.listen(app.get('port'));

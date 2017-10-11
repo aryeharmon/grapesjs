@@ -5,9 +5,11 @@
     <title>GrapesJS</title>
     <link rel="stylesheet" href="/css/grapes.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="http://feather.aviary.com/imaging/v3/editor.js"></script>
     <script src="/jquery/dist/jquery.min.js"></script>
     <script src="/grapes.min.js"></script>
     <script src="/grapesjs-navbar/dist/grapesjs-navbar.min.js"></script>
+    <script src="/grapesjs-aviary/dist/grapesjs-aviary.min.js"></script>
     <script src="/grapesjs-plugin-export/dist/grapesjs-plugin-export.min.js"></script>
     <script src="/grapesjs-plugin-forms/dist/grapesjs-plugin-forms.min.js"></script>
     <script src="/grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.min.js"></script>
@@ -132,9 +134,11 @@
         'gjs-blocks-basic',
         'gjs-plugin-forms',
         'gjs-preset',
+        'gjs-aviary',
       ], 
       pluginsOpts: {
         'gjs-navbar': {/* ...options */},
+        'gjs-aviary': {/* ...options */}
       },
       allowScripts: 1,
       showOffsets: 1,
@@ -414,7 +418,189 @@
         },{
           name: 'Decorations',
           open: false,
-          buildProps: ['border-radius-c', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
+          buildProps: ['border-radius-c', 'background-color', 'box-shadow', 'background'],
+                    properties : [
+                        {
+                            name      : 'border top width',
+                            property  : 'border-top-width',
+                            defaults  : '0',
+                            unit      :  'px',
+                            type:     'integer',
+                        },{
+                            name    : 'border top style',
+                            property  : 'border-top-style',
+                            type    : 'select',
+                            defaults  : 'none',
+                            list    : [{
+                                      value     : 'none',
+                                      name   : 'none',
+                                    },{
+                                      value   : 'solid',
+                                      name   : 'solid',
+                                    },{
+                                      value   : 'dotted',
+                                      name   : 'dotted',
+                                    },{
+                                      value   : 'dashed',
+                                      name   : 'dashed',
+                                    },{
+                                      value   : 'double',
+                                      name   : 'double',
+                                    },{
+                                      value   : 'groove',
+                                      name   : 'groove',
+                                    },{
+                                      value   : 'ridge',
+                                      name   : 'ridge',
+                                    },{
+                                      value   : 'inset',
+                                      name   : 'inset',
+                                    },{
+                                      value   : 'outset',
+                                      name   : 'outset',
+                                    }],
+                        },{
+                             name      : 'border top color',
+                             property  : 'border-top-color',
+                             defaults  : '#ffffff',
+                             type      : 'color'
+                         },
+                        {
+                            name      : 'border right width',
+                            property  : 'border-right-width',
+                            defaults  : '0',
+                            unit      :  'px',
+                            type:     'integer',
+                        },{
+                            name    : 'border right style',
+                            property  : 'border-right-style',
+                            type    : 'select',
+                            defaults  : 'none',
+                            list    : [{
+                                      value     : 'none',
+                                      name   : 'none',
+                                    },{
+                                      value   : 'solid',
+                                      name   : 'solid',
+                                    },{
+                                      value   : 'dotted',
+                                      name   : 'dotted',
+                                    },{
+                                      value   : 'dashed',
+                                      name   : 'dashed',
+                                    },{
+                                      value   : 'double',
+                                      name   : 'double',
+                                    },{
+                                      value   : 'groove',
+                                      name   : 'groove',
+                                    },{
+                                      value   : 'ridge',
+                                      name   : 'ridge',
+                                    },{
+                                      value   : 'inset',
+                                      name   : 'inset',
+                                    },{
+                                      value   : 'outset',
+                                      name   : 'outset',
+                                    }],
+                        },{
+                             name      : 'border right color',
+                             property  : 'border-right-color',
+                             defaults  : '#ffffff',
+                             type      : 'color'
+                         },
+                        {
+                            name      : 'border bottom width',
+                            property  : 'border-bottom-width',
+                            defaults  : '0',
+                            unit      :  'px',
+                            type:     'integer',
+                        },{
+                            name    : 'border bottom style',
+                            property  : 'border-bottom-style',
+                            type    : 'select',
+                            defaults  : 'none',
+                            list    : [{
+                                      value     : 'none',
+                                      name   : 'none',
+                                    },{
+                                      value   : 'solid',
+                                      name   : 'solid',
+                                    },{
+                                      value   : 'dotted',
+                                      name   : 'dotted',
+                                    },{
+                                      value   : 'dashed',
+                                      name   : 'dashed',
+                                    },{
+                                      value   : 'double',
+                                      name   : 'double',
+                                    },{
+                                      value   : 'groove',
+                                      name   : 'groove',
+                                    },{
+                                      value   : 'ridge',
+                                      name   : 'ridge',
+                                    },{
+                                      value   : 'inset',
+                                      name   : 'inset',
+                                    },{
+                                      value   : 'outset',
+                                      name   : 'outset',
+                                    }],
+                        },{
+                             name      : 'border bottom color',
+                             property  : 'border-bottom-color',
+                             defaults  : '#ffffff',
+                             type      : 'color'
+                         },
+                        {
+                            name      : 'border left width',
+                            property  : 'border-left-width',
+                            defaults  : '0',
+                            unit      :  'px',
+                            type:     'integer',
+                        },{
+                            name    : 'border left style',
+                            property  : 'border-left-style',
+                            type    : 'select',
+                            defaults  : 'none',
+                            list    : [{
+                                      value     : 'none',
+                                      name   : 'none',
+                                    },{
+                                      value   : 'solid',
+                                      name   : 'solid',
+                                    },{
+                                      value   : 'dotted',
+                                      name   : 'dotted',
+                                    },{
+                                      value   : 'dashed',
+                                      name   : 'dashed',
+                                    },{
+                                      value   : 'double',
+                                      name   : 'double',
+                                    },{
+                                      value   : 'groove',
+                                      name   : 'groove',
+                                    },{
+                                      value   : 'ridge',
+                                      name   : 'ridge',
+                                    },{
+                                      value   : 'inset',
+                                      name   : 'inset',
+                                    },{
+                                      value   : 'outset',
+                                      name   : 'outset',
+                                    }],
+                        },{
+                             name      : 'border left color',
+                             property  : 'border-left-color',
+                             defaults  : '#ffffff',
+                             type      : 'color'
+                         }
+                    ]
         },{
           name: 'Extra',
           open: false,
@@ -658,7 +844,7 @@
         defaults: Object.assign({}, defaultModel.prototype.defaults, {
           traits: [{
             name: 'title',
-            label: 'Título',
+            label: 'T??tulo',
             placeholder: 'Insira um texto aqui'
           }]
         }),
