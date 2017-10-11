@@ -37,10 +37,10 @@
     "jquery": "^3.1.1",
     "jsonfile": "^3.0.1",
     "keymaster": "^1.6.2",
-    "promise-polyfill": "^6.0.2",
     "locutus": "^2.0.9",
     "lodash": "^4.17.4",
     "npm": "^5.3.0",
+    "promise-polyfill": "^6.0.2",
     "spectrum-colorpicker": "^1.8.0",
     "underscore": "^1.8.3",
     "uuid": "^3.1.0"
