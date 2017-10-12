@@ -176,6 +176,9 @@ app.post('/save-layout', function (req, res) {
   var id = uuidv1();
   layouts[id] = {
     label: req.body.label,
+    image_preview: req.body.image_preview,
+    category: req.body.category,
+    subcategory: req.body.subcategory,
     html: req.body.html,
   };
 
@@ -378,6 +381,7 @@ app.post('/admin/menu/edit/:id', function (req, res) {
   });
 
 });
+
 
 var create_routes = function (routerObj, callback) {
   async.each(pages, function (page, callback) {
