@@ -149,14 +149,12 @@ module.exports = () => {
 
           $('#saveComponentModal')
             .on('show.bs.modal', () => {
-
-              console.log('show.bs.modal');
-
+              const categoriesOptions = [];
               $.ajax({
                 type: "GET",
                 url: '/list-category',
                 success: (response) => {
-                  const categoriesOptions = Object.keys(response).map(key => {
+                  categoriesOptions = Object.keys(response).map(key => {
                     return {
                       name: response[key].name,
                       id: key,
@@ -170,20 +168,28 @@ module.exports = () => {
                 }
               });
 
-              $.ajax({
-                type: "GET",
-                url: '/components',
-                data: {
-                  filterBy: {
-                    categoryId: "2d40d980-81c3-11e7-8131-c766dc12ab90",
+              $("#categoryInput").change(function () {
+                const categoryName = $(this).val();
+
+                console.log("categoriesOptions : ", categoriesOptions);
+
+                const categoryId = "";
+
+                $.ajax({
+                  type: "GET",
+                  url: '/components',
+                  data: {
+                    filterBy: {
+                      categoryId,
+                    },
                   },
-                },
-                success: (response) => {
-                  console.log('components => ', response);
-                },
-                error: (xhr) => {
-                  //Do Something to handle error
-                }
+                  success: (response) => {
+                    console.log('components => ', response);
+                  },
+                  error: (xhr) => {
+                    //Do Something to handle error
+                  }
+                });
               });
 
             }).modal('show');

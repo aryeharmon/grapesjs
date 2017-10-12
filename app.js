@@ -176,9 +176,9 @@ app.post('/save-layout', function (req, res) {
   var id = uuidv1();
   layouts[id] = {
     label: req.body.label,
-    image_preview: req.body.image_preview,
-    category: req.body.category,
-    subcategory: req.body.subcategory,
+    image_preview:  req.body.image_preview,
+    category:req.body.category,
+    subcategory:req.body.subcategory,    
     html: req.body.html,
   };
 
