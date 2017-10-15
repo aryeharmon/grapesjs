@@ -457,4 +457,6 @@ app.post('/admin/save/page', function (req, res) {
 	});
 });
 
-app.listen(3005);
+app.set('port', process.env.PORT || 3000);
+app.listen(app.get('port'));
+
