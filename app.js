@@ -33,6 +33,7 @@ var cheerio = require('cheerio');
 var routerObj = express.Router();
 
 app.use(function (req, res, next) {
+	res.locals.base_url = process.env.BASE_URL;
 	routerObj(req, res, next)
 });
 
@@ -290,7 +291,7 @@ app.get('/admin/page/delete/:id', function (req, res) {
 	jsonfile.writeFile(pages_file, pages, function (err) {
 		routerObj = express.Router();
 		create_routes(routerObj, function() {
-			res.redirect('/admin');
+			res.redirect(process.env.BASE_URL + '/admin');
 		})
 	});
 });
@@ -310,7 +311,7 @@ app.post('/admin/menu', function (req, res) {
 	};
 
 	jsonfile.writeFile(menues_file, menues, function (err) {
-		res.redirect('/admin/menu');
+		res.redirect(process.env.BASE_URL + '/admin/menu');
 	});
 
 });
@@ -318,7 +319,7 @@ app.get('/admin/menu/delete/:id', function (req, res) {
 	delete menues[req.params.id];
 
 	jsonfile.writeFile(menues_file, menues, function (err) {
-		res.redirect('/admin/menu');
+		res.redirect(process.env.BASE_URL + '/admin/menu');
 	});
 });
 app.get('/admin/menu/edit/:id', function (req, res) {
@@ -338,7 +339,7 @@ app.post('/admin/menu/edit/:id', function (req, res) {
 	menues[req.params.id].menu = req.body.menu;
 
 	jsonfile.writeFile(menues_file, menues, function (err) {
-		res.redirect('/admin/menu/edit/' + req.params.id);
+		res.redirect(process.env.BASE_URL + '/admin/menu/edit/' + req.params.id);
 	});
 	
 });
@@ -451,7 +452,7 @@ app.post('/admin/save/page', function (req, res) {
 	jsonfile.writeFile(pages_file, pages, function (err) {
 		routerObj = express.Router();
 		create_routes(routerObj, function() {
-			res.redirect('/admin');
+			res.redirect(process.env.BASE_URL + '/admin');
 		})
 	});
 });

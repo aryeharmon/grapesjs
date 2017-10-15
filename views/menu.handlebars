@@ -19,8 +19,8 @@
 				<li>
 					{{ name }}
 
-					<a href="/admin/menu/delete/{{@key}}" class="btn btn-danger">Delete</a>
-					<a href="/admin/menu/edit/{{@key}}" target="_blank" class="btn btn-primary">Edit</a>
+					<a href="{{base_url}}/admin/menu/delete/{{@key}}" class="btn btn-danger">Delete</a>
+					<a href="{{base_url}}/admin/menu/edit/{{@key}}" target="_blank" class="btn btn-primary">Edit</a>
 				</li>
 			{{/each}}
 		</ul>
