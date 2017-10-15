@@ -29,9 +29,9 @@
 			{{#each pages}}
 				<li>
 					{{ page_name }}
-					<a href="{{base_url}}/admin/page/delete/{{@key}}" class="btn btn-danger">Delete</a>
-					<a href="{{base_url}}/edit/{{slug}}" target="_blank" class="btn btn-primary">Edit</a>
-					<a href="{{base_url}}/{{slug}}" target="_blank" class="btn btn-default">View</a>
+					<a href="{{../base_url}}/admin/page/delete/{{@key}}" class="btn btn-danger">Delete</a>
+					<a href="{{../base_url}}/edit/{{slug}}" target="_blank" class="btn btn-primary">Edit</a>
+					<a href="{{../base_url}}/{{slug}}" target="_blank" class="btn btn-default">View</a>
 				</li>
 			{{/each}}
 		</ul>
