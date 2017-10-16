@@ -239,7 +239,6 @@ module.exports = {
     var s  = m.get('stylable');
     if(!(s instanceof Array) && !s)
       return;
-    window.mmmmmmmm = e;
     this.onSelect(e, e.target);
   },
 
@@ -308,7 +307,7 @@ module.exports = {
     // var el = el.parentElement.parentElement;
     var model = $(el).data('model');
 
-    if (model) {
+    if (model && model.attributes.type) {
       this.editor.select(model);
       this.showFixedElementOffset(el);
       this.hideElementOffset();
