@@ -64,21 +64,9 @@
           <label for="categoryInput" class="col-4 col-form-label">Category</label>
           <div class="col-8">
             <select class="form-control" id="categoryInput">
-
-              {{!-- {{#each categoriesOptions }}
-              <option>html</option>
-              {{/each}} --}}
-
-              <option>html</option>
-              <option>mustach</option>
-              <option>basic</option>
-              <option>region</option>
-              <option>typography</option>
-              <option>box</option>
-              <option>extra</option>
-              <option>angular</option>
-              <option>forms</option>
-              <option>custom layout</option>
+              {{#each categoriesOptions }}
+              <option value={{id}}>{{name}}</option>
+              {{/each}} 
             </select>
           </div>
         </div>
@@ -87,11 +75,11 @@
           <label for="subCategoryInput" class="col-4 col-form-label">Subcategory</label>
           <div class="col-8">
             <select class="form-control" id="subCategoryInput">
-              <option>template</option>
-              <option>section</option>
-              <option>figure</option>
-              <option>caption</option>
-              <option>source</option>
+              
+              {{#each subcomponents }}
+              <option>{{tagName}}</option>
+              {{/each}} 
+
             </select>
           </div>
         </div>

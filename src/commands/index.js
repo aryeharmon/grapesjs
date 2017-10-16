@@ -149,31 +149,8 @@ module.exports = () => {
 
           $('#saveComponentModal')
             .on('show.bs.modal', () => {
-              const categoriesOptions = [];
-              $.ajax({
-                type: "GET",
-                url: '/list-category',
-                success: (response) => {
-                  categoriesOptions = Object.keys(response).map(key => {
-                    return {
-                      name: response[key].name,
-                      id: key,
-                    }
-                  });
-
-                  // window.categoriesOptions = categoriesOptions;
-                },
-                error: (xhr) => {
-                  //Do Something to handle error
-                }
-              });
-
               $("#categoryInput").change(function () {
-                const categoryName = $(this).val();
-
-                console.log("categoriesOptions : ", categoriesOptions);
-
-                const categoryId = "";
+                const categoryId = $(this).val();
 
                 $.ajax({
                   type: "GET",
@@ -184,7 +161,12 @@ module.exports = () => {
                     },
                   },
                   success: (response) => {
-                    console.log('components => ', response);
+                    $("#subCategoryInput").empty();
+                    $.each(response, function (key) {
+                      let item = response[key];
+                      $("#subCategoryInput").append($("<option></option>")
+                        .attr("value", item.id).text(item.tagName));
+                    });
                   },
                   error: (xhr) => {
                     //Do Something to handle error

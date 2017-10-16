@@ -176,9 +176,9 @@ app.post('/save-layout', function (req, res) {
   var id = uuidv1();
   layouts[id] = {
     label: req.body.label,
-    image_preview:  req.body.image_preview,
-    category:req.body.category,
-    subcategory:req.body.subcategory,    
+    image_preview: req.body.image_preview,
+    category: req.body.category,
+    subcategory: req.body.subcategory,
     html: req.body.html,
   };
 
@@ -222,6 +222,7 @@ app.post('/add-category', function (req, res) {
     res.json(categories);
   });
 });
+
 app.post('/remove-category', function (req, res) {
   delete categories[req.body.id];
 
@@ -423,6 +424,17 @@ var create_routes = function (routerObj, callback) {
                 res.locals.html = $('body').html();
                 res.locals.css = css;
                 res.locals.page = page;
+                res.locals.categoriesOptions = Object.keys(categories).map(key => {
+                  return {
+                    name: categories[key].name,
+                    id: key,
+                  };
+                });
+                
+                res.locals.subcomponents = Object.keys(components).map(key => {
+                  return components[key];
+                });
+
                 res.render('home');
 
               });
