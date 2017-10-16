@@ -149,6 +149,36 @@ module.exports = () => {
 
           $('#saveComponentModal')
             .on('show.bs.modal', () => {
+
+              // $.ajax({
+              //   type: "GET",
+              //   url: '/list-category',
+              //   success: (response) => {
+
+              //     const categoriesOptions = Object.keys(response).map(key => {
+              //       return {
+              //         name: response[key].name,
+              //         id: key,
+              //       };
+              //     });
+
+              //     const optionValue = categoriesOptions[0];
+              //     $("#selectbox").val(optionValue.id)
+              //       .find("option[value=" + optionValue.id + "]").attr('selected', true);
+
+              //     $("#categoryInput").empty();
+              //     $.each(categoriesOptions, function (key) {
+              //       let item = categoriesOptions[key];
+
+              //       $("#categoryInput").append($("<option></option>")
+              //         .attr("value", item.id).text(item.name));
+              //     });
+              //   },
+              //   error: (xhr) => {
+              //     //Do Something to handle error
+              //   }
+              // });
+
               $("#categoryInput").change(function () {
                 const categoryId = $(this).val();
 

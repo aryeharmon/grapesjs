@@ -424,13 +424,14 @@ var create_routes = function (routerObj, callback) {
                 res.locals.html = $('body').html();
                 res.locals.css = css;
                 res.locals.page = page;
+
                 res.locals.categoriesOptions = Object.keys(categories).map(key => {
                   return {
                     name: categories[key].name,
                     id: key,
                   };
                 });
-                
+
                 res.locals.subcomponents = Object.keys(components).map(key => {
                   return components[key];
                 });
