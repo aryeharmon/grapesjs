@@ -330,8 +330,10 @@ app.get('/admin/menu/edit/:id', function (req, res) {
 	res.render('menu-edit', {layout: 'admin'});
 });
 app.get('/menu/:id', function (req, res) {
+	if (menues[req.params.id]) {
 	var menu = menues[req.params.id].menu || [];
 	res.json({items: menu});
+	}
 });
 app.post('/admin/menu/edit/:id', function (req, res) {
 	req.body.menu = JSON.parse(req.body.menu);
