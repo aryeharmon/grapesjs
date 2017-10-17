@@ -229,19 +229,19 @@ module.exports = () => {
               type: "POST",
               url: '/save-layout',
               data: {
-                html: html,
-                label: label,
-                image_preview: image_preview,
-                category: category,
-                subcategory: subcategory,
+                html,
+                label,
+                image_preview,
+                category,
+                subcategory,
               },
               success: (data) => {
                 $("#labelInput").val('');
                 $('#image_upload_preview').attr('src', 'http://placehold.it/200x150');
                 editor.BlockManager.add(data, {
-                  label: label,
+                  label,
                   content: html,
-                  category: category,
+                  category,
                 });
               },
               error: (xhr) => {
