@@ -41,13 +41,13 @@
 
 module.exports = () => {
   var c = {},
-  commands = {},
-  defaultCommands = {},
-  defaults = require('./config/config'),
-  AbsCommands = require('./view/CommandAbstract');
+    commands = {},
+    defaultCommands = {},
+    defaults = require('./config/config'),
+    AbsCommands = require('./view/CommandAbstract');
 
   // Need it here as it would be used below
-  var add = function(id, obj){
+  var add = function (id, obj) {
     delete obj.initialize;
     commands[id] = AbsCommands.extend(obj);
     return this;
@@ -75,13 +75,13 @@ module.exports = () => {
       }
 
       var ppfx = c.pStylePrefix;
-      if(ppfx)
+      if (ppfx)
         c.stylePrefix = ppfx + c.stylePrefix;
 
       // Load commands passed via configuration
-      for( var k in c.defaults) {
+      for (var k in c.defaults) {
         var obj = c.defaults[k];
-        if(obj.id)
+        if (obj.id)
           this.add(obj.id, obj);
       }
 
@@ -112,7 +112,7 @@ module.exports = () => {
         run(ed) {
           var sel = ed.getSelected();
 
-          if(!sel || !sel.get('removable')) {
+          if (!sel || !sel.get('removable')) {
             console.warn('The element is not removable');
             return;
           }
@@ -134,7 +134,7 @@ module.exports = () => {
           }
           // end aryeh edit
 
-                  
+
           ed.select(null);
           sel.destroy();
           ed.trigger('component:update', sel);
@@ -145,29 +145,110 @@ module.exports = () => {
       defaultCommands['save'] = {
         run(ed) {
           var sel = ed.getSelected();
-          var html = sel.toHTML()
-          var label = prompt("Please enter a label name", "");
+          var html = sel.toHTML();
 
-          if (html && label) {
+          $('#saveComponentModal')
+            .on('show.bs.modal', () => {
 
+              // $.ajax({
+              //   type: "GET",
+              //   url: '/list-category',
+              //   success: (response) => {
+
+              //     const categoriesOptions = Object.keys(response).map(key => {
+              //       return {
+              //         name: response[key].name,
+              //         id: key,
+              //       };
+              //     });
+
+              //     const optionValue = categoriesOptions[0];
+              //     $("#selectbox").val(optionValue.id)
+              //       .find("option[value=" + optionValue.id + "]").attr('selected', true);
+
+              //     $("#categoryInput").empty();
+              //     $.each(categoriesOptions, function (key) {
+              //       let item = categoriesOptions[key];
+
+              //       $("#categoryInput").append($("<option></option>")
+              //         .attr("value", item.id).text(item.name));
+              //     });
+              //   },
+              //   error: (xhr) => {
+              //     //Do Something to handle error
+              //   }
+              // });
+              $("#imageFileInput").change(function () {
+
+                if (this.files && this.files[0]) {
+                  var reader = new FileReader();
+
+                  reader.onload = function (e) {
+                    $('#image_upload_preview').attr('src', e.target.result);
+                  }
+
+                  reader.readAsDataURL(this.files[0]);
+
+                }
+              });
+              $("#categoryInput").change(function () {
+                const categoryId = $(this).val();
+
+                $.ajax({
+                  type: "GET",
+                  url: '/components',
+                  data: {
+                    filterBy: {
+                      categoryId,
+                    },
+                  },
+                  success: (response) => {
+                    $("#subCategoryInput").empty();
+                    $.each(response, function (key) {
+                      let item = response[key];
+                      $("#subCategoryInput").append($("<option></option>")
+                        .attr("value", item.id).text(item.tagName));
+                    });
+                  },
+                  error: (xhr) => {
+                    //Do Something to handle error
+                  }
+                });
+              });
+
+            }).modal('show');
+
+          $("#savePresetBtn").click(function () {
+
+            const label = $("#labelInput").val();
+            const image_preview = $('#image_upload_preview').attr('src');
+            const category = $("#categoryInput option:selected").text();
+            const subcategory = $("#subcategory option:selected").text();
 
             $.ajax({
               type: "POST",
               url: base_url + '/save-layout',
               data: {
-                html: html,
-                label: label,
+                html,
+                label,
+                image_preview,
+                category,
+                subcategory,
               },
-              success: function(data) {
+              success: (data) => {
+                $("#labelInput").val('');
+                $('#image_upload_preview').attr('src', 'http://placehold.it/200x150');
                 editor.BlockManager.add(data, {
-                  label: label,
+                  label,
                   content: html,
-                  category: 'Custom Layouts',
+                  category,
                 });
+              },
+              error: (xhr) => {
+                //Do Something to handle error
               }
             });
-          }
-
+          });
         },
       };
 
@@ -175,14 +256,16 @@ module.exports = () => {
         run(ed) {
           var sel = ed.getSelected();
 
-          if(!sel || !sel.get('copyable')) {
+          if (!sel || !sel.get('copyable')) {
             console.warn('The element is not clonable');
             return;
           }
 
           var collection = sel.collection;
           var index = collection.indexOf(sel);
-          collection.add(sel.clone(), {at: index + 1});
+          collection.add(sel.clone(), {
+            at: index + 1
+          });
           ed.trigger('component:update', sel);
         },
       };
@@ -192,7 +275,7 @@ module.exports = () => {
           var sel = ed.getSelected();
           var dragger;
 
-          if(!sel || !sel.get('draggable')) {
+          if (!sel || !sel.get('draggable')) {
             console.warn('The element is not draggable');
             return;
           }
@@ -244,7 +327,7 @@ module.exports = () => {
         },
       };
 
-      if(c.em)
+      if (c.em)
         c.model = c.em.get('Canvas');
 
       return this;
@@ -255,7 +338,7 @@ module.exports = () => {
      * @private
      */
     onLoad() {
-    	this.loadDefaultCommands();
+      this.loadDefaultCommands();
     },
 
     /**
@@ -285,9 +368,9 @@ module.exports = () => {
     get(id) {
       var el = commands[id];
 
-      if(typeof el == 'function'){
+      if (typeof el == 'function') {
         el = new el(c);
-        commands[id]	= el;
+        commands[id] = el;
       }
 
       return el;
