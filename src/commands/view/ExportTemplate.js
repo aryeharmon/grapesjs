@@ -75,7 +75,7 @@ module.exports = {
 
     $.ajax({
       type: "POST",
-      url: '/storage/html',
+      url: base_url + '/storage/html',
       data: data,
       success: function(data) {
         console.log('saved template.')

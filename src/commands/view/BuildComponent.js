@@ -666,7 +666,7 @@ module.exports = {
 
       $.ajax({
        type: "POST",
-       url: "/remove-component",
+       url: base_url + "/remove-component",
        data: {id: $(this).data('id')},
        success: function(data)
        {
@@ -687,7 +687,7 @@ module.exports = {
 
       $.ajax({
        type: "POST",
-       url: "/remove-category",
+       url: base_url + "/remove-category",
        data: {id: that.category_id},
        success: function(data)
        {
@@ -712,7 +712,7 @@ module.exports = {
 
       $.ajax({
        type: "POST",
-       url: "/add-category",
+       url: base_url + "/add-category",
        data: $("#saveCategory").serialize(),
        success: function(data)
        {
@@ -727,7 +727,7 @@ module.exports = {
     $("#saveComponent").submit(function(e) {
       e.preventDefault();
       that.get_form_data();
-      var url = "/save-component";
+      var url = base_url + "/save-component";
 
       $.ajax({
        type: "POST",
