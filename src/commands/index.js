@@ -178,7 +178,19 @@ module.exports = () => {
               //     //Do Something to handle error
               //   }
               // });
+              $("#imageFileInput").change(function () {
 
+                if (this.files && this.files[0]) {
+                  var reader = new FileReader();
+
+                  reader.onload = function (e) {
+                    $('#image_upload_preview').attr('src', e.target.result);
+                  }
+
+                  reader.readAsDataURL(this.files[0]);
+
+                }
+              });
               $("#categoryInput").change(function () {
                 const categoryId = $(this).val();
 
@@ -207,9 +219,9 @@ module.exports = () => {
             }).modal('show');
 
           $("#savePresetBtn").click(function () {
-            // alert("I want this to appear after the modal has opened!"); 
+
             const label = $("#labelInput").val();
-            const image_preview = image_preview || 'img';
+            const image_preview = $('#image_upload_preview').attr('src');
             const category = $("#categoryInput option:selected").text();
             const subcategory = $("#subcategory option:selected").text();
 
@@ -224,6 +236,8 @@ module.exports = () => {
                 subcategory: subcategory,
               },
               success: (data) => {
+                $("#labelInput").val('');
+                $('#image_upload_preview').attr('src', 'http://placehold.it/200x150');
                 editor.BlockManager.add(data, {
                   label: label,
                   content: html,
