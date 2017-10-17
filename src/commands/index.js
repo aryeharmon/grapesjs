@@ -153,7 +153,7 @@ module.exports = () => {
 
             $.ajax({
               type: "POST",
-              url: '/save-layout',
+              url: base_url + '/save-layout',
               data: {
                 html: html,
                 label: label,

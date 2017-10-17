@@ -17,7 +17,7 @@ module.exports = Backbone.View.extend({
       if (result) {
         $.ajax({
           type: "POST",
-          url: '/delete-layout',
+          url: base_url + '/delete-layout',
           data: {
             id: that.model.id,
           },

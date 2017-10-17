@@ -386,6 +386,7 @@ var create_routes = function(routerObj, callback) {
 		res.locals.html = $('body').html();
 		res.locals.css = css;
 		res.locals.page = page;
+		res.locals.base_url = process.env.BASE_URL || '';
 		res.render('home');
 
     });
