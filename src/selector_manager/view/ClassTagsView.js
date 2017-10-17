@@ -52,7 +52,7 @@ module.exports = Backbone.View.extend({
 
     this.listenTo(this.target ,'change:selectedComponent',this.componentChanged);
     this.listenTo(this.target, 'targetClassUpdated', this.updateSelector);
-
+    window.asfsafsafsaf = this.collection;
     this.listenTo(this.collection, 'add', this.addNew);
     this.listenTo(this.collection, 'reset', this.renderClasses);
     this.listenTo(this.collection, 'remove', this.tagRemoved);

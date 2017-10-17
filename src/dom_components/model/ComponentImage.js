@@ -9,7 +9,7 @@ module.exports = Component.extend({
     void: 1,
     droppable: 0,
     highlightable: 0,
-    resizable: 1,
+    resizable: false,
     traits: ['alt']
   }),
 

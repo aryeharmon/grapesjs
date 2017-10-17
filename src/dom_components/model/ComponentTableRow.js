@@ -6,7 +6,8 @@ module.exports = Component.extend({
       type: 'row',
       tagName: 'tr',
       draggable: ['table', 'tbody', 'thead'],
-      droppable: ['th', 'td']
+      droppable: ['th', 'td'],
+      resizable: false,
   }),
 
   initialize(o, opt) {

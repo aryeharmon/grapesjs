@@ -307,7 +307,7 @@ module.exports = {
     // var el = el.parentElement.parentElement;
     var model = $(el).data('model');
 
-    if (model && model.attributes.type) {
+    if (model && model.attributes.type && model.attributes.type.indexOf('col') === -1 && model.attributes.type !== 'Flex Row') {
       this.editor.select(model);
       this.showFixedElementOffset(el);
       this.hideElementOffset();
@@ -329,9 +329,23 @@ module.exports = {
     var attrName = 'data-' + pfx + 'handler';
     var resizeClass = pfx + 'resizing';
     var model = em.get('selectedComponent');
-    var resizable = model.get('resizable');
+    
     var options = {};
     var modelToStyle;
+
+    // aryeh edit
+    // var model = $(el).data('model');
+
+    var old_model = model;
+
+    while (model.attributes.resizable === false && el.tagName !== 'BODY') {
+      var el = el.parentElement;
+      var model = $(el).data('model');
+    }
+
+    var resizable = model.get('resizable');
+
+    // end aryeh edit
 
     var toggleBodyClass = (method, e, opts) => {
       var handlerAttr = e.target.getAttribute(attrName);
@@ -346,7 +360,33 @@ module.exports = {
     if (editor && resizable) {
       options = {
         onStart(e, opts) {
+          window.editor.select(model);
           toggleBodyClass('addClass', e, opts);
+          
+          if (model.attributes.classes && model.attributes.classes.models.length === 0) {
+            // modelToStyle.attributes.classes.add('label', 'john');
+            // modelToStyle.attributes.classes.models[0].set('name', 'col' + parseInt(Math.random()*10000000000) );
+            // modelToStyle.attributes.classes.models[0].set('name', 'col' + parseInt(Math.random()*10000000000) );
+    if (em) {
+      const sm = em.get('SelectorManager');
+      var labelmodel = sm.add({label: 'col' + parseInt(Math.random()*10000000000)});
+
+      if (model) {
+        var compCls = model.get('classes');
+        var lenB = compCls.length;
+        compCls.add(labelmodel);
+        var lenA = compCls.length;
+        window.asfsafsafsaf.add(labelmodel);
+
+          em.trigger('targetClassAdded');
+
+        // this.updateStateVis();
+      }
+    }
+          }
+
+
+
           modelToStyle = em.get('StyleManager').getModelToStyle(model);
           showOffsets = 0;
         },
@@ -358,11 +398,16 @@ module.exports = {
           toggleBodyClass('removeClass', e, opts);
           editor.trigger('change:canvasOffset');
           showOffsets = 1;
+
+          window.editor.select(old_model);
         },
         updateTarget(el, rect, options = {}) {
           if (!modelToStyle) {
             return;
           }
+
+
+
 
           const {store, selectedHandler} = options;
           const onlyHeight = ['tc', 'bc'].indexOf(selectedHandler) >= 0;
@@ -371,12 +416,20 @@ module.exports = {
           const style = modelToStyle.getStyle();
 
           if (!onlyHeight) {
-            style.width = rect.w + unit;
+            style.width = parseInt((rect.w / $('.gjs-frame').width()) * 100) + '%';
           }
 
           if (!onlyWidth) {
-            style.height = rect.h + unit;
+            style.height = rect.h + 'px';
           }
+
+
+          window.aaaaaa = modelToStyle;
+          window.aaaaaa2 = model;
+
+
+
+
 
           modelToStyle.setStyle(style, {avoidStore: 1});
           em.trigger('targetStyleUpdated');

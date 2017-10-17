@@ -6,6 +6,7 @@ module.exports = Component.extend({
       type: 'cell',
       tagName: 'td',
       draggable: ['tr'],
+      resizable: false,
   }),
 
 },{
