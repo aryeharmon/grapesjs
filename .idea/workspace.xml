@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7f936e87-1479-415b-89a9-5e819b339b31" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/commands/index.js" afterPath="$PROJECT_DIR$/src/commands/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/home.handlebars" afterPath="$PROJECT_DIR$/views/home.handlebars" />
-    </list>
+    <list default="true" id="7f936e87-1479-415b-89a9-5e819b339b31" name="Default" comment="" />
     <ignored path="grapesjs.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -2137,7 +2132,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="43189000" />
+    <option name="totallyTimeSpent" value="43812000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="0" width="1616" height="1040" extended-state="0" />
