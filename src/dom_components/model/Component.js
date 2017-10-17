@@ -314,6 +314,7 @@ module.exports = Backbone.Model.extend(Styleable).extend({
     let customName = this.get('custom-name');
     let tag = this.get('tagName');
     tag = tag == 'div' ? 'box' : tag;
+
     let name = this.get('type') || tag;
     name = name.charAt(0).toUpperCase() + name.slice(1);
     return customName || name;

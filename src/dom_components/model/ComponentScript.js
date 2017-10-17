@@ -7,6 +7,7 @@ module.exports = Component.extend({
     droppable: false,
     draggable: false,
     layerable: false,
+    resizable: false,
   }),
 
 }, {

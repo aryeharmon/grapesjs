@@ -5,6 +5,7 @@ module.exports = Component.extend({
   defaults: _.extend({}, Component.prototype.defaults, {
     droppable: false,
     editable: true,
+    resizable: false,
   }),
 
   toHTML() {

@@ -22,6 +22,7 @@ module.exports = Component.extend({
       sources: [],
       attributes:{allowfullscreen:'allowfullscreen'},
       toolbar: OComponent.prototype.defaults.toolbar,
+      resizable: false,
   }),
 
   initialize(o, opt) {

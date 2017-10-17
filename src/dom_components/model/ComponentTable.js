@@ -8,6 +8,7 @@ module.exports = Component.extend({
       droppable: ['tr', 'tbody', 'thead', 'tfoot'],
       columns: 3,
       rows: 2,
+      resizable: false,
       /*
       traits: [{
         label: 'Columns',

@@ -35,6 +35,7 @@ module.exports = Component.extend({
         max: '20',
         changeProp: 1,
       }],
+      resizable: false,
   }),
 
 
