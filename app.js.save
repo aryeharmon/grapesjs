@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const express = require('express')
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser')
@@ -33,7 +31,6 @@ var cheerio = require('cheerio');
 var routerObj = express.Router();
 
 app.use(function (req, res, next) {
-	res.locals.base_url = process.env.BASE_URL;
 	routerObj(req, res, next)
 });
 
@@ -160,7 +157,6 @@ app.post('/save-component', function (req, res) {
 		res.send(id);
 	});
 });
-
 app.post('/remove-component', function (req, res) {
 	delete components[req.body.id];
 
@@ -180,7 +176,6 @@ app.post('/save-layout', function (req, res) {
 		res.send(id);
 	});
 });
-
 app.post('/delete-layout', function (req, res) {
 	delete layouts[req.body.id];
 
@@ -192,18 +187,6 @@ app.post('/delete-layout', function (req, res) {
 app.get('/list-category', function (req, res) {
 	res.json(categories);
 });
-
-app.get('/components', (req, res) => {
-
-  const filterBy = req.query.filterBy || {};
-  const __components = Object.keys(components).filter(key => {
-    return filterBy && filterBy.categoryId && components[key].category === filterBy.categoryId;
-  }).map(key => {
-    return components[key]
-  });
-
-  res.json(__components);
-});
 app.post('/add-category', function (req, res) {
 	var id = req.body.id || uuidv1();
 	categories[id] = {
@@ -214,7 +197,6 @@ app.post('/add-category', function (req, res) {
 		res.json(categories);
 	});
 });
-
 app.post('/remove-category', function (req, res) {
 	delete categories[req.body.id];
 
@@ -287,7 +269,6 @@ app.get('/amp-view', function (req, res) {
 	fs.readFile('./html.html', 'utf8', function (err, html) {
 		fs.readFile('./css.css', 'utf8', function (err, css) {
 			res.locals.html = html;
-
 			res.locals.css = css;
 			res.locals.components = Object.keys(components).map(function(key) {
 				return camelCase(components[key].tagName);
@@ -307,7 +288,7 @@ app.get('/admin/page/delete/:id', function (req, res) {
 	jsonfile.writeFile(pages_file, pages, function (err) {
 		routerObj = express.Router();
 		create_routes(routerObj, function() {
-			res.redirect(process.env.BASE_URL + '/admin');
+			res.redirect('/admin');
 		})
 	});
 });
@@ -327,7 +308,7 @@ app.post('/admin/menu', function (req, res) {
 	};
 
 	jsonfile.writeFile(menues_file, menues, function (err) {
-		res.redirect(process.env.BASE_URL + '/admin/menu');
+		res.redirect('/admin/menu');
 	});
 
 });
@@ -335,7 +316,7 @@ app.get('/admin/menu/delete/:id', function (req, res) {
 	delete menues[req.params.id];
 
 	jsonfile.writeFile(menues_file, menues, function (err) {
-		res.redirect(process.env.BASE_URL + '/admin/menu');
+		res.redirect('/admin/menu');
 	});
 });
 app.get('/admin/menu/edit/:id', function (req, res) {
@@ -346,10 +327,8 @@ app.get('/admin/menu/edit/:id', function (req, res) {
 	res.render('menu-edit', {layout: 'admin'});
 });
 app.get('/menu/:id', function (req, res) {
-	if (menues[req.params.id]) {
 	var menu = menues[req.params.id].menu || [];
 	res.json({items: menu});
-	}
 });
 app.post('/admin/menu/edit/:id', function (req, res) {
 	req.body.menu = JSON.parse(req.body.menu);
@@ -357,7 +336,7 @@ app.post('/admin/menu/edit/:id', function (req, res) {
 	menues[req.params.id].menu = req.body.menu;
 
 	jsonfile.writeFile(menues_file, menues, function (err) {
-		res.redirect(process.env.BASE_URL + '/admin/menu/edit/' + req.params.id);
+		res.redirect('/admin/menu/edit/' + req.params.id);
 	});
 	
 });
@@ -400,24 +379,9 @@ var create_routes = function(routerObj, callback) {
       });
     }, function() {
 		res.locals.html = $('body').html();
-					res.locals.html = res.locals.html.replace(/img/g, 'amp-img');
-
 		res.locals.css = css;
 		res.locals.page = page;
-		res.locals.base_url = process.env.BASE_URL || '';
-
-        res.locals.categoriesOptions = Object.keys(categories).map(key => {
-            return {
-                name: categories[key].name,
-                id: key,
-            };
-    });
-
-        res.locals.subcomponents = Object.keys(components).map(key => {
-            return components[key];
-    });
-
-        res.render('home');
+		res.render('home');
 
     });
   });
@@ -435,7 +399,6 @@ var create_routes = function(routerObj, callback) {
 
 					var re = new RegExp("<mustach-loop (.*)insatnce=\"([^\"]+)\"[^>]*>((.|\n)*?)<\/mustach-loop>", "g");
 					html = html.replace(re, "{{#$2}}$3{{/$2}}");
-					html = html.replace(/<img/g, '<amp-img layout="responsive" height="1" width="1"');
 
 					var $ = cheerio.load(html);
 
@@ -486,11 +449,9 @@ app.post('/admin/save/page', function (req, res) {
 	jsonfile.writeFile(pages_file, pages, function (err) {
 		routerObj = express.Router();
 		create_routes(routerObj, function() {
-			res.redirect(process.env.BASE_URL + '/admin');
+			res.redirect('/admin');
 		})
 	});
 });
 
-app.set('port', process.env.PORT || 3000);
-app.listen(app.get('port'));
-
+app.listen(300);
