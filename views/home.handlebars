@@ -61,14 +61,18 @@
       flex-wrap: wrap;
       /*background-color: lightgrey;*/
     }
-    @media only screen and (max-width: 500px) {
+    @media only screen and (max-width: 720px) {
       .flex-start {    
         display: block;
+      }
+      .flex-start > div {
+        width: 100%;
       }
     }
 
 
     .flex-start > div {    
+      /*width: 100%;*/
       /*background: yellow;*/
 
     }
@@ -98,35 +102,162 @@
       var page = {{{ toJSON page }}};
 
       {{#each components}}
-        $('{{ tagName }}').each(function() {
-          var width = $(this).attr('width');
-          var height = $(this).attr('height');
-          var src = $(this).attr('src');
-          var layout = $(this).attr('layout');
-          
-          if (width) {
-            $(this).css('width', width);
-            $(this).css('display', "inline-block");
-          }
-          if (height) {
-            $(this).css('height', height);
-            $(this).css('display', "block");
-            $(this).css('overflow', "hidden");
-          }
-          if (src) {
-            $(this).css('background-image', "url(" + src + ")");
+              $('{{ tagName }}').each(function() {
+                    var width = $(this).attr('width');
+                    var height = $(this).attr('height');
+                    var src = $(this).attr('src');
+                    var layout = $(this).attr('layout');
+                    
+                    if (width) {
+                      $(this).css('width', width);
+                      $(this).css('display', "inline-block");
+                    }
+                    if (height) {
+                      $(this).css('height', '100%');
+                      $(this).css('display', "block");
+                      $(this).css('overflow', "hidden");
+                    }
+                    if (src) {
+                      $(this).css('background-image', "url(" + src + ")");
 
-            $(this).css('max-width', "100%");
-            $(this).css('background-size', "100% 100%");
-          }
-          if (layout === 'responsive') {
-            $(this).css('width', '100%');
-            // $(this).css('height', 'auto');
-          }
-        });
+                      $(this).css('max-width', width);
+                      $(this).css('background-size', "100% 100%");
+                    }
+                    if (layout === 'responsive') {
+                      $(this).css('width', width);
+                      // $(this).css('height', 'auto');
+                    }
+              });
     {{/each}}
 
     var blkStyle = '.blk-row::after{ content: ""; clear: both; display: block;} .blk-row{padding: 10px;}';
+
+
+grapesjs.plugins.add('rafa', (editor, options) => {
+
+
+
+// Get DomComponents module
+var comps = editor.DomComponents;
+
+// Get the model and the view from the default Component type
+  var domc = editor.DomComponents;
+  var defaultType = domc.getType('default');
+  var defaultModel = defaultType.model;
+  var defaultView = defaultType.view;
+
+
+{{#each components}}
+comps.addType('{{tagName}}', {
+  model: defaultModel.extend({
+    defaults: Object.assign({}, defaultModel.prototype.defaults, {
+      style: {
+        // "min-height": '40px',
+        "display": 'block',
+      },
+      tagName: '{{tagName}}',
+      classes: ['cutom-element-type'],
+      stylable: [],
+      draggable: '*',
+      droppable: true,
+      resizable: false,
+      saveable: true,
+      traits: {{{toJSON (add_default traits)}}},
+    }),
+  },
+  {
+    isComponent: function(el) {
+      if(el.tagName == '{{toUpperCase tagName}}'){
+        return {type: '{{tagName}}'};
+      }
+    },
+  }),
+
+  view: defaultType.view,
+});
+{{/each}}
+
+domc.addType('template', {
+      model: defaultModel.extend({}, {
+        isComponent: function(el) {
+          if (el.tagName == 'TEMPLATE') {
+            // as template.children will return an empty array the traverser
+            // will skip all nodes, therefore attach them as a string (they 
+            // will be processed later)
+            return {type: 'template', components: el.innerHTML}
+          }
+        }
+      }),
+      view: defaultView.extend({
+        // '<template>' can't be shown so in canvas use another tag
+        tagName: 'div'
+      }),
+    });
+
+comps.addType('repeat', {
+  model: defaultModel.extend({
+    defaults: Object.assign({}, defaultModel.prototype.defaults, {
+      style: {
+        // "min-height": '40px',
+        "display": 'block',
+      },
+      tagName: 'repeat',
+      classes: [],
+      stylable: false,
+      draggable: '*',
+      droppable: true,
+      saveable: true,
+      resizable: false,
+      traits: [{
+        name: 'ng-repeat',
+        value: 'e in data track by $index',
+        editable: false,
+      }],
+    }),
+  },
+  {
+    isComponent: function(el) {
+      if(el.tagName == 'REPEAT'){
+        return {type: 'repeat'};
+      }
+    },
+  }),
+
+  // Define the View
+  view: defaultType.view,
+});
+
+  comps.addType('FlexRow', {
+    model: defaultModel.extend({
+      defaults: Object.assign({}, defaultModel.prototype.defaults, {
+        tagName: 'div',
+        classes: [],
+        stylable: false,
+        draggable: '*',
+        droppable: true,
+        saveable: true,
+        resizable: false,
+        traits: [{
+          name: 'ng-repeat',
+          value: 'e in data track by $index',
+          editable: false,
+        }],
+      }),
+    }, {
+      isComponent: function(el) {
+        if (el.tagName == 'DIV' && $(el).attr('class') && $(el).attr('class').indexOf('flex-start') > -1) {
+          return {
+            type: 'Flex Row'
+          };
+        }
+      },
+    }),
+
+    // Define the View
+    view: defaultType.view,
+  });
+
+})
 
 
 
@@ -141,6 +272,7 @@
         'gjs-plugin-forms',
         'gjs-preset',
         'gjs-aviary',
+        'rafa',
       ], 
       pluginsOpts: {
         'gjs-navbar': {/* ...options */},
@@ -878,129 +1010,6 @@
       // });
 
     })
-
-
-
-
-
-
-
-// Get DomComponents module
-var comps = editor.DomComponents;
-
-// Get the model and the view from the default Component type
-var defaultType = comps.getType('default');
-var defaultModel = defaultType.model;
-var defaultView = defaultType.view;
-
-{{#each components}}
-comps.addType('{{tagName}}', {
-  model: defaultModel.extend({
-    defaults: Object.assign({}, defaultModel.prototype.defaults, {
-      style: {
-        // "min-height": '40px',
-        "display": 'block',
-      },
-      tagName: '{{tagName}}',
-      classes: ['cutom-element-type'],
-      stylable: [],
-      draggable: '*',
-      droppable: true,
-      saveable: true,
-      traits: {{{toJSON (add_default traits)}}},
-    }),
-  },
-  {
-    isComponent: function(el) {
-      if(el.tagName == '{{toUpperCase tagName}}'){
-        return {type: '{{tagName}}'};
-      }
-    },
-  }),
-
-  view: defaultType.view,
-});
-{{/each}}
-
-domc.addType('template', {
-      model: defaultModel.extend({}, {
-        isComponent: function(el) {
-          if (el.tagName == 'TEMPLATE') {
-            // as template.children will return an empty array the traverser
-            // will skip all nodes, therefore attach them as a string (they 
-            // will be processed later)
-            return {type: 'template', components: el.innerHTML}
-          }
-        }
-      }),
-      view: defaultView.extend({
-        // '<template>' can't be shown so in canvas use another tag
-        tagName: 'div'
-      }),
-    });
-
-comps.addType('repeat', {
-  model: defaultModel.extend({
-    defaults: Object.assign({}, defaultModel.prototype.defaults, {
-      style: {
-        // "min-height": '40px',
-        "display": 'block',
-      },
-      tagName: 'repeat',
-      classes: [],
-      stylable: false,
-      draggable: '*',
-      droppable: true,
-      saveable: true,
-      traits: [{
-        name: 'ng-repeat',
-        value: 'e in data track by $index',
-        editable: false,
-      }],
-    }),
-  },
-  {
-    isComponent: function(el) {
-      if(el.tagName == 'REPEAT'){
-        return {type: 'repeat'};
-      }
-    },
-  }),
-
-  // Define the View
-  view: defaultType.view,
-});
-
-  comps.addType('FlexRow', {
-    model: defaultModel.extend({
-      defaults: Object.assign({}, defaultModel.prototype.defaults, {
-        tagName: 'div',
-        classes: [],
-        stylable: false,
-        draggable: '*',
-        droppable: true,
-        saveable: true,
-        traits: [{
-          name: 'ng-repeat',
-          value: 'e in data track by $index',
-          editable: false,
-        }],
-      }),
-    }, {
-      isComponent: function(el) {
-        if (el.tagName == 'DIV' && $(el).attr('class') && $(el).attr('class').indexOf('flex-start') > -1) {
-          return {
-            type: 'Flex Row'
-          };
-        }
-      },
-    }),
-
-    // Define the View
-    view: defaultType.view,
-  });
-
-
 
     editor.render();
     </script>

@@ -307,7 +307,7 @@ module.exports = {
     // var el = el.parentElement.parentElement;
     var model = $(el).data('model');
 
-    if (model && model.attributes.type && model.attributes.type.indexOf('col') === -1 && model.attributes.type !== 'Flex Row') {
+    if (model && (model.attributes.type && model.attributes.type.indexOf('col') === -1 || model.attributes.tagName !== 'div') && model.attributes.type !== 'Flex Row' ) {
       this.editor.select(model);
       this.showFixedElementOffset(el);
       this.hideElementOffset();

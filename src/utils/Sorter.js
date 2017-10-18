@@ -799,7 +799,10 @@ module.exports = Backbone.View.extend({
    * @param {Object} pos Object with position coordinates
    * */
   move(dst, src, pos) {
-    window.aryeh = [dst, pos, src];
+    if ($(src).data('model')) {
+      var parent = $($(src).data('model').view.el.parentElement).data('model');
+      window.dddddd = parent;
+    }
 
     var em = this.em;
     em && em.trigger('component:dragEnd:before', dst, src, pos);
@@ -821,7 +824,7 @@ module.exports = Backbone.View.extend({
       var opts = {at: index, noIncrement: 1};
 
       if (!dropContent) {
-        modelTemp = targetCollection.add({}, opts);
+        // modelTemp = targetCollection.add({}, opts);
 
         if (model) {
           modelToDrop = model.collection.remove(model);
@@ -839,7 +842,6 @@ module.exports = Backbone.View.extend({
             // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
             // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
             targetCollection.add("<div class='flex-start'></div>", opts);
-            
             var targetCollection = $($(dst).children()[opts.at]).data('collection');
             // targetCollection.add("<div></div>", opt);
 
@@ -847,7 +849,7 @@ module.exports = Backbone.View.extend({
             var targetCollection = $($($(dst).children()[opts.at]).find('div')).data('collection');
 
             opts.at++;
-          } else {
+          } else if (dst.className.indexOf('flex-start') > -1) {
             targetCollection.add("<div></div>", opts);
             var targetCollection = $($(dst).children()[opts.at]).data('collection');
           }
@@ -858,7 +860,7 @@ module.exports = Backbone.View.extend({
       created = targetCollection.add(modelToDrop, opts);
 
       if (!dropContent) {
-        targetCollection.remove(modelTemp);
+        // targetCollection.remove(modelTemp);
       } else {
         this.dropContent = null;
       }
@@ -882,6 +884,18 @@ module.exports = Backbone.View.extend({
     }
 
     em && em.trigger('component:dragEnd', targetCollection, modelToDrop, warns);
+
+    if (parent) {
+
+      function removeParent(element) {
+        var par = element.parentElement;
+        if (element.childElementCount === 0) {
+          $(element).data('model').destroy();
+          removeParent($(par).data('model').view.el);
+        }
+      }
+      removeParent(parent.view.el);
+    }
 
     return created;
   },
