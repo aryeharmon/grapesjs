@@ -48,12 +48,8 @@ module.exports = Backbone.View.extend({
    * @private
    */
   getContent() {
-    const pfx = this.pfx;
-
-    if (!this.$content) {
-      this.$content = this.$el.find(`.${pfx}content #${pfx}c`);
-    }
-
+    if(!this.$content)
+      this.$content  = this.$el.find('.'+this.pfx+'content #'+this.pfx+'c');
     return this.$content;
   },
 
@@ -74,11 +70,8 @@ module.exports = Backbone.View.extend({
    * */
   updateContent() {
     var content = this.getContent();
-    const children = content.children();
-    const coll = this.getCollector();
-    const body = this.model.get('content');
-    children.length && coll.append(children);
-    content.empty().append(body);
+    this.getCollector().append(content.children());
+    content.html(this.model.get('content'));
   },
 
   /**

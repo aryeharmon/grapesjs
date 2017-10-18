@@ -78,11 +78,8 @@ describe('SelectorManager', () => {
   });
 
   Models.run();
-
-  describe('Views', () => {
-    ClassTagView.run();
-    ClassTagsView.run();
-    e2e.run();
-  });
+  ClassTagView.run();
+  ClassTagsView.run();
+  e2e.run();
 
 });

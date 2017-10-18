@@ -15,10 +15,7 @@ if(env !== 'dev') {
   ]
 }
 
-plugins.push(new webpack.ProvidePlugin({
-  _: 'underscore',
-  Backbone: 'backbone'
-}));
+plugins.push(new webpack.ProvidePlugin({_: 'underscore'}));
 
 module.exports = {
   entry: './src',
@@ -26,6 +23,14 @@ module.exports = {
       filename: './dist/' + name + '.min.js',
       library: 'grapesjs',
       libraryTarget: 'umd',
+  },
+  externals: {
+    jquery: {
+      commonjs2: 'jquery',
+      commonjs: 'jquery',
+      amd: 'jquery',
+      root: 'jQuery'
+    }
   },
   plugins: plugins,
   module: {
@@ -45,8 +50,5 @@ module.exports = {
   },
   resolve: {
     modules: ['src', 'node_modules'],
-    alias: {
-      jquery: 'cash-dom'
-    }
   },
 }

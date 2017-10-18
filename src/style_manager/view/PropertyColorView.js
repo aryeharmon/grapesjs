@@ -1,4 +1,5 @@
-const InputColor = require('domain_abstract/ui/InputColor');
+var Backbone = require('backbone');
+var InputColor = require('domain_abstract/ui/InputColor');
 
 module.exports = require('./PropertyIntegerView').extend({
 
@@ -9,14 +10,13 @@ module.exports = require('./PropertyIntegerView').extend({
 
   onRender() {
     if (!this.input) {
-      const ppfx = this.ppfx;
       const inputColor = new InputColor({
         target: this.target,
         model: this.model,
-        ppfx
+        ppfx: this.ppfx
       });
       const input = inputColor.render();
-      this.el.querySelector(`.${ppfx}fields`).appendChild(input.el);
+      this.$el.append(input.$el);
       this.$input = input.inputEl;
       this.$color = input.colorEl;
       this.input = this.$input.get(0);

@@ -1,5 +1,5 @@
-const PropertyView = require('./PropertyView');
-const $ = Backbone.$;
+var Backbone = require('backbone');
+var PropertyView = require('./PropertyView');
 
 module.exports = PropertyView.extend({
 
@@ -26,9 +26,9 @@ module.exports = PropertyView.extend({
   },
 
   init() {
-    const em = this.em;
-    this.modal = em.get('Modal');
-    this.am = em.get('AssetManager');
+    this.assets = this.target.get('assets');
+    this.modal = this.target.get('Modal');
+    this.am = this.target.get('AssetManager');
     this.events['click #'+this.pfx+'close']    = 'removeFile';
     this.events['click #'+this.pfx+'images']  = 'openAssetManager';
     this.delegateEvents();
@@ -36,8 +36,7 @@ module.exports = PropertyView.extend({
 
   onRender() {
     if (!this.$input) {
-      const plh = this.model.getDefaultValue();
-      this.$input = $(`<input placeholder="${plh}">`);
+      this.$input = $('<input>', {placeholder: this.model.getDefaultValue(), type: 'text' });
     }
 
     if (!this.$preview) {

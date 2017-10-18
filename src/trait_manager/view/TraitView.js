@@ -1,4 +1,4 @@
-const $ = Backbone.$;
+var Backbone = require('backbone');
 
 module.exports = Backbone.View.extend({
 
@@ -81,28 +81,21 @@ module.exports = Backbone.View.extend({
       var md = this.model;
       var trg = this.target;
       var name = md.get('name');
-      const plh = md.get('placeholder') || md.get('default') || '';
-      const type = md.get('type') || 'text';
-      const attrs = trg.get('attributes');
-      const min = md.get('min');
-      const max = md.get('max');
-      const value = md.get('changeProp') ?
-        trg.get(name) : md.get('value') || attrs[name];
-      const input = $(`<input type="${type}" placeholder="${plh}">`);
-
-      if (value) {
-        input.prop('value', value);
+      var opts = {
+        placeholder: md.get('placeholder') || md.get('default'),
+        type: md.get('type') || 'text'
+      };
+      if(md.get('changeProp')){
+        opts.value = trg.get(name);
+      }else{
+        var attrs = trg.get('attributes');
+        opts.value = md.get('value') || attrs[name];
       }
-
-      if (min) {
-        input.prop('min', min);
-      }
-
-      if (max) {
-        input.prop('max', max);
-      }
-
-      this.$input = input;
+      if(md.get('min'))
+        opts.min = md.get('min');
+      if(md.get('max'))
+        opts.max = md.get('max');
+      this.$input = $('<input>', opts);
     }
     return this.$input.get(0);
   },
@@ -130,10 +123,8 @@ module.exports = Backbone.View.extend({
   renderField() {
     if(!this.$input){
       this.$el.append(this.tmpl);
-      const el = this.getInputEl();
-      // I use prepand expecially for checkbox traits
-      const inputWrap = this.el.querySelector(`.${this.inputhClass}`);
-      inputWrap.insertBefore(el, inputWrap.childNodes[0]);
+      var el = this.getInputEl();
+      this.$el.find('.' + this.inputhClass).prepend(el);
     }
   },
 

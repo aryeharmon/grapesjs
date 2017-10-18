@@ -13,13 +13,8 @@ module.exports = {
         var target;
 
         before(() => {
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          fixtures = document.body.querySelector('#fixtures');
+          fixtures = $("#fixtures");
           fixture = $('<div class="classtag-fixture"></div>');
-        });
-
-        after(() => {
-          fixture.remove();
         });
 
         beforeEach(function () {
@@ -40,10 +35,9 @@ module.exports = {
               get() { return { add() {} };}
           };
 
-          fixtures.innerHTML = '';
           fixture.empty().appendTo(fixtures);
-          fixture.append(view.render().el);
-          this.btnAdd = view.$addBtn;
+          fixture.html(view.render().el);
+          this.btnAdd = view.$el.find('#' + view.addBtnId);
           this.input = view.$el.find('input#' + view.newInputId);
           this.$tags = fixture.find('#tags-c');
           this.$states = fixture.find('#states');
@@ -52,6 +46,10 @@ module.exports = {
 
         afterEach(() => {
           delete view.collection;
+        });
+
+        after(() => {
+          fixture.remove();
         });
 
         it('Object exists', () => {
@@ -69,15 +67,15 @@ module.exports = {
         });
 
         it('Start new tag creation', function() {
-          this.btnAdd.trigger('click');
+          this.btnAdd.click();
           expect(this.btnAdd.css('display')).toEqual('none');
           expect(this.input.css('display')).toNotEqual('none');
         });
 
         it.skip('Stop tag creation', function() {
-          this.btnAdd.trigger('click');
+          this.btnAdd.click();
           this.input.val('test')
-          this.input.trigger('blur');
+          this.input.blur();
           //(this.btnAdd.css('display') !== 'none').should.equal(true);
           //(this.input.css('display') == 'none').should.equal(true);
           //this.input.val().should.equal('');
@@ -86,7 +84,7 @@ module.exports = {
           expect(this.input.val()).toEqual('');
         });
 
-        it.skip('Check keyup of ESC on input', function() {
+        it('Check keyup of ESC on input', function() {
           this.btnAdd.click();
           sinon.stub(view, "addNewTag");
           this.input.trigger({
@@ -96,7 +94,7 @@ module.exports = {
           expect(view.addNewTag.calledOnce).toEqual(true);
         });
 
-        it.skip('Check keyup on ENTER on input', function() {
+        it('Check keyup on ENTER on input', function() {
           this.btnAdd.click();
           sinon.stub(view, "endNewTag");
           this.input.trigger({

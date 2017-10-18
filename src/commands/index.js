@@ -309,7 +309,7 @@ module.exports = () => {
      * */
     loadDefaultCommands() {
       for (var id in defaultCommands) {
-          this.add(id, defaultCommands[id]);
+        this.add(id, defaultCommands[id]);
       }
 
       return this;

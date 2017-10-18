@@ -6,27 +6,36 @@ module.exports = {
 
       describe('ButtonView', () => {
 
-        var fixtures;
+        var $fixtures;
+        var $fixture;
         var model;
         var view;
         var btnClass = 'btn';
+
+        before(() => {
+          $fixtures  = $("#fixtures");
+          $fixture   = $('<div class="cssrule-fixture"></div>');
+        });
 
         beforeEach(() => {
           model = new Button();
           view = new ButtonView({
             model
           });
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          fixtures = document.body.querySelector('#fixtures');
-          fixtures.appendChild(view.render().el);
+          $fixture.empty().appendTo($fixtures);
+          $fixture.html(view.render().el);
         });
 
         afterEach(() => {
           view.remove();
         });
 
+        after(() => {
+          $fixture.remove();
+        });
+
         it('Button empty', () => {
-          expect(fixtures.innerHTML).toEqual('<span class="' + btnClass+ '"></span>');
+          expect($fixture.html()).toEqual('<span class="' + btnClass+ '"></span>');
         });
 
         it('Update class', () => {

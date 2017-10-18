@@ -1,5 +1,4 @@
-import $ from 'cash-dom';
-import { defaults } from 'underscore';
+import { isUndefined, defaults } from 'underscore';
 
 module.exports = (() => {
   const defaultConfig = require('./config/config');
@@ -10,14 +9,12 @@ module.exports = (() => {
 
   return {
 
-    $,
+    // Will be replaced on build
+    version: '<# VERSION #>',
 
     editors,
 
     plugins,
-
-    // Will be replaced on build
-    version: '<# VERSION #>',
 
     /**
      * Initializes an editor based on passed options
@@ -39,6 +36,11 @@ module.exports = (() => {
      */
     init(config = {}) {
       const els = config.container;
+
+      // Make a missing $ more verbose
+      if (isUndefined($)) {
+        throw 'jQuery not found';
+      }
 
       if (!els) {
         throw new Error("'container' is required");

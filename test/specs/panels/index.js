@@ -96,12 +96,9 @@ describe('Panels', () => {
   });
 
   Models.run();
-
-  describe('Views', () => {
-    PanelView.run();
-    PanelsView.run();
-    ButtonView.run();
-    ButtonsView.run();
-    e2e.run();
-  })
+  PanelView.run();
+  PanelsView.run();
+  ButtonView.run();
+  ButtonsView.run();
+  e2e.run();
 });

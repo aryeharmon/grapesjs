@@ -21,7 +21,6 @@ describe('Asset Manager', () => {
     };
 
     beforeEach(() => {
-      document.body.innerHTML = '<div id="asset-c"></div>';
       imgObj = {
         type: 'image',
         src: 'path/to/image',
@@ -30,7 +29,6 @@ describe('Asset Manager', () => {
       };
       obj = new AssetManager();
       obj.init();
-      document.body.querySelector('#asset-c').appendChild(obj.render());
     });
 
     afterEach(() => {
@@ -90,7 +88,6 @@ describe('Asset Manager', () => {
       var storageManager;
 
       beforeEach(() => {
-        document.body.innerHTML = '<div id="asset-c"></div>';
         storageManager = new StorageManager().init({
           autoload: 0,
           type: storageId
@@ -99,7 +96,6 @@ describe('Asset Manager', () => {
           stm: storageManager,
         });
         storageManager.add(storageId, storageMock);
-        document.body.querySelector('#asset-c').appendChild(obj.render());
       });
 
       afterEach(() => {

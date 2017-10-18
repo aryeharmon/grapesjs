@@ -6,26 +6,35 @@ module.exports = {
 
       describe('ComponentTextView', () => {
 
-        var fixtures;
+        var $fixtures;
+        var $fixture;
         var model;
         var view;
+
+        before(() => {
+          $fixtures = $("#fixtures");
+          $fixture = $('<div class="components-fixture"></div>');
+        });
 
         beforeEach(() => {
           model = new Component();
           view = new ComponentTextView({
             model
           });
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          fixtures = document.body.querySelector('#fixtures');
-          fixtures.appendChild(view.render().el);
+          $fixture.empty().appendTo($fixtures);
+          $fixture.html(view.render().el);
         });
 
         afterEach(() => {
           view.remove();
         });
 
+        after(() => {
+          $fixture.remove();
+        });
+
         it('Component empty', () => {
-          expect(fixtures.innerHTML).toEqual('<div data-highlightable="1"></div>');
+          expect($fixture.html()).toEqual('<div data-highlightable="1"></div>');
         });
 
         it('Input content is stored in model', () => {
@@ -38,8 +47,7 @@ module.exports = {
         it('Init with content', () => {
           model = new Component({ content: 'test' });
           view = new ComponentTextView({ model });
-          fixtures.appendChild(view.render().el);
-          expect(view.el.innerHTML).toEqual('test');
+          expect(view.render().el.innerHTML).toEqual('test');
         });
 
     });

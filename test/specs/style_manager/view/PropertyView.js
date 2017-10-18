@@ -8,7 +8,8 @@ module.exports = {
       describe('PropertyView', () => {
 
         var component;
-        var fixtures;
+        var $fixtures;
+        var $fixture;
         var target;
         var model;
         var view;
@@ -17,6 +18,11 @@ module.exports = {
         var propName = 'testprop';
         var propValue = 'testvalue';
         var defValue = 'testDefault';
+
+        before(() => {
+          $fixtures  = $("#fixtures");
+          $fixture   = $('<div class="sm-fixture"></div>');
+        });
 
         beforeEach(() => {
           propTarget = Object.assign({}, Backbone.Events);
@@ -29,10 +35,9 @@ module.exports = {
             propTarget
           };
           view = new PropertyView(options);
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          fixtures = document.body.firstChild;
+          $fixture.empty().appendTo($fixtures);
           view.render();
-          fixtures.appendChild(view.el);
+          $fixture.html(view.el);
         });
 
         afterEach(() => {
@@ -40,12 +45,13 @@ module.exports = {
         });
 
         after(() => {
+          $fixture.remove();
           component = null;
         });
 
         it('Rendered correctly', () => {
           var prop = view.el;
-          expect(fixtures.querySelector('.property')).toExist();
+          expect($fixture.get(0).querySelector('.property')).toExist();
           expect(prop.querySelector('.label')).toExist();
           expect(prop.querySelector('.field')).toExist();
         });
@@ -148,9 +154,9 @@ module.exports = {
               model,
               propTarget: target
             });
-            fixtures.innerHTML = '';
+            $fixture.empty().appendTo($fixtures);
             view.render();
-            fixtures.appendChild(view.el);
+            $fixture.html(view.el);
           });
 
           it('updateTargetStyle', () => {
@@ -201,9 +207,9 @@ module.exports = {
             view = new PropertyView({
               model
             });
-            fixtures.innerHTML = '';
+            $fixture.empty().appendTo($fixtures);
             view.render();
-            fixtures.appendChild(view.el);
+            $fixture.html(view.el);
           });
 
           it('Value as default', () => {
@@ -215,8 +221,8 @@ module.exports = {
             expect(input.getAttribute('placeholder')).toEqual(defValue);
           });
 
-          it('Input value is set up to default', () => {
-            expect(view.getInputValue()).toEqual(defValue);
+          it('Input value is empty', () => {
+            expect(view.getInputValue()).toEqual('');
           });
 
         });

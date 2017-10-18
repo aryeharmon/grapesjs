@@ -7,12 +7,18 @@ module.exports = {
 
       describe('ComponentView', () => {
 
-        var fixtures;
+        var $fixtures;
+        var $fixture;
         var model;
         var view;
         var hClass = 'hc-state';
         var dcomp;
         var compOpts;
+
+        before(() => {
+          $fixtures = $("#fixtures");
+          $fixture = $('<div class="components-fixture"></div>');
+        });
 
         beforeEach(() => {
           dcomp = new DomComponents();
@@ -23,33 +29,36 @@ module.exports = {
           view = new ComponentView({
             model
           });
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          fixtures = document.body.querySelector('#fixtures');
-          fixtures.appendChild(view.render().el);
+          $fixture.empty().appendTo($fixtures);
+          $fixture.html(view.render().el);
         });
 
         afterEach(() => {
           view.remove();
         });
 
+        after(() => {
+          $fixture.remove();
+        });
+
         it('Component empty', () => {
-          expect(fixtures.innerHTML).toEqual('<div data-highlightable="1"></div>');
+          expect($fixture.html()).toEqual('<div data-highlightable="1"></div>');
         });
 
         it('Add helper class on update of state', () => {
           model.set('state', 'test');
-          expect(fixtures.innerHTML).toEqual('<div data-highlightable="1" class="' + hClass + '"></div>');
+          expect($fixture.html()).toEqual('<div data-highlightable="1" class="' + hClass + '"></div>');
         });
 
         it('Clean form helper state', () => {
           model.set('state', 'test');
           model.set('state', '');
-          expect(fixtures.innerHTML).toEqual('<div data-highlightable="1" class=""></div>');
+          expect($fixture.html()).toEqual('<div data-highlightable="1" class=""></div>');
         });
 
         it('Add helper class on status update', () => {
           model.set('status', 'selected');
-          expect(fixtures.innerHTML).toEqual('<div data-highlightable="1" class="selected"></div>');
+          expect($fixture.html()).toEqual('<div data-highlightable="1" class="selected"></div>');
         });
 
         it('Get string of classes', () => {
@@ -77,7 +86,7 @@ module.exports = {
         it('Clean style', () => {
           model.set('style', { color: 'red'});
           model.set('style', {});
-          expect(view.el.getAttribute('style')).toEqual(null);
+          expect(view.el.getAttribute('style')).toEqual('');
         });
 
         it('Get style string', () => {
@@ -108,8 +117,6 @@ module.exports = {
         it('Init with different tag', () => {
           model = new Component({ tagName: 'span' });
           view = new ComponentView({ model });
-          fixtures.innerHTML = '';
-          fixtures.appendChild(view.render().el);
           expect(view.render().el.tagName).toEqual('SPAN');
         });
 
@@ -124,9 +131,7 @@ module.exports = {
             model,
             componentTypes: dcomp.componentTypes,
           });
-          fixtures.innerHTML = '';
-          fixtures.appendChild(view.render().el);
-          expect(view.$el.html()).toEqual('<span data-highlightable="1"></span><div title="test" data-highlightable="1"></div>');
+          expect(view.render().$el.html()).toEqual('<span data-highlightable="1"></span><div title="test" data-highlightable="1"></div>');
         });
 
     });

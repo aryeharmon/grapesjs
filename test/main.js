@@ -16,13 +16,13 @@ describe('Main', () => {
   require(`${path}css_composer`);
   require(`${path}device_manager`);
   require(`${path}dom_components`);
+  require(`${path}grapesjs`);
   require(`${path}modal`);
   require(`${path}panels`);
   require(`${path}parser`);
   require(`${path}plugin_manager`);
   require(`${path}selector_manager`);
   require(`${path}storage_manager`);
-  require(`${path}style_manager`);
+  // require(`${path}style_manager`);
   require(`${path}trait_manager`);
-  require(`${path}grapesjs`);
 });

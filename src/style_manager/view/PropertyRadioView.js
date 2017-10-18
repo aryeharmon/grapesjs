@@ -18,7 +18,7 @@ module.exports = require('./PropertyView').extend({
     const prop = model.get('property');
     const options = model.get('list') || model.get('options') || [];
 
-    if (!this.input) {
+    if (!this.$input) {
       if(options && options.length) {
         let inputStr = '';
 
@@ -31,39 +31,31 @@ module.exports = require('./PropertyView').extend({
             <div class="${ppfx}radio-item">
               <input type="radio" class="${pfx}radio" id="${id}" name="${prop}" value="${el.value}"/>
               <label class="${cl || itemCls}" ${titleAttr} for="${id}">${cl ? '' : labelTxt}</label>
-            </div>
-          `;
+            </div>`;
         });
 
-        const inputHld = this.el.querySelector(`#${pfx}input-holder`);
-        inputHld.innerHTML = `<div>${inputStr}</div>`;
-        this.input = inputHld.firstChild;
+        this.$inputEl = $(inputStr);
+        this.input = this.$inputEl.get(0);
+        this.$el.find(`#${pfx}input-holder`).html(this.$inputEl);
+        this.$input = this.$inputEl.find(`input[name="${prop}"]`);
       }
     }
   },
 
   getInputValue() {
-    const inputChk = this.getCheckedEl();
-    return inputChk ? inputChk.value : '';
-  },
-
-  getCheckedEl() {
-    const input = this.getInputEl();
-    return input ? input.querySelector('input:checked') : '';
+    return this.$input ? this.$el.find('input:checked').val() : '';
   },
 
   setValue(value) {
     const model = this.model;
-    let val = value || model.get('value') || model.getDefaultValue();
-    const input = this.getInputEl();
-    const inputIn = input ? input.querySelector(`[value="${val}"]`) : '';
+    var v = model.get('value') || model.getDefaultValue();
 
-    if (inputIn) {
-      inputIn.checked = true;
-    } else {
-      const inputChk = this.getCheckedEl();
-      inputChk && (inputChk.checked = false);
+    if (value) {
+      v  = value;
     }
+
+    if(this.$input)
+      this.$input.filter(`[value="${v}"]`).prop('checked', true);
   },
 
 });

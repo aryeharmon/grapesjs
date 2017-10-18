@@ -13,6 +13,11 @@ module.exports = {
         var dcomp;
         var compOpts;
 
+        before(() => {
+          $fixtures = $("#fixtures");
+          $fixture = $('<div class="components-fixture"></div>');
+        });
+
         beforeEach(() => {
           dcomp = new DomComponents();
           compOpts = {
@@ -23,12 +28,16 @@ module.exports = {
             collection: model,
             componentTypes: dcomp.componentTypes,
           });
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          document.body.querySelector('#fixtures').appendChild(view.render().el);
+          $fixture.empty().appendTo($fixtures);
+          $fixture.html(view.render().el);
         });
 
         afterEach(() => {
           view.collection.reset();
+        });
+
+        after(() => {
+          $fixture.remove();
         });
 
         it("Collection is empty", () => {

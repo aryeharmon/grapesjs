@@ -32,11 +32,8 @@ module.exports = {
   checkLocal: 1,
 
   // ONLY FOR REMOTE STORAGE
-  // Custom parameters to pass with the remote storage request, eg. csrf token
+  // Custom params that should be passed with each store/load request
   params: {},
-
-  // Custom headers for the remote storage request
-  headers: {},
 
   // Endpoint where to save all stuff
   urlStore: '',

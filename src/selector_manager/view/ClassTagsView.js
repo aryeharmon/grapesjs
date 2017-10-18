@@ -97,7 +97,7 @@ module.exports = Backbone.View.extend({
    * @private
    */
   startNewTag(e) {
-    this.$addBtn.get(0).style.display = 'none';
+    this.$addBtn.hide();
     this.$input.show().focus();
   },
 
@@ -107,7 +107,7 @@ module.exports = Backbone.View.extend({
    * @private
    */
   endNewTag(e) {
-    this.$addBtn.get(0).style.display = '';
+    this.$addBtn.show();
     this.$input.hide().val('');
   },
 

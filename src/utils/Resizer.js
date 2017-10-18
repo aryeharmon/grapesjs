@@ -1,5 +1,3 @@
-const $ = Backbone.$;
-
 var defaults = {
   // Function which returns custom X and Y coordinates of the mouse
   mousePosFetcher: null,

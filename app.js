@@ -160,7 +160,6 @@ app.post('/save-component', function (req, res) {
 		res.send(id);
 	});
 });
-
 app.post('/remove-component', function (req, res) {
 	delete components[req.body.id];
 
@@ -180,7 +179,6 @@ app.post('/save-layout', function (req, res) {
 		res.send(id);
 	});
 });
-
 app.post('/delete-layout', function (req, res) {
 	delete layouts[req.body.id];
 
@@ -192,18 +190,6 @@ app.post('/delete-layout', function (req, res) {
 app.get('/list-category', function (req, res) {
 	res.json(categories);
 });
-
-app.get('/components', (req, res) => {
-
-  const filterBy = req.query.filterBy || {};
-  const __components = Object.keys(components).filter(key => {
-    return filterBy && filterBy.categoryId && components[key].category === filterBy.categoryId;
-  }).map(key => {
-    return components[key]
-  });
-
-  res.json(__components);
-});
 app.post('/add-category', function (req, res) {
 	var id = req.body.id || uuidv1();
 	categories[id] = {
@@ -214,7 +200,6 @@ app.post('/add-category', function (req, res) {
 		res.json(categories);
 	});
 });
-
 app.post('/remove-category', function (req, res) {
 	delete categories[req.body.id];
 
@@ -405,19 +390,7 @@ var create_routes = function(routerObj, callback) {
 		res.locals.css = css;
 		res.locals.page = page;
 		res.locals.base_url = process.env.BASE_URL || '';
-
-        res.locals.categoriesOptions = Object.keys(categories).map(key => {
-            return {
-                name: categories[key].name,
-                id: key,
-            };
-    });
-
-        res.locals.subcomponents = Object.keys(components).map(key => {
-            return components[key];
-    });
-
-        res.render('home');
+		res.render('home');
 
     });
   });
@@ -491,6 +464,6 @@ app.post('/admin/save/page', function (req, res) {
 	});
 });
 
+//app.listen(3000);
 app.set('port', process.env.PORT || 3000);
 app.listen(app.get('port'));
-

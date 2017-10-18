@@ -26,6 +26,7 @@ describe('GrapesJS', () => {
 
     before(() => {
       editorName = 'editor-fixture';
+      fixtures = $("#fixtures");
     });
 
     beforeEach(() => {
@@ -40,16 +41,14 @@ describe('GrapesJS', () => {
         },
       }
       obj = grapesjs;
-      //fixture = $('<div id="' + editorName + '"></div>');
-      //fixture.empty().appendTo(fixtures);
-
-      document.body.innerHTML = `<div id="fixtures"><div id="${editorName}"></div></div>`;
-      fixtures = document.body.querySelector('#fixtures');
+      fixture = $('<div id="' + editorName + '"></div>');
+      fixture.empty().appendTo(fixtures);
     });
 
     afterEach(() => {
       config = {};
       obj = null;
+      fixture.remove();
     });
 
     it('Main object should be loaded', () => {
@@ -60,7 +59,7 @@ describe('GrapesJS', () => {
       var editor = obj.init(config);
       expect(editor).toExist();
     });
-
+    
     it('Init new editor with node for container', () => {
       var configAlt = {
         container: document.createElement('div'),
@@ -102,7 +101,7 @@ describe('GrapesJS', () => {
 
     it.skip('Init editor from element', () => {
       config.fromElement = 1;
-      fixtures.innerHTML = documentEl;
+      fixture.html(documentEl);
       var editor = obj.init(config);
       var html = editor.getHtml();
       var css = editor.getCss();
@@ -228,22 +227,6 @@ describe('GrapesJS', () => {
       var editor = obj.init(config);
       editor.setDevice('Tablet');
       expect(editor.getDevice()).toEqual('Tablet');
-    });
-
-    // Problems with iframe loading
-    it.skip('Init new editor with custom plugin overrides default commands', () => {
-      var editor,
-          pluginName = 'test-plugin-opts';
-
-      obj.plugins.add(pluginName, (edt, opts) => {
-        let cmdm = edt.Commands;
-        // Overwrite export template
-        cmdm.add('export-template', {test: 1});
-      });
-      config.plugins = [pluginName];
-
-      editor = obj.init(config);
-      expect(editor.Commands.get('export-template').test).toEqual(1);
     });
 
   });

@@ -5,22 +5,33 @@ module.exports = {
   run() {
       describe('ModalView', () => {
 
+        var $fixtures;
+        var $fixture;
         var model;
         var view;
         var editorModel;
+
+        before(() => {
+          $fixtures = $("#fixtures");
+          $fixture= $('<div class="modal-fixture"></div>');
+        });
 
         beforeEach(() => {
           model = new Modal();
           view = new ModalView({
             model
           });
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          document.body.querySelector('#fixtures').appendChild(view.render().el);
+          $fixture.empty().appendTo($fixtures);
+          $fixture.html(view.render().el);
         });
 
         afterEach(() => {
           view = null;
           model = null;
+        });
+
+        after(() => {
+          $fixture.remove();
         });
 
         it("The content is not empty", () => {

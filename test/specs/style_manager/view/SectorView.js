@@ -6,22 +6,31 @@ module.exports = {
 
       describe('SectorView', () => {
 
-        var fixtures;
+        var $fixtures;
+        var $fixture;
         var model;
         var view;
+
+        before(() => {
+          $fixtures  = $("#fixtures");
+          $fixture   = $('<div class="sector-fixture"></div>');
+        });
 
         beforeEach(() => {
           model = new Sector();
           view = new SectorView({
             model
           });
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          fixtures = document.body.querySelector('#fixtures');
-          fixtures.appendChild(view.render().el);
+          $fixture.empty().appendTo($fixtures);
+          $fixture.html(view.render().el);
         });
 
         afterEach(() => {
           view.remove();
+        });
+
+        after(() => {
+          $fixture.remove();
         });
 
         it('Rendered correctly', () => {
@@ -34,7 +43,7 @@ module.exports = {
 
         it('No properties', () => {
           var props = view.el.querySelector('.properties');
-          expect(props.innerHTML).toEqual('');
+          expect(props.innerHTML).toEqual('<div class="clear"></div>');
         });
 
         it('Update on open', () => {
@@ -66,14 +75,15 @@ module.exports = {
             view = new SectorView({
               model
             });
-            //$fixture.empty().appendTo($fixtures);
-            //$fixture.html(view.render().el);
-            document.body.innerHTML = '<div id="fixtures"></div>';
-            fixtures = document.body.querySelector('#fixtures');
-            fixtures.appendChild(view.render().el);
+            $fixture.empty().appendTo($fixtures);
+            $fixture.html(view.render().el);
           });
 
-          it('Rendered correctly', () => {
+          afterEach(() => {
+            view.remove();
+          });
+
+          it('Rendered correctly2', () => {
             var sector = view.el;
             var props = sector.querySelector('.properties');
             expect(sector.querySelector('.title').innerHTML).toContain('TestName');
@@ -84,7 +94,7 @@ module.exports = {
 
           it('Has properties', () => {
             var props = view.el.querySelector('.properties');
-            expect(props.children.length).toEqual(3);
+            expect(props.children.length).toEqual(4); // Last one is 'clear' element
           });
 
         });

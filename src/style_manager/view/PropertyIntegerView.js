@@ -1,5 +1,4 @@
 const InputNumber = require('domain_abstract/ui/InputNumber');
-const $ = Backbone.$;
 
 module.exports = require('./PropertyView').extend({
 
@@ -29,8 +28,7 @@ module.exports = require('./PropertyView').extend({
       const fields = this.el.querySelector(`.${ppfx}fields`);
       fields.appendChild(input.el);
       this.$input = input.inputEl;
-      this.unit = input.unitEl;
-      this.$unit = $(this.unit);
+      this.$unit = input.unitEl;
       this.input = this.$input.get(0);
       this.inputInst = input;
     }

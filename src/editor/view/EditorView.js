@@ -1,5 +1,3 @@
-const $ = Backbone.$;
-
 module.exports = Backbone.View.extend({
 
   initialize() {

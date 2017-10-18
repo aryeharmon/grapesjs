@@ -14,7 +14,7 @@ module.exports = Backbone.View.extend({
     this.parent = o.parent;
     this.listenTo(this.collection, 'add', this.addTo);
     this.listenTo(this.collection, 'reset resetNavigator', this.render);
-    this.className = this.pfx + 'items';
+    this.className   = this.pfx + 'items';
 
     if (config.sortable && !this.opt.sorter) {
       var pfx = this.pfx;
@@ -64,10 +64,6 @@ module.exports = Backbone.View.extend({
     const level = this.level;
     var fragment  = fragmentEl || null;
     var viewObject  = ItemView;
-
-    if(!this.isCountable(model, this.config.hideTextnode)) {
-      return;
-    }
 
     var view = new viewObject({
       level,
@@ -119,11 +115,17 @@ module.exports = Backbone.View.extend({
   },
 
   render() {
-    const frag = document.createDocumentFragment();
-    this.el.innerHTML = '';
-    this.collection.each(model => this.addToCollection(model, frag));
-    this.el.appendChild(frag);
-    this.$el.attr('class', this.className);
+    var fragment = document.createDocumentFragment();
+    this.$el.empty();
+
+    this.collection.each(function(model) {
+      if(!this.isCountable(model, this.config.hideTextnode))
+        return;
+      this.addToCollection(model, fragment);
+    }, this);
+
+    this.$el.append(fragment);
+    this.$el.attr('class', _.result(this, 'className'));
     return this;
   }
 });

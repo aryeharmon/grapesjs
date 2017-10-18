@@ -1,5 +1,5 @@
-const SelectComponent = require('./SelectComponent');
-const $ = Backbone.$;
+var Backbone = require('backbone');
+var SelectComponent = require('./SelectComponent');
 
 module.exports = _.extend({},SelectComponent,{
 

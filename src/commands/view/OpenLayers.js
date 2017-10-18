@@ -1,5 +1,4 @@
-const Layers = require('navigator');
-const $ = Backbone.$;
+var Layers = require('navigator');
 
 module.exports = {
 

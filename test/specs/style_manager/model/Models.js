@@ -163,11 +163,6 @@ module.exports = {
     describe('Layer', () => {
 
       var obj;
-      var properties = [
-        {value: 'val1', property: 'prop1'},
-        {value: 'val2', property: 'prop2'},
-        {value: 'val3', property: 'prop3', functionName: 'test'}
-      ];
 
       beforeEach(() => {
         obj = new Layer();
@@ -181,26 +176,8 @@ module.exports = {
         expect(obj.has('index')).toEqual(true);
       });
 
-      it('Is not active', () => {
-        expect(obj.get('active')).toEqual(false);
-      });
-
-      it('Has no properties', () => {
-        expect(obj.get('properties').length).toEqual(0);
-      });
-
-      it('Get correct values from properties', () => {
-        obj = new Layer({
-          properties
-        })
-        expect(obj.getFullValue()).toEqual('val1 val2 test(val3)');
-      });
-
-      it('Get correct value from properties', () => {
-        obj = new Layer({properties})
-        expect(obj.getPropertyValue()).toEqual('');
-        expect(obj.getPropertyValue('no-prop')).toEqual('');
-        expect(obj.getPropertyValue('prop3')).toEqual('test(val3)');
+      it('Is active', () => {
+        expect(obj.get('active')).toEqual(true);
       });
 
     });
@@ -208,11 +185,6 @@ module.exports = {
     describe('Layers', () => {
 
       var obj;
-      var properties = [
-        {value: 'val1', property: 'prop1'},
-        {value: 'val2', property: 'prop2'},
-        {value: 'val3', property: 'prop3', functionName: 'test'}
-      ];
 
       beforeEach(() => {
         obj = new Layers();
@@ -252,23 +224,6 @@ module.exports = {
         expect(obj.idx).toEqual(1);
       });
 
-      it('getFullValue from layers', () => {
-        obj = new Layers([
-          {properties},
-          {properties},
-          {properties}
-        ]);
-        expect(obj.getFullValue()).toEqual('val1 val2 test(val3), val1 val2 test(val3), val1 val2 test(val3)');
-      });
-
-      it('getPropertyValues from layers', () => {
-        obj = new Layers([
-          {properties},
-          {properties},
-          {properties}
-        ]);
-        expect(obj.getPropertyValues('prop3')).toEqual('test(val3), test(val3), test(val3)');
-      });
     });
 
     describe('PropertyFactory', () => {

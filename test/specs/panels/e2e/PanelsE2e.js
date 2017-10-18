@@ -10,7 +10,7 @@ module.exports = {
         var editorName = 'panel-fixture';
 
         before(() => {
-          fixtures  = $('<div id="#fixtures"></div>').appendTo('body');
+          fixtures  = $("#fixtures");
         });
 
         beforeEach(() => {
@@ -33,7 +33,7 @@ module.exports = {
           //fixture.remove();
         });
 
-        it('Command is correctly executed on button click', () => {
+        it.skip('Command is correctly executed on button click', () => {
           var commandId = 'command-test';
           config.commands = {
             defaults: [{

@@ -113,12 +113,9 @@ describe('DOM Components', () => {
   });
 
   ComponentModels.run();
-
-  describe('Views', () => {
-    ComponentView.run();
-    ComponentsView.run();
-    ComponentTextView.run();
-    ComponentImageView.run();
-  });
+  ComponentView.run();
+  ComponentsView.run();
+  ComponentTextView.run();
+  ComponentImageView.run();
 
 });

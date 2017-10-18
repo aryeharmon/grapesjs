@@ -9,7 +9,6 @@ module.exports = Backbone.View.extend({
     this.preview = o.preview;
     this.pfx = this.config.stylePrefix || '';
     this.ppfx = this.config.pStylePrefix || '';
-    this.propsConfig = o.propsConfig;
     let pfx = this.pfx;
     let ppfx = this.ppfx;
     let collection = this.collection;
@@ -56,27 +55,23 @@ module.exports = Backbone.View.extend({
    * */
   addToCollection(model, fragmentEl, index) {
     var fragment = fragmentEl || null;
-    const stackModel = this.stackModel;
-    const config = this.config;
-    const sorter = this.sorter;
-    const propsConfig = this.propsConfig;
+    var viewObject = LayerView;
 
     if(typeof this.preview !== 'undefined'){
       model.set('preview', this.preview);
     }
 
-    var view = new LayerView({
+    var view = new viewObject({
         model,
-        config,
-        sorter,
-        stackModel,
-        propsConfig
+        stackModel: this.stackModel,
+        config: this.config,
+        sorter: this.sorter
     });
-    var rendered = view.render().el;
+    var rendered  = view.render().el;
 
-    if (fragment) {
-      fragment.appendChild(rendered);
-    } else {
+    if(fragment){
+      fragment.appendChild( rendered );
+    }else{
       if(typeof index != 'undefined'){
         var method  = 'before';
         // If the added model is the last of collection

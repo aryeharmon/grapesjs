@@ -1,7 +1,6 @@
 # [GrapesJS](http://grapesjs.com)
 
 [![Build Status](https://travis-ci.org/artf/grapesjs.svg?branch=master)](https://travis-ci.org/artf/grapesjs)
-[![Chat](https://img.shields.io/badge/chat-discord-7289da.svg)](https://discord.gg/QAbgGXq)
 
 <p align="center"><img src="http://grapesjs.com/img/grapesjs-front-page-m.jpg" alt="GrapesJS" width="500" align="center"/></p>
 
@@ -38,6 +37,7 @@ Newsletter Demo - http://grapesjs.com/demo-newsletter-editor.html
 * [API](#api)
 * [Testing](#testing)
 * [Plugins](#plugins)
+* [Sponsors](#sponsors)
 * [Support](#support)
 * [License](#license)
 
@@ -110,6 +110,13 @@ $ npm run build
 
 
 ## Usage
+
+JQuery is the only hard dependency so you have to include it before using GrapesJS
+
+```html
+<script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+```
+After that include scripts from GrapesJS with all your configurations
 
 ```html
 <link rel="stylesheet" href="path/to/grapes.min.css">
@@ -192,6 +199,16 @@ $ npm test
 
 
 Find out more about plugins here: [Creating plugins](https://github.com/artf/grapesjs/wiki/Creating-plugins)
+
+
+
+
+
+## Sponsors
+
+The project is sponsored by
+
+[![Sendloop](http://grapesjs.com/img/sendloop-logo-l.png)](https://sendloop.com)
 
 
 

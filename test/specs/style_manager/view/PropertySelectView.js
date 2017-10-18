@@ -8,7 +8,8 @@ module.exports = {
       describe('PropertySelectView', () => {
 
         var component;
-        var fixtures;
+        var $fixtures;
+        var $fixture;
         var target;
         var model;
         var view;
@@ -21,6 +22,11 @@ module.exports = {
               {value: 'test1value', style: 'test:style'},
               {name: 'test2', value: 'test2value'}
             ];
+
+        before(() => {
+          $fixtures  = $("#fixtures");
+          $fixture   = $('<div class="sm-fixture"></div>');
+        });
 
         beforeEach(() => {
           propTarget = Object.assign({}, Backbone.Events);
@@ -36,10 +42,9 @@ module.exports = {
             model,
             propTarget
           });
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          fixtures = document.body.firstChild;
+          $fixture.empty().appendTo($fixtures);
           view.render();
-          fixtures.appendChild(view.el);
+          $fixture.html(view.el);
         });
 
         afterEach(() => {
@@ -47,12 +52,13 @@ module.exports = {
         });
 
         after(() => {
+          $fixture.remove();
           component = null;
         });
 
         it('Rendered correctly', () => {
           var prop = view.el;
-          expect(fixtures.querySelector('.property')).toExist();
+          expect($fixture.get(0).querySelector('.property')).toExist();
           expect(prop.querySelector('.label')).toExist();
           expect(prop.querySelector('.field')).toExist();
         });
@@ -114,9 +120,9 @@ module.exports = {
               model,
               propTarget: target
             });
-            fixtures.innerHTML = '';
+            $fixture.empty().appendTo($fixtures);
             view.render();
-            fixtures.appendChild(view.el);
+            $fixture.html(view.el);
           });
 
           it('Update value and input on target swap', () => {
@@ -155,9 +161,9 @@ module.exports = {
             view = new PropertySelectView({
               model
             });
-            fixtures.innerHTML = '';
+            $fixture.empty().appendTo($fixtures);
             view.render();
-            fixtures.appendChild(view.el);
+            $fixture.html(view.el);
           });
 
           it('Value as default', () => {
@@ -182,8 +188,7 @@ module.exports = {
               model
             });
             view.render();
-            fixtures.innerHTML = '';
-            fixtures.appendChild(view.el);
+            $fixture.html(view.el);
             expect(view.getInputValue()).toEqual('');
           });
 

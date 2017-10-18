@@ -6,9 +6,15 @@ module.exports = {
       describe('ClassTagView', () => {
 
         var obj;
+        var fixture;
         var fixtures;
         var testLabel;
         var coll;
+
+        before(() => {
+          fixtures = $("#fixtures");
+          fixture = $('<div class="classtag-fixture"></div>');
+        });
 
         beforeEach(() => {
           coll  = new Selectors();
@@ -24,13 +30,16 @@ module.exports = {
           });
           obj.target = { get() {} };
           _.extend(obj.target, Backbone.Events);
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          fixtures = document.body.querySelector('#fixtures');
-          fixtures.appendChild(obj.render().el);
+          fixture.empty().appendTo(fixtures);
+          fixture.html(obj.render().el);
         });
 
         afterEach(() => {
           obj.model = null;
+        });
+
+        after(() => {
+          fixture.remove();
         });
 
         it('Object exists', () => {
@@ -65,8 +74,11 @@ module.exports = {
         });
 
         it('Could be removed', () => {
+          var spy = sinon.spy();
+          obj.config.target = { get() {} };
+          sinon.stub(obj.config.target, 'get').returns(0);
           obj.$el.find('#close').trigger('click');
-          setTimeout(() => expect(fixtures.innerHTML).toNotExist(), 0)
+          expect(fixture.html()).toNotExist();
         });
 
         it('On remove triggers event', () => {
@@ -96,7 +108,6 @@ module.exports = {
 
         it('Label input is disabled', () => {
           var inputProp = obj.inputProp;
-          var label = obj.$labelInput.get(0);
           expect(obj.$labelInput.prop(inputProp)).toEqual(true);
         });
 

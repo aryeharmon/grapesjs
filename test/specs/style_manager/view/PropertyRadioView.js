@@ -8,7 +8,8 @@ module.exports = {
       describe('PropertyRadioView', () => {
 
         var component;
-        var fixtures;
+        var $fixtures;
+        var $fixture;
         var target;
         var model;
         var view;
@@ -21,10 +22,10 @@ module.exports = {
               { name: 'test2', value: 'test2value'}
             ];
 
-        // Have some issue with getCheckedEl() and jsdom
-        // this view.getInputEl().querySelector('input:checked') return null
-        // but view.getInputEl().querySelectorAll('input:checked')[0] works
-        var getCheckedEl = (view) => view.getInputEl().querySelectorAll('input:checked')[0];
+        before(() => {
+          $fixtures  = $("#fixtures");
+          $fixture   = $('<div class="sm-fixture"></div>');
+        });
 
         beforeEach(() => {
           target = new Component();
@@ -40,10 +41,9 @@ module.exports = {
             model,
             propTarget
           });
-          document.body.innerHTML = '<div id="fixtures"></div>';
-          fixtures = document.body.firstChild;
+          $fixture.empty().appendTo($fixtures);
           view.render();
-          fixtures.appendChild(view.el);
+          $fixture.html(view.el);
         });
 
         afterEach(() => {
@@ -51,12 +51,13 @@ module.exports = {
         });
 
         after(() => {
+          $fixture.remove();
           component = null;
         });
 
         it('Rendered correctly', () => {
           var prop = view.el;
-          expect(fixtures.querySelector('.property')).toExist();
+          expect($fixture.get(0).querySelector('.property')).toExist();
           expect(prop.querySelector('.label')).toExist();
           expect(prop.querySelector('.field')).toExist();
         });
@@ -67,12 +68,12 @@ module.exports = {
         });
 
         it('Options rendered', () => {
-          var input = view.el.querySelector('#input-holder').firstChild;
+          var input = view.el.querySelector('#input-holder');
           expect(input.children.length).toEqual(options.length);
         });
 
         it('Options rendered correctly', () => {
-          var children = view.el.querySelector('#input-holder').firstChild.children;
+          var children = view.el.querySelector('#input-holder').children;
           expect(children[0].querySelector('label').textContent).toEqual('test1value');
           expect(children[1].querySelector('label').textContent).toEqual('test2');
           expect(children[0].querySelector('input').value).toEqual(options[0].value);
@@ -82,7 +83,7 @@ module.exports = {
         });
 
         it('Input should exist', () => {
-          expect(view.input).toExist();
+          expect(view.$input).toExist();
         });
 
         it('Input value is empty', () => {
@@ -91,12 +92,12 @@ module.exports = {
 
         it('Update model on input change', () => {
           view.setValue(propValue);
-          expect(getCheckedEl(view).value).toEqual(propValue);
+          expect(view.getInputValue()).toEqual(propValue);
         });
 
         it('Update input on value change', () => {
           view.model.set('value', propValue);
-          expect(getCheckedEl(view).value).toEqual(propValue);
+          expect(view.getInputValue()).toEqual(propValue);
         });
 
         it('Update target on value change', () => {
@@ -116,9 +117,9 @@ module.exports = {
               model,
               propTarget: target
             });
-            fixtures.innerHTML = '';
+            $fixture.empty().appendTo($fixtures);
             view.render();
-            fixtures.appendChild(view.el);
+            $fixture.html(view.el);
           });
 
           it('Update value and input on target swap', () => {
@@ -127,7 +128,7 @@ module.exports = {
             component.set('style', style);
             view.propTarget.trigger('update');
             expect(view.model.get('value')).toEqual(propValue);
-            expect(getCheckedEl(view).value).toEqual(propValue);
+            expect(view.getInputValue()).toEqual(propValue);
           });
 
           it('Update value after multiple swaps', () => {
@@ -139,7 +140,7 @@ module.exports = {
             component.set('style', style);
             view.propTarget.trigger('update');
             expect(view.model.get('value')).toEqual('test2value');
-            expect(getCheckedEl(view).value).toEqual('test2value');
+            expect(view.getInputValue()).toEqual('test2value');
           });
 
         })
@@ -157,9 +158,9 @@ module.exports = {
             view = new PropertyRadioView({
               model
             });
-            fixtures.innerHTML = '';
-            view.render();
-            fixtures.appendChild(view.el);
+            $fixture.empty().appendTo($fixtures);
+            view.render()
+            $fixture.html(view.el);
           });
 
           it('Value as default', () => {
