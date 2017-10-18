@@ -1,4 +1,4 @@
-.sp-container {
+﻿.sp-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -3463,7 +3463,8 @@
 .CodeMirror {
     font-family: monospace;
     height: 300px;
-    color: black
+    color: black;
+    direction: ltr
 }
 
 .CodeMirror-lines {
@@ -3915,8 +3916,8 @@ div.CodeMirror-dragcursors {
 }
 
 .cm-searching {
-    background: #ffa;
-    background: rgba(255, 255, 0, 0.4)
+    background-color: #ffa;
+    background-color: rgba(255, 255, 0, 0.4)
 }
 
 .cm-force-border {
@@ -4029,11 +4030,11 @@ span.CodeMirror-selectedtext {
     font-style: normal
 }
 
-.gjs-bg-main, .gjs-off-prv, .gjs-select option, .gjs-clm-select option, .gjs-sm-select option, .gjs-sm-unit option, .gjs-pn-panel, .gjs-nv-item .gjs-nv-title-c, .gjs-field-select option, .gjs-sm-sector .gjs-sm-colorp-c, .gjs-clm-tags .gjs-sm-colorp-c, .gjs-block, .gjs-mdl-dialog, #gjs-rte-toolbar, .sp-container {
+.gjs-bg-main, .gjs-off-prv, .gjs-pn-panel, .gjs-select option, .gjs-clm-select option, .gjs-sm-select option, .gjs-sm-unit option, .gjs-field-select option, .gjs-sm-sector .gjs-sm-colorp-c, .gjs-clm-tags .gjs-sm-colorp-c, .gjs-block, .gjs-nv-item .gjs-nv-title-c, .gjs-mdl-dialog, #gjs-rte-toolbar, .sp-container {
     background-color: #444
 }
 
-.gjs-color-main, .gjs-off-prv, .gjs-btn-prim, .gjs-pn-panel, .gjs-pn-btn, .gjs-btnt, .gjs-sm-sector .gjs-sm-field.gjs-sm-composite, .gjs-clm-tags .gjs-sm-field.gjs-sm-composite, .gjs-sm-sector .gjs-sm-composite.gjs-clm-field, .gjs-clm-tags .gjs-sm-composite.gjs-clm-field, .gjs-sm-sector .gjs-sm-stack #gjs-sm-add, .gjs-clm-tags .gjs-sm-stack #gjs-sm-add, .gjs-block-svg-path, .gjs-mdl-dialog, #gjs-rte-toolbar .gjs-rte-btn {
+.gjs-color-main, .gjs-off-prv, .gjs-pn-panel, .gjs-pn-btn, .gjs-btnt, .gjs-btn-prim, .gjs-sm-sector .gjs-sm-field.gjs-sm-composite, .gjs-clm-tags .gjs-sm-field.gjs-sm-composite, .gjs-sm-sector .gjs-sm-composite.gjs-clm-field, .gjs-clm-tags .gjs-sm-composite.gjs-clm-field, .gjs-sm-sector .gjs-sm-stack #gjs-sm-add, .gjs-clm-tags .gjs-sm-stack #gjs-sm-add, .gjs-block-svg-path, .gjs-mdl-dialog, #gjs-rte-toolbar .gjs-rte-btn {
     color: #ddd;
     fill: #ddd
 }
@@ -4198,7 +4199,7 @@ span.CodeMirror-selectedtext {
     clear: both
 }
 
-.no-select, .gjs-com-no-select, .gjs-com-no-select img, .gjs-category-title, .gjs-sm-sector .gjs-sm-title, .gjs-clm-tags .gjs-sm-title, .gjs-block-category .gjs-title, .gjs-clm-tags #gjs-clm-close, .gjs-clm-tags #gjs-clm-tag-label {
+.no-select, .gjs-com-no-select, .gjs-com-no-select img, .gjs-category-title, .gjs-sm-sector .gjs-sm-title, .gjs-clm-tags .gjs-sm-title, .gjs-block-category .gjs-title, .gjs-nv-title, .gjs-clm-tags #gjs-clm-close, .gjs-clm-tags #gjs-clm-tag-label {
     -moz-user-select: none;
     -khtml-user-select: none;
     -webkit-user-select: none;
@@ -4221,48 +4222,8 @@ span.CodeMirror-selectedtext {
     pointer-events: none
 }
 
-.gjs-btn-prim {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    padding: 3px 6px;
-    cursor: pointer;
-    padding: 0.5em;
-    border: none
-}
-
-.gjs-btn-prim:active {
-    background-color: rgba(255, 255, 255, 0.1)
-}
-
-.gjs-input, .gjs-select {
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 2px;
-    box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.1);
-    box-sizing: border-box;
-    color: #ddd;
-    padding: 0.5em 1em
-}
-
-div.gjs-select {
-    padding: 0
-}
-
-.gjs-select select {
-    padding-right: 10px
-}
-
-.gjs-select:-moz-focusring, .gjs-select select:-moz-focusring {
-    color: transparent;
-    text-shadow: 0 0 0 rgba(255, 255, 255, 0.7)
-}
-
-.gjs-input:focus, .gjs-select:focus, .gjs-button:focus, .gjs-btn-prim:focus, .gjs-select:focus, .gjs-select select:focus {
-    outline: none
-}
-
 .gjs-traits-label {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     font-size: 13px;
     font-weight: lighter;
     margin-bottom: 5px;
@@ -4643,7 +4604,8 @@ ol.example li.placeholder:before {
     border-style: solid !important;
     border-color: #62c462;
     outline: none;
-    box-sizing: border-box
+    box-sizing: border-box;
+    transition: top .2s, left .2s, width .2s, height .2s
 }
 
 .gjs-placeholder-int, .gjs-com-placeholder-int, .gjs-nv-placeholder-int {
@@ -4669,7 +4631,7 @@ ol.example li.placeholder:before {
     width: 85%;
     left: 0;
     top: 0;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3)
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2)
 }
 
 .gjs-pn-panel#gjs-pn-options {
@@ -4689,7 +4651,7 @@ ol.example li.placeholder:before {
 }
 
 .gjs-pn-panel#gjs-pn-views {
-    border-bottom: 2px solid rgba(0, 0, 0, 0.3);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
     right: 0;
     width: 15%;
     z-index: 4
@@ -4701,7 +4663,7 @@ ol.example li.placeholder:before {
     right: 0;
     width: 15%;
     overflow: auto;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3)
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2)
 }
 
 .gjs-pn-buttons {
@@ -4761,148 +4723,7 @@ ol.example li.placeholder:before {
     position: absolute
 }
 
-.gjs-nv-selected-parent {
-    border: 1px solid #ffca6f
-}
-
-.gjs-nv-opac50 {
-    opacity: .5;
-    filter: alpha(opacity=50)
-}
-
-.gjs-nv-navigator {
-    position: relative;
-    height: 100%
-}
-
-.gjs-nv-navigator #gjs-nv-placeholder {
-    width: 100%;
-    position: absolute
-}
-
-.gjs-nv-navigator #gjs-nv-placeholder #gjs-nv-plh-int {
-    height: 100%;
-    padding: 1px
-}
-
-.gjs-nv-navigator #gjs-nv-placeholder #gjs-nv-plh-int.gjs-nv-insert {
-    background-color: #62c462
-}
-
-.gjs-nv-navigator .gjs-nv-item {
-    font-weight: lighter;
-    text-align: left;
-    position: relative;
-    background-color: rgba(0, 0, 0, 0.1)
-}
-
-.gjs-nv-navigator .gjs-nv-item.gjs-nv-hide {
-    opacity: .55;
-    filter: alpha(opacity=55)
-}
-
-.gjs-nv-navigator .gjs-nv-item #gjs-nv-counter {
-    font-size: 10px;
-    position: absolute;
-    right: 27px;
-    top: 9px
-}
-
-.gjs-nv-navigator .gjs-nv-item #gjs-nv-btn-eye {
-    height: auto !important;
-    width: auto !important;
-    font-size: 13px;
-    left: 0;
-    top: 0;
-    padding: 7px 5px 7px 10px;
-    position: absolute;
-    cursor: pointer;
-    z-index: 1
-}
-
-.gjs-nv-item #gjs-nv-caret {
-    font-size: 7px;
-    width: 8px;
-    padding: 5px;
-    cursor: pointer;
-    opacity: .7;
-    filter: alpha(opacity=70)
-}
-
-.gjs-nv-item #gjs-nv-caret:hover {
-    opacity: 1;
-    filter: alpha(opacity=100)
-}
-
-.gjs-nv-title {
-    background-color: rgba(0, 0, 0, 0.1);
-    font-size: 11px;
-    letter-spacing: 1px;
-    padding: 3px 10px 5px 30px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center
-}
-
-.gjs-nv-item .gjs-nv-children .gjs-nv-title {
-    border-left: 1px solid rgba(5, 5, 5, 0.3)
-}
-
-.gjs-nv-item > .gjs-nv-children {
-    margin-left: 7px;
-    display: none
-}
-
-.gjs-nv-item.open > .gjs-nv-children {
-    display: block
-}
-
-.gjs-nv-item > .gjs-nv-no-chld > #gjs-nv-caret::before {
-    content: ''
-}
-
-.gjs-nv-no-chld > #gjs-nv-caret {
-    display: none
-}
-
-.gjs-nv-item > #gjs-nv-move {
-    position: absolute;
-    cursor: move;
-    font-size: 12px;
-    right: 0;
-    top: 0;
-    padding: 7px 10px 7px 5px
-}
-
-.gjs-nv-selected .gjs-nv-title {
-    background-color: rgba(255, 255, 255, 0.1)
-}
-
-.gjs-nv-nav-item-edit {
-    visibility: hidden;
-    padding: 5px;
-    font-size: 10px;
-    opacity: .7;
-    filter: alpha(opacity=70)
-}
-
-.gjs-nv-nav-item-edit:hover {
-    opacity: 1;
-    filter: alpha(opacity=100)
-}
-
-.gjs-nv-title-c:hover .gjs-nv-nav-item-edit {
-    visibility: visible;
-    cursor: pointer
-}
-
-.gjs-nav-comp-name {
-    padding: 5px;
-    box-sizing: content-box
-}
-
-.btn.expand, .gjs-nv-navigator .gjs-nv-item .expand#gjs-nv-btn-eye {
+.btn.expand, .gjs-layers .gjs-nv-item .expand#gjs-nv-btn-eye {
     background-image: none
 }
 
@@ -4928,37 +4749,63 @@ ol.example li.placeholder:before {
     line-height: 18px
 }
 
+.gjs-fields {
+    display: flex
+}
+
+.gjs-select {
+    padding: 0;
+    width: 100%
+}
+
+.gjs-select select {
+    padding-right: 10px
+}
+
+.gjs-select:-moz-focusring, .gjs-select select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 rgba(255, 255, 255, 0.7)
+}
+
+.gjs-input:focus, .gjs-button:focus, .gjs-btn-prim:focus, .gjs-select:focus, .gjs-select select:focus {
+    outline: none
+}
+
+.gjs-field-range {
+    flex: 9 1 auto
+}
+
 .gjs-field {
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.2);
+    border: none;
+    box-shadow: none;
     border-radius: 2px;
     box-sizing: border-box;
     padding: 0;
-    position: relative
+    position: relative;
+    color: rgba(255, 255, 255, 0.7)
 }
 
 .gjs-field input, .gjs-field select, .gjs-field textarea {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    color: rgba(255, 255, 255, 0.7);
+    color: inherit;
     border: none;
     background-color: transparent;
     box-sizing: border-box;
     width: 100%;
     position: relative;
-    padding: 3px 4px 4px;
+    padding: 5px;
     z-index: 1
+}
+
+.gjs-field input:focus, .gjs-field select:focus, .gjs-field textarea:focus {
+    outline: none
 }
 
 .gjs-field textarea {
     resize: vertical
-}
-
-.gjs-field select {
-    height: 20px;
-    padding-right: 12px
 }
 
 .gjs-field option {
@@ -4975,7 +4822,10 @@ ol.example li.placeholder:before {
 }
 
 .gjs-field .gjs-d-s-arrow {
-    bottom: 7px;
+    bottom: 0;
+    top: 0;
+    margin: auto;
+    right: 5px;
     border-top: 4px solid rgba(255, 255, 255, 0.7);
     position: absolute;
     height: 0;
@@ -4985,13 +4835,29 @@ ol.example li.placeholder:before {
     cursor: pointer
 }
 
+.gjs-field .gjs-field-number {
+    padding-right: 30px
+}
+
+.gjs-field-arrows {
+    position: absolute;
+    cursor: ns-resize;
+    margin: auto;
+    height: 20px;
+    width: 9px;
+    z-index: 10;
+    bottom: 0;
+    right: 3px;
+    top: 0
+}
+
 .gjs-field-color input {
     padding-right: 22px;
     box-sizing: border-box
 }
 
 .gjs-field-colorp {
-    border-left: 1px solid rgba(0, 0, 0, 0.3);
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     height: 100%;
     padding: 2px;
@@ -5019,7 +4885,7 @@ ol.example li.placeholder:before {
     cursor: pointer;
     height: 100%;
     width: 100%;
-    box-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
     border-radius: 1px;
     position: absolute;
     top: 0
@@ -5049,7 +4915,7 @@ ol.example li.placeholder:before {
 
 .gjs-radio-item {
     float: left;
-    border-left: 1px solid rgba(0, 0, 0, 0.3)
+    border-left: 1px solid rgba(0, 0, 0, 0.2)
 }
 
 .gjs-radio-item:first-child {
@@ -5057,7 +4923,7 @@ ol.example li.placeholder:before {
 }
 
 .gjs-radio-item:hover {
-    background: rgba(0, 0, 0, 0.3)
+    background: rgba(0, 0, 0, 0.2)
 }
 
 .gjs-radio-item input {
@@ -5065,7 +4931,7 @@ ol.example li.placeholder:before {
 }
 
 .gjs-radio-item input:checked + .gjs-radio-item-label {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.2)
 }
 
 .gjs-radio-item-label {
@@ -5076,12 +4942,10 @@ ol.example li.placeholder:before {
 
 .gjs-field-units {
     position: absolute;
-    right: 0;
+    margin: auto;
+    right: 10px;
+    bottom: 0;
     top: 0
-}
-
-.gjs-field-units select {
-    padding: 0 12px 0 0
 }
 
 .gjs-field-unit {
@@ -5091,16 +4955,6 @@ ol.example li.placeholder:before {
     font-size: 10px;
     color: rgba(255, 255, 255, 0.7);
     cursor: pointer
-}
-
-.gjs-field-arrows {
-    z-index: 10;
-    cursor: ns-resize;
-    height: 100%;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 9px
 }
 
 .gjs-field-arrow-u, .gjs-field-arrow-d {
@@ -5132,24 +4986,29 @@ ol.example li.placeholder:before {
 }
 
 .gjs-field-range input {
-    margin: 0
+    margin: 0;
+    height: 100%
 }
 
-.gjs-field-range input::-moz-range-thumb {
+.gjs-field-range input:focus {
+    outline: none
+}
+
+.gjs-field-range input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    margin-top: -4px;
     height: 10px;
     width: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 100%;
     background-color: #ddd;
     cursor: pointer
 }
 
-.gjs-field-range input::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    margin-top: -5px;
+.gjs-field-range input::-moz-range-thumb {
     height: 10px;
     width: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 100%;
     background-color: #ddd;
     cursor: pointer
@@ -5158,31 +5017,44 @@ ol.example li.placeholder:before {
 .gjs-field-range input::-ms-thumb {
     height: 10px;
     width: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 100%;
     background-color: #ddd;
     cursor: pointer
 }
 
 .gjs-field-range input::-moz-range-track {
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 1px;
-    height: 2px
+    margin-top: 3px;
+    height: 3px
 }
 
 .gjs-field-range input::-webkit-slider-runnable-track {
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 1px;
-    height: 2px
+    margin-top: 3px;
+    height: 3px
 }
 
 .gjs-field-range input::-ms-track {
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 1px;
-    height: 2px
+    margin-top: 3px;
+    height: 3px
+}
+
+.gjs-btn-prim {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    padding: 3px 6px;
+    padding: 5px;
+    cursor: pointer;
+    border: none
+}
+
+.gjs-btn-prim:active {
+    background-color: rgba(255, 255, 255, 0.1)
 }
 
 .gjs-chk-icon {
@@ -5241,10 +5113,10 @@ ol.example li.placeholder:before {
 }
 
 .gjs-category-open, .gjs-sm-sector.gjs-sm-open, .gjs-sm-open.gjs-clm-tags, .gjs-block-category.gjs-open {
-	border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25)
 }
 
-.gjs-category-title, .gjs-sm-sector .gjs-sm-title, .gjs-clm-tags .gjs-sm-title, .gjs-block-category .gjs-title {
+.gjs-category-title, .gjs-sm-sector .gjs-sm-title, .gjs-clm-tags .gjs-sm-title, .gjs-block-category .gjs-title, .gjs-nv-title {
     font-weight: lighter;
     background-color: rgba(0, 0, 0, 0.1);
     font-size: 13px;
@@ -5382,7 +5254,7 @@ ol.example li.placeholder:before {
 }
 
 .gjs-sm-sector .gjs-sm-field.gjs-sm-color, .gjs-clm-tags .gjs-sm-field.gjs-sm-color, .gjs-sm-sector .gjs-sm-color.gjs-clm-field, .gjs-clm-tags .gjs-sm-color.gjs-clm-field, .gjs-sm-sector .gjs-sm-field.gjs-sm-input, .gjs-clm-tags .gjs-sm-field.gjs-sm-input, .gjs-sm-sector .gjs-sm-input.gjs-clm-field, .gjs-clm-tags .gjs-sm-input.gjs-clm-field, .gjs-sm-sector .gjs-sm-field.gjs-sm-integer, .gjs-clm-tags .gjs-sm-field.gjs-sm-integer, .gjs-sm-sector .gjs-sm-integer.gjs-clm-field, .gjs-clm-tags .gjs-sm-integer.gjs-clm-field, .gjs-sm-sector .gjs-sm-field.gjs-sm-list, .gjs-clm-tags .gjs-sm-field.gjs-sm-list, .gjs-sm-sector .gjs-sm-list.gjs-clm-field, .gjs-clm-tags .gjs-sm-list.gjs-clm-field, .gjs-sm-sector .gjs-sm-field.gjs-sm-select, .gjs-clm-tags .gjs-sm-field.gjs-sm-select, .gjs-sm-sector .gjs-sm-select.gjs-clm-field, .gjs-clm-tags .gjs-sm-select.gjs-clm-field, .gjs-sm-sector .gjs-clm-select, .gjs-clm-tags .gjs-clm-select {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.7);
@@ -5447,7 +5319,7 @@ ol.example li.placeholder:before {
 
 .gjs-sm-sector .gjs-sm-list .gjs-sm-el, .gjs-clm-tags .gjs-sm-list .gjs-sm-el {
     float: left;
-    border-left: 1px solid rgba(0, 0, 0, 0.3)
+    border-left: 1px solid rgba(0, 0, 0, 0.2)
 }
 
 .gjs-sm-sector .gjs-sm-list .gjs-sm-el:first-child, .gjs-clm-tags .gjs-sm-list .gjs-sm-el:first-child {
@@ -5455,12 +5327,16 @@ ol.example li.placeholder:before {
 }
 
 .gjs-sm-sector .gjs-sm-list .gjs-sm-el:hover, .gjs-clm-tags .gjs-sm-list .gjs-sm-el:hover {
-    background: rgba(0, 0, 0, 0.3)
+    background: rgba(0, 0, 0, 0.2)
 }
 
 .gjs-sm-sector .gjs-sm-properties, .gjs-clm-tags .gjs-sm-properties {
     font-size: 11px;
     padding: 10px 5px
+}
+
+.gjs-sm-sector .gjs-sm-slider .gjs-field-integer, .gjs-clm-tags .gjs-sm-slider .gjs-field-integer {
+    flex: 1 1 65px
 }
 
 .gjs-sm-sector .gjs-sm-property, .gjs-clm-tags .gjs-sm-property {
@@ -5471,14 +5347,14 @@ ol.example li.placeholder:before {
     padding: 0 5px
 }
 
-.gjs-sm-sector .gjs-sm-property.gjs-sm-composite, .gjs-clm-tags .gjs-sm-property.gjs-sm-composite, .gjs-sm-sector .gjs-sm-property.gjs-sm-file, .gjs-clm-tags .gjs-sm-property.gjs-sm-file, .gjs-sm-sector .gjs-sm-property.gjs-sm-list, .gjs-clm-tags .gjs-sm-property.gjs-sm-list, .gjs-sm-sector .gjs-sm-property.gjs-sm-stack, .gjs-clm-tags .gjs-sm-property.gjs-sm-stack {
+.gjs-sm-sector .gjs-sm-property.gjs-sm-composite, .gjs-clm-tags .gjs-sm-property.gjs-sm-composite, .gjs-sm-sector .gjs-sm-property.gjs-sm-file, .gjs-clm-tags .gjs-sm-property.gjs-sm-file, .gjs-sm-sector .gjs-sm-property.gjs-sm-list, .gjs-clm-tags .gjs-sm-property.gjs-sm-list, .gjs-sm-sector .gjs-sm-property.gjs-sm-radio, .gjs-clm-tags .gjs-sm-property.gjs-sm-radio, .gjs-sm-sector .gjs-sm-property.gjs-sm-stack, .gjs-clm-tags .gjs-sm-property.gjs-sm-stack, .gjs-sm-sector .gjs-sm-property.gjs-sm-slider, .gjs-clm-tags .gjs-sm-property.gjs-sm-slider, .gjs-sm-sector .gjs-sm-property.gjs-sm-color, .gjs-clm-tags .gjs-sm-property.gjs-sm-color {
     width: 100%
 }
 
 .gjs-sm-sector .gjs-sm-property .gjs-sm-btn, .gjs-clm-tags .gjs-sm-property .gjs-sm-btn {
-    background-color: rgba(33, 33, 33, 0.3);
+    background-color: rgba(33, 33, 33, 0.2);
     border-radius: 2px;
-    box-shadow: 1px 1px 0 rgba(5, 5, 5, 0.3), 1px 1px 0 rgba(43, 43, 43, 0.3) inset;
+    box-shadow: 1px 1px 0 rgba(5, 5, 5, 0.2), 1px 1px 0 rgba(43, 43, 43, 0.2) inset;
     padding: 5px;
     position: relative;
     text-align: center;
@@ -5487,7 +5363,7 @@ ol.example li.placeholder:before {
     cursor: pointer;
     color: #ddd;
     box-sizing: border-box;
-    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
     border: none;
     opacity: .85;
     filter: alpha(opacity=85)
@@ -5529,14 +5405,14 @@ ol.example li.placeholder:before {
 
 .gjs-sm-sector .gjs-sm-property .gjs-sm-layers, .gjs-clm-tags .gjs-sm-property .gjs-sm-layers {
     margin-top: 5px;
+    padding: 1px 3px;
     min-height: 30px
 }
 
 .gjs-sm-sector .gjs-sm-property .gjs-sm-layer, .gjs-clm-tags .gjs-sm-property .gjs-sm-layer {
     background-color: rgba(255, 255, 255, 0.055);
     border-radius: 2px;
-    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2), 1px 1px 0 rgba(255, 255, 255, 0.055) inset;
-    margin: 2px;
+    margin: 2px 0;
     padding: 7px;
     position: relative;
     cursor: pointer
@@ -5637,7 +5513,7 @@ ol.example li.placeholder:before {
     height: 16px;
     width: 100%;
     margin-top: -16px;
-    box-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
     border-radius: 1px
 }
 
@@ -5731,6 +5607,151 @@ ol.example li.placeholder:before {
 .gjs-block.gjs-bdrag {
     width: auto;
     padding: 0
+}
+
+.gjs-nv-selected-parent {
+    border: 1px solid #ffca6f
+}
+
+.gjs-nv-opac50 {
+    opacity: .5;
+    filter: alpha(opacity=50)
+}
+
+.gjs-layers {
+    position: relative;
+    height: 100%
+}
+
+.gjs-layers #gjs-nv-placeholder {
+    width: 100%;
+    position: absolute
+}
+
+.gjs-layers #gjs-nv-placeholder #gjs-nv-plh-int {
+    height: 100%;
+    padding: 1px
+}
+
+.gjs-layers #gjs-nv-placeholder #gjs-nv-plh-int.gjs-nv-insert {
+    background-color: #62c462
+}
+
+.gjs-layers .gjs-nv-item {
+    font-weight: lighter;
+    text-align: left;
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.1)
+}
+
+.gjs-layers .gjs-nv-item.gjs-nv-hide {
+    opacity: .55;
+    filter: alpha(opacity=55)
+}
+
+.gjs-layers .gjs-nv-item #gjs-nv-counter {
+    font-size: 10px;
+    position: absolute;
+    right: 27px;
+    top: 9px
+}
+
+.gjs-layers .gjs-nv-item #gjs-nv-btn-eye {
+    height: auto !important;
+    width: auto !important;
+    font-size: 13px;
+    left: 0;
+    top: 0;
+    padding: 7px 5px 7px 10px;
+    position: absolute;
+    cursor: pointer;
+    z-index: 1
+}
+
+.gjs-nv-item #gjs-nv-caret {
+    font-size: 7px;
+    width: 8px;
+    padding: 2px;
+    cursor: pointer;
+    position: absolute;
+    left: -9px;
+    top: 6px;
+    opacity: .7;
+    filter: alpha(opacity=70)
+}
+
+.gjs-nv-item #gjs-nv-caret:hover {
+    opacity: 1;
+    filter: alpha(opacity=100)
+}
+
+.gjs-nv-title {
+    padding: 3px 10px 5px 30px;
+    display: flex;
+    align-items: center
+}
+
+.gjs-nv-title-inn {
+    position: relative
+}
+
+.gjs-nv-item .gjs-nv-children .gjs-nv-title {
+    border-left: 1px solid rgba(5, 5, 5, 0.2)
+}
+
+.gjs-nv-item > .gjs-nv-children {
+    display: none
+}
+
+.gjs-nv-item.open > .gjs-nv-children {
+    display: block
+}
+
+.gjs-nv-item > .gjs-nv-no-chld > #gjs-nv-caret::before {
+    content: ''
+}
+
+.gjs-nv-no-chld > .gjs-nv-title-inn > #gjs-nv-caret {
+    display: none
+}
+
+.gjs-nv-item > #gjs-nv-move {
+    position: absolute;
+    cursor: move;
+    font-size: 12px;
+    right: 0;
+    top: 0;
+    padding: 7px 10px 7px 5px
+}
+
+.gjs-nv-selected .gjs-nv-title {
+    background-color: rgba(255, 255, 255, 0.1)
+}
+
+.gjs-nv-nav-item-edit {
+    visibility: hidden;
+    padding: 5px;
+    font-size: 9px;
+    position: absolute;
+    left: -27px;
+    top: 1px;
+    opacity: .7;
+    filter: alpha(opacity=70)
+}
+
+.gjs-nv-nav-item-edit:hover {
+    opacity: 1;
+    filter: alpha(opacity=100)
+}
+
+.gjs-nv-title-c:hover .gjs-nv-nav-item-edit {
+    visibility: visible;
+    cursor: pointer
+}
+
+.gjs-nav-comp-name {
+    padding: 5px;
+    box-sizing: content-box
 }
 
 .gjs-clm-tags {
@@ -5869,7 +5890,7 @@ ol.example li.placeholder:before {
 
 .gjs-mdl-header {
     position: relative;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     padding: 15px 15px 7px
 }
 
@@ -5882,24 +5903,6 @@ ol.example li.placeholder:before {
     clear: both;
     display: block;
     margin-bottom: 10px
-}
-
-.gjs-dropzone {
-    display: none;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 5;
-    width: 100%;
-    height: 100%;
-    transition: opacity 0.25s;
-    pointer-events: none
-}
-
-.gjs-dropzone-active .gjs-dropzone {
-    display: block;
-    opacity: 1
 }
 
 .gjs-am-assets {
@@ -5971,7 +5974,7 @@ ol.example li.placeholder:before {
 }
 
 .gjs-am-assets-cont .gjs-am-asset {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     padding: 5px;
     cursor: pointer;
     position: relative
@@ -6059,7 +6062,7 @@ ol.example li.placeholder:before {
 
 .gjs-cm-editor#gjs-cm-htmlmixed {
     padding-right: 10px;
-    border-right: 1px solid rgba(0, 0, 0, 0.3)
+    border-right: 1px solid rgba(0, 0, 0, 0.2)
 }
 
 .gjs-cm-editor#gjs-cm-htmlmixed #gjs-cm-title {
@@ -6076,7 +6079,7 @@ ol.example li.placeholder:before {
 }
 
 .gjs-cm-editor #gjs-cm-title {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
     font-size: 12px;
     padding: 5px 10px 3px;
     text-align: right
@@ -6084,7 +6087,7 @@ ol.example li.placeholder:before {
 
 #gjs-rte-toolbar {
     display: none;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     position: absolute;
     border-radius: 3px;
     z-index: 10
@@ -6094,7 +6097,7 @@ ol.example li.placeholder:before {
     display: inline-block;
     padding: 5px;
     min-width: 25px;
-    border-right: 1px solid rgba(0, 0, 0, 0.3);
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
     text-align: center;
     cursor: pointer;
     outline: none
@@ -6105,7 +6108,7 @@ ol.example li.placeholder:before {
 }
 
 #gjs-rte-toolbar .gjs-rte-btn.btn-info {
-    background-color: rgba(0, 0, 0, 0.3)
+    background-color: rgba(0, 0, 0, 0.2)
 }
 
 #gjs-rte-toolbar .gjs-rte-btn:hover {
@@ -6137,8 +6140,8 @@ ol.example li.placeholder:before {
 }
 
 .sp-container {
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    box-shadow: 0 0 7px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.2);
     border-radius: 3px
 }
 
@@ -6147,7 +6150,7 @@ ol.example li.placeholder:before {
 }
 
 .colpick_dark .colpick_color {
-    outline: 1px solid rgba(0, 0, 0, 0.3)
+    outline: 1px solid rgba(0, 0, 0, 0.2)
 }
 
 .sp-cancel, .sp-cancel:hover {
@@ -6190,8 +6193,8 @@ ol.example li.placeholder:before {
 }
 
 .sp-container button, .sp-container button:hover, .sp-container button:active {
-    background: rgba(0, 0, 0, 0.3);
-    border-color: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(0, 0, 0, 0.2);
     color: #ddd;
     text-shadow: none;
     box-shadow: none;
@@ -6238,167 +6241,3 @@ ol.example li.placeholder:before {
         opacity: 0
     }
 }
-
-/*        B New Style        */
-.gjs-pn-panel{
-    background-color: #fff;
-}
-#gjs-pn-options .gjs-pn-btn, #gjs-pn-views .gjs-btnt, #gjs-pn-options .gjs-pn-btnt, #gjs-pn-views .gjs-btn {
-    color: #616161;
-}
-#gjs-pn-options .gjs-pn-btn.gjs-pn-active, #gjs-pn-options .gjs-btnt.gjs-pn-active ,#gjs-pn-views .gjs-pn-btn.gjs-pn-active, #gjs-pn-views .gjs-btnt.gjs-pn-active {
-    background-color: #f4f4f4;
-    color: #0079fe;
-    box-shadow: 0px 0px;
-}
-.gjs-pn-panel#gjs-pn-views-container {
-    background-color: #29b8f4;
-}
-.gjs-field {
-    background-color: #0079fe;
-}
-.gjs-devices-c .gjs-field{
-    background-color: #2e2e2e;
-}
-.gjs-devices-c .gjs-field select{
-    color: #0079fe;
-    background: #f4f4f4;
-}
-.gjs-field.gjs-select {
-    border: 1px solid #f4f4f4;
-}
-.gjs-pn-panel#gjs-pn-views-container #gjs-clm-states {
-    background-color: #2e2e2e;
-}
-.gjs-clm-tags .gjs-clm-tag {
-    background-color: #f4f4f4;
-    border: 1px solid #29b8f4;
-    box-shadow: 1px 1px #f4f4f4 inset;
-    text-shadow: 1px 1px #f4f4f4;
-}
-.gjs-clm-tags #gjs-clm-checkbox {
-    color: #29b8f4;
-}
-.gjs-clm-tags #gjs-clm-tag-label input{
-    color: #b8b8b8;
-}
-.gjs-clm-tags #gjs-clm-close {
-    color: #0079fe;
-}
-.gjs-clm-tags #gjs-clm-add-tag {
-    color: #fff;
-    background-color: #29b8f4;
-    border: 1px solid #29b8f4;
-}
-.gjs-category-title, .gjs-sm-sector .gjs-sm-title, .gjs-clm-tags .gjs-sm-title, .gjs-block-category .gjs-title {
-    color: #fff;
-    font-weight: bold;
-    background-color: #55c7f7;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-}
-.gjs-clm-tags #gjs-clm-label, .gjs-clm-tags #gjs-clm-sel {
-    color: #fff;
-}
-.gjs-sm-sector .gjs-sm-properties {
-    font-size: 11px;
-    padding: 10px 5px;
-    color: #fff;
-}
-.gjs-radio-item-label {
-    color: #fff;
-}
-.gjs-sm-header {
-    color: #fff;
-}
-.gjs-color-hl, .gjs-color-warn {
-    color: #fff;
-    fill: #fff;
-}
-.gjs-sm-sector .gjs-sm-field.gjs-sm-composite {
-    background-color: rgb(41, 184, 244);
-}
-.gjs-radio-item input:checked + .gjs-radio-item-label {
-    background-color: #b8b8b8;
-    color:#fff;
-}
-.gjs-radio-item-label {
-    color: #8e8e94;
-}
-.gjs-field {
-    background-color: #fff;
-    color: #fff;
-}
-.gjs-radio-item {
-    border-left: 1px solid #f4f4f4;
-}
-.gjs-devices-c .gjs-device-label {
-    width: 200px;
-    display: block;
-    float: left;
-    padding-left: 25px;
-    font-weight: bold;
-    line-height: 30px;
-    text-align: right;
-    margin-top: -1px;
-    color: #5c5c5c;
-}
-.gjs-device-label:before {
-    content: '';
-    display: inline-block;
-    background: url(img/builder.png);
-    background-repeat: no-repeat;
-    width: 93px;
-    height: 32px;
-    float: left;
-}
-.gjs-devices-c {
-    padding: 0px;
-}
-.gjs-nv-item .gjs-nv-title-c {
-    color: #fff;
-    font-weight: bold;
-    background-color: #55c7f7;
-}
-.gjs-nv-selected .gjs-nv-title{
-    background-color: #29b8f4;
-}
-.gjs-nv-title {
-    background-color: #55c7f7;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-}
-.gjs-block{
-    background-color: #55c7f7;
-    border: 0px;
-    box-shadow: 0px 0px;
-}
-.gjs-block-label, .gjs-block.gjs-fonts::before, .gjs-block.fa:before {
-    color: #fff;
-    box-shadow: 0px 0px 0px;
-}
-.gjs-block:hover  {
-    box-shadow: 0px 0px 0px;
-    border:1px solid #fff;
-    color: #fff !important;
-}
-.gjs-block:hover:before  {
-    box-shadow: 0px 0px 0px;
-    color: #fff !important;
-}
-.gjs-nv-item #gjs-nv-btn-eye:before{
-    color: #fff;
-}
-.gjs-pn-panel#gjs-pn-views-container #gjs-clm-states {
-    background-color: #f4f4f4;
-    color: #0079fe;
-}
-.gjs-select option{
-    background-color: #f4f4f4;
-}
-.gjs-trt-trait .gjs-label{
-	color:#fff;
-}
-.gjs-traits-label {
-    color: #fff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-}
-/*        E New Style        */
