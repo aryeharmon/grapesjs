@@ -385,7 +385,6 @@ var create_routes = function(routerObj, callback) {
       });
     }, function() {
 		res.locals.html = $('body').html();
-					res.locals.html = res.locals.html.replace(/img/g, 'amp-img');
 
 		res.locals.css = css;
 		res.locals.page = page;
@@ -408,7 +407,6 @@ var create_routes = function(routerObj, callback) {
 
 					var re = new RegExp("<mustach-loop (.*)insatnce=\"([^\"]+)\"[^>]*>((.|\n)*?)<\/mustach-loop>", "g");
 					html = html.replace(re, "{{#$2}}$3{{/$2}}");
-					html = html.replace(/<img/g, '<amp-img layout="responsive" height="1" width="1"');
 
 					var $ = cheerio.load(html);
 
