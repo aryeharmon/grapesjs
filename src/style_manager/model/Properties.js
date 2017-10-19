@@ -58,15 +58,24 @@ module.exports = require('backbone').Collection.extend(TypeableCollection).exten
         }
       }
     },{
-      id: 'radio',
-      model: require('./PropertyRadio'),
-      view: require('./../view/PropertyRadioView'),
-      isType(value) {
-        if (value && value.type == 'radio') {
-          return value;
-        }
-      }
-    },{
+          id: 'radio',
+          model: require('./PropertyRadio'),
+          view: require('./../view/PropertyRadioView'),
+          isType(value) {
+              if (value && value.type == 'radio') {
+                  return value;
+              }
+          }
+      },{
+          id: 'radio-position',
+          model: require('./PropertyRadioPosition'),
+          view: require('./../view/PropertyRadioPositionView'), // 1. copy these js files and create them. ok let me know when done and i will continue helping you, ok
+          isType(value) {
+              if (value && value.type == 'radio-position') {
+                  return value;
+              }
+          }
+      },{
       id: 'slider',
       model: require('./PropertySlider'),
       view: require('./../view/PropertySliderView'),
