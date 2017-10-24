@@ -10,6 +10,7 @@ var camelCase = require('camelcase');
 var async = require('async');
 var _ = require('lodash');
 var cheerio = require('cheerio');
+var requestImageSize = require('request-image-size');
 
 var fs = require('fs');
 
@@ -417,13 +418,47 @@ var create_routes = function(routerObj, callback) {
 							$(that).replaceWith(plum);
 							callback();
 						});
-					}, function() {	
-						res.locals.html = $('body').html();
-						res.locals.css = css;
-						res.locals.components = Object.keys(components).map(function(key) {
-							return camelCase(components[key].tagName);
+					}, function() {
+
+						var images
+
+						async.each($('amp-carousel'), function(carousel, callback) {
+							var max_width = 0;
+							var max_height = 0;
+							async.each($(carousel).find('img'), function(img, callback) {
+								var src = $(img).attr('src');
+								requestImageSize(src)
+								.then(function(size) {
+									$(img).replaceWith(function () {
+										max_width = Math.max(max_width, size.width);
+										max_height = Math.max(max_height, size.height);
+										return '<amp-img src="'+src+'" width="'+size.width+'" height="'+size.height+'" layout="responsive"></amp-img>';
+									});
+									callback();
+								})
+								.catch(function(err) {
+									console.log('catch error')
+									callback();
+								});
+							}, function(err) {
+								$(carousel).replaceWith(function () {
+									return '<amp-carousel type="' + $(carousel).attr('type') + '" autoplay="' + $(carousel).attr('autoplay') + '" delay="' + $(carousel).attr('delay') + '" width="'+max_width+'" height="'+max_height+'" layout="responsive">'+$(carousel).html()+'</amp-carousel>'
+									// return '<amp-carousel type="' + $(carousel).attr('type') + '" autoplay="' + $(carousel).attr('autoplay') + '" delay="' + $(carousel).attr('delay') + '" src="'+src+'" width="'+max_width+'" height="'+max_height+'" layout="responsive"></amp-carousel>';
+								});
+
+								callback();
+							});
+						}, function(err) {
+							res.locals.html = $('body').html();
+							res.locals.css = css;
+							res.locals.components = Object.keys(components).map(function(key) {
+								return camelCase(components[key].tagName);
+							});
+							res.render('amp-view', {layout: false})
 						});
-						res.render('amp-view', {layout: false})
+
+
+
 					});
 
 
