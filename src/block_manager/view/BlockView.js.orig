@@ -1,0 +1,165 @@
+var Backbone = require('backbone');
+var BlocksView = require('./BlocksView');
+
+module.exports = Backbone.View.extend({
+
+  events: {
+    mousedown: 'startDrag',
+    // mouseover: 'mouseoverblock',
+    contextmenu: 'onRightClick',
+  },
+
+  onRightClick: function (event) {
+    var that = this;
+    event.preventDefault();
+    var category = that.model.get('category').id;
+
+    if (category === 'Custom Layouts') {
+      var result = confirm('Want to delete "' + that.model.get('label') + '" ?');
+      if (result) {
+        $.ajax({
+<<<<<<< HEAD
+          type: "POST",
+          url: base_url + '/delete-layout',
+=======
+>>>>>>> rafa/feature/save-modal
+          data: {
+            id: that.model.id,
+          },
+          success: function (data) {
+            editor.BlockManager.remove(that.model.id);
+          }
+        });
+      }
+    }
+  },
+  initialize(o, config) {
+    _.bindAll(this, 'endDrag');
+    this.config = config || {};
+    this.ppfx = this.config.pStylePrefix || '';
+    this.listenTo(this.model, 'destroy remove', this.remove);
+    this.doc = $(document);
+  },
+
+  /**
+   * Start block dragging
+   * @private
+   */
+  startDrag(e) {
+    //Right or middel click
+    if (e.button !== 0) {
+      return;
+    }
+
+    if (!this.config.getSorter) {
+      return;
+    }
+
+    var children = this.model.get('children');
+
+    this.config.em.refreshCanvas();
+    var sorter = this.config.getSorter();
+
+    if (e.target.tagName === 'LI') {
+      sorter.setDragHelper(e.target, e);
+      sorter.setDropContent(children[$(e.target).data('id')].content);
+    } else {
+      sorter.setDragHelper(this.el, e);
+      sorter.setDropContent(this.model.get('content'));
+    }
+
+    sorter.startSort(this.el);
+    this.doc.on('mouseup', this.endDrag);
+  },
+
+  /**
+   * Drop block
+   * @private
+   */
+  endDrag(e) {
+    this.doc.off('mouseup', this.endDrag);
+    const sorter = this.config.getSorter();
+
+    // After dropping the block in the canvas the mouseup event is not yet
+    // triggerd on 'this.doc' and so clicking outside, the sorter, tries to move
+    // things (throws false positives). As this method just need to drop away
+    // the block helper I use the trick of 'moved = 0' to void those errors.
+    sorter.moved = 0;
+    sorter.endMove();
+  },
+
+  template: _.template(`
+	    <style>
+	      .gjs-block:hover > .gjs-block-label .dropdown{
+	          display: block !important;
+	      }
+	    </style>
+      <div class="<%= className %>-label" style="position: relative;">
+        <div class="dropdown" style="z-index:999;display: none;margin-top: 8px;position: absolute;top: -61px;right: -47px;background-color: #555;color: #fff;text-align: center;box-shadow: 0 0 3px rgba(0, 0, 0, .3);-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .3);border-radius: 3px;-webkit-border-radius: 3px;">
+	            <% _.each(children, function(child, index){ %>          
+                <div id="<%= index %>" class="card card-outline-secondary m-2 text-center" style="background-color: #333;">
+                  <img class="card-img-top" width="90" src="<%= child.image_preview %>"> 
+                  <div class="card-block"> 
+                    <p class="mt-1 p-2">  <%= child.label %> </p>
+                  </div>
+                </div>                                       
+  	          <% }); %>
+        </div>
+        <%= label %>
+	    </div>
+  	  `),
+
+  // mouseoverblock: function (event) {
+  //   var that = this;
+  //   event.preventDefault();
+  //   var subcategory = that.model.get('label');
+
+  //   $.ajax({
+  //     type: "GET",
+  //     url: '/layouts/by/subcategory',
+  //     data: {
+  //       subcategory,
+  //     },
+  //     success: (response) => {
+
+  //       if (response.length === 0) {
+  //         return;
+  //       }
+
+  //       that.model.attributes.children = response;
+
+  //       // editor.BlockManager.add(response, {
+  //       //   label,
+  //       //   content: html,
+  //       //   category,
+  //       //   children: response,
+  //       // });
+
+  //       // console.log('that.model => ', response, that.model.attributes.children);
+
+  //     },
+  //     error: (xhr) => {
+  //       //Do Something to handle error
+  //     }
+  //   });
+
+  // },
+
+  render() {
+
+    var children = this.model.get('children');
+
+    var className = this.ppfx + 'block';
+
+    this.$el.addClass(className);
+
+    this.el.innerHTML = this.template({
+      className,
+      label: this.model.get('label'),
+      children,
+    });
+
+    return this;
+  },
+
+});

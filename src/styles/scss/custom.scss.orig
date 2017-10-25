@@ -1,0 +1,589 @@
+<<<<<<< HEAD
+
+
+/* B new style */
+
+.gjs-pn-panel{
+    background-color: #222222;
+    padding:4px;
+=======
+.gjs-pn-panel {
+    background-color: #222222;
+    padding: 4px;
+>>>>>>> rafa/feature/save-modal
+}
+
+.gjs-pn-btn.gjs-pn-active,
+.gjs-btnt.gjs-pn-active {
+    background-color: #2e2e2e;
+}
+
+.gjs-pn-panel#gjs-pn-views-container {
+    background-color: #f4f4f4;
+}
+
+.gjs-field {
+    background-color: #a0303d;
+}
+
+.gjs-devices-c .gjs-field {
+    background-color: #2e2e2e;
+}
+
+.gjs-devices-c .gjs-field select {
+    color: #fff;
+}
+
+.gjs-pn-panel#gjs-pn-views-container #gjs-clm-states {
+    background-color: #2e2e2e;
+}
+
+.gjs-clm-tags .gjs-clm-tag {
+    background-color: #f4f4f4;
+    border: 1px solid #f4f4f4;
+    box-shadow: 1px 1px #f4f4f4 inset;
+    text-shadow: 1px 1px #f4f4f4;
+}
+
+.gjs-clm-tags #gjs-clm-checkbox {
+    color: #a0303d;
+}
+
+.gjs-clm-tags #gjs-clm-tag-label input {
+    color: #a0303d;
+}
+
+.gjs-clm-tags #gjs-clm-close {
+    color: #a0303d;
+}
+
+.gjs-clm-tags #gjs-clm-add-tag {
+    color: #fff;
+    background-color: #a0303d;
+}
+
+.gjs-category-title,
+.gjs-sm-sector .gjs-sm-title,
+.gjs-clm-tags .gjs-sm-title,
+.gjs-block-category .gjs-title {
+    color: #a0303d;
+    font-weight: bold;
+    background-color: #fff;
+}
+
+.gjs-clm-tags #gjs-clm-label,
+.gjs-clm-tags #gjs-clm-sel {
+    color: #8e8e94;
+}
+
+.gjs-sm-sector .gjs-sm-properties {
+    font-size: 11px;
+    padding: 10px 5px;
+    color: #8e8e94;
+}
+
+.gjs-radio-item-label {
+    color: #fff;
+}
+
+.gjs-sm-header {
+    color: #8e8e94;
+}
+
+.gjs-color-hl,
+.gjs-color-warn {
+    color: #8e8e94;
+    fill: #8e8e94;
+}
+
+.gjs-sm-sector .gjs-sm-field.gjs-sm-composite {
+    background-color: rgb(244, 244, 244);
+}
+
+.gjs-radio-item input:checked+.gjs-radio-item-label {
+    background-color: #8e8e94;
+    color: #fff;
+}
+
+.gjs-radio-item-label {
+    color: #8e8e94;
+}
+
+.gjs-field {
+    background-color: #fff;
+    color: #fff;
+}
+
+.gjs-radio-item {
+    border-left: 1px solid #f4f4f4;
+}
+
+.gjs-devices-c .gjs-device-label {
+    display: inline-block;
+    font-weight: bold;
+    line-height: 33px;
+    text-align: right;
+    margin-top: -1px;
+    color: #fff;
+<<<<<<< HEAD
+=======
+}
+
+.gjs-device-label:before {
+    content: '';
+    display: inline-block;
+>>>>>>> rafa/feature/save-modal
+    background: url(./img/builder.png);
+    background-repeat: no-repeat;
+    height: 32px;
+    float: left;
+    margin-left: 60px;
+    padding-left: 122px;
+    padding-right: 20px;
+}
+.gjs-devices-c .gjs-field select{
+    padding: 4px;
+}
+
+.gjs-devices-c {
+    padding: 0px;
+}
+
+.gjs-nv-item .gjs-nv-title-c {
+    color: #a0303d;
+    font-weight: bold;
+    background-color: #f4f4f4;
+}
+
+.gjs-nv-selected .gjs-nv-title {
+    background-color: #fff;
+}
+
+.gjs-nv-title {
+    background-color: #f4f4f4;
+}
+
+.gjs-block {
+    background-color: #fff;
+    border: 0px;
+}
+
+.gjs-block-label,
+.gjs-block.gjs-fonts::before,
+.gjs-block.fa:before {
+    color: #8e8e94;
+    box-shadow: 0px 0px 0px;
+}
+
+.gjs-block:hover {
+    box-shadow: 0px 0px 0px;
+    border: 1px solid #a0303d;
+    color: #a0303d !important;
+}
+
+.gjs-block:hover:before {
+    box-shadow: 0px 0px 0px;
+    color: #a0303d !important;
+}
+
+.gjs-nv-item #gjs-nv-btn-eye:before {
+    color: #222222;
+}
+<<<<<<< HEAD
+.gjs-field input, .gjs-field textarea{
+=======
+
+.gjs-field input,
+.gjs-field textarea {
+>>>>>>> rafa/feature/save-modal
+    color: #737373 !important;
+}
+
+.gjs-pn-panel#gjs-pn-views-container .gjs-field select {
+    color: #737373 !important;
+}
+
+.gjs-color-main,
+.gjs-off-prv,
+.gjs-btn-prim,
+.gjs-pn-panel,
+.gjs-pn-btn,
+.gjs-btnt,
+.gjs-sm-sector .gjs-sm-field.gjs-sm-composite,
+.gjs-clm-tags .gjs-sm-field.gjs-sm-composite,
+.gjs-sm-sector .gjs-sm-composite.gjs-clm-field,
+.gjs-clm-tags .gjs-sm-composite.gjs-clm-field,
+.gjs-sm-sector .gjs-sm-stack #gjs-sm-add,
+.gjs-clm-tags .gjs-sm-stack #gjs-sm-add,
+.gjs-block-svg-path,
+.gjs-mdl-dialog,
+#gjs-rte-toolbar .gjs-rte-btn {
+    color: #737373;
+    fill: #737373;
+}
+
+
+/* B change style component */
+
+.gjs-mdl-dialog {
+    background-color: #222222;
+}
+
+.gjs-mdl-dialog .gjs-mdl-title {
+    color: #a32d34;
+    font-weight: bold;
+}
+
+.gjs-mdl-dialog h3 {
+    color: #fff;
+    display: inline-block;
+    width: 100%;
+}
+
+form#saveCategory {
+    display: inline-block;
+    width: 100%;
+    float: left;
+}
+
+form#saveCategory .form-group {
+    display: inline-block;
+    width: 90%;
+    float: left;
+}
+
+form#saveCategory label {
+    display: inline-block;
+    width: 20%;
+    float: left;
+    color: #fff;
+}
+
+form#saveCategory input {
+    display: inline-block;
+    float: left;
+    width: 70%;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.23);
+}
+
+form#saveCategory button {
+    width: 10%;
+    display: inline-block;
+    float: left;
+    background: #a32d34;
+    border: 1px solid #a32d34;
+    color: #fff;
+<<<<<<< HEAD
+    outline:none
+=======
+    outline: none
+>>>>>>> rafa/feature/save-modal
+}
+
+form#saveCategory button:hover {
+    background: #9e030c;
+    border: 1px solid #9e030c;
+}
+
+ul#categories_container {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#categories_container li.edit-category-li {
+    text-indent: -.7em;
+    color: #fff;
+    margin-bottom: 5px;
+    padding-left: 50px;
+}
+
+#categories_container li.edit-category-li::before {
+    content: "• ";
+    color: #a32d34;
+    font-size: 18px;
+    padding-right: 10px;
+}
+
+#categories_container button {
+    float: right;
+    width: 70px;
+    margin-right: 10px;
+<<<<<<< HEAD
+    background:#898989;
+    border: 1px solid #898989;
+    color:#fff;
+    outline:none;
+=======
+    background: #898989;
+    border: 1px solid #898989;
+    color: #fff;
+    outline: none;
+>>>>>>> rafa/feature/save-modal
+}
+
+#categories_container button:hover {
+    background: #a32d34;
+    border: 1px solid #a32d34;
+}
+
+#categories_container button.edit-category {
+    float: right;
+    width: 70px;
+    margin-right: 0px;
+<<<<<<< HEAD
+    background:#4b4b4b;
+    border: 1px solid #4b4b4b;
+    outline:none;
+=======
+    background: #4b4b4b;
+    border: 1px solid #4b4b4b;
+    outline: none;
+>>>>>>> rafa/feature/save-modal
+}
+
+#categories_container button.edit-category:hover {
+    background: #a32d34;
+    border: 1px solid #a32d34;
+}
+
+#saveComponent .form-group {
+    display: inline-block;
+    width: 100%;
+    float: left;
+}
+
+#saveComponent label {
+    display: inline-block;
+    width: 18%;
+    float: left;
+    margin: 0px;
+    padding: 0px;
+    color: #fff;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+#saveComponent select {
+    display: inline-block;
+    width: 63.5%;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.23);
+    margin-bottom: 5px;
+}
+
+#saveComponent select option {
+    margin: 40px;
+    background: #222222!important;
+    color: #fff !important;
+}
+
+#saveComponent input {
+    display: inline-block;
+    width: 63%;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.23);
+    margin-bottom: 5px;
+}
+<<<<<<< HEAD
+#saveComponent #traits div{
+=======
+
+#saveComponent #traits div {
+>>>>>>> rafa/feature/save-modal
+    display: inline-block;
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+<<<<<<< HEAD
+#saveComponent #traits strong{
+=======
+
+#saveComponent #traits strong {
+>>>>>>> rafa/feature/save-modal
+    display: inline-block;
+    width: 18%;
+    float: left;
+    margin: 0px;
+    padding: 0px;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+#saveComponent #traits .form-group {
+    display: inline-block;
+    width: 100%;
+    float: left;
+    margin-top: 0px;
+}
+
+#saveComponent #traits hr {
+    margin-top: 15px;
+    display: inline-block;
+    width: 100%;
+}
+
+#saveComponent #traits button.remove-setting {
+    background: #898989;
+    border: 1px solid #898989;
+    color: #fff;
+}
+
+#saveComponent #traits button.remove-setting:hover {
+    background: #a32d34;
+    border: 1px solid #a32d34;
+    color: #fff;
+}
+
+#saveComponent #traits button.remove-option {
+    background: #898989;
+    border: 1px solid #898989;
+    color: #fff;
+}
+
+#saveComponent #traits button.remove-option:hover {
+    background: #a32d34;
+    border: 1px solid #a32d34;
+}
+
+#saveComponent #traits button.add-option {
+    display: inline-block;
+    float: left;
+    margin-top: 5px;
+    padding: 2px 19px;
+    background: #4b4b4b;
+    border: 1px solid #4b4b4b;
+    color: #fff;
+    outline: none;
+}
+
+#saveComponent #traits button.add-option:hover {
+    background: #a32d34;
+    border: 1px solid #a32d34;
+}
+
+#saveComponent button.btn.btn-default {
+    padding: 3px 25px;
+    background: #a32d34;
+    color: #fff;
+    border: 1px solid #a32d34;
+}
+
+#saveComponent button.btn.btn-default:hover {
+    background: #9e030c;
+    border: 1px solid #9e030c;
+}
+
+#saveComponent button#add-settings {
+    background: #4b4b4b;
+    border: 1px solid #4b4b4b;
+    color: #fff;
+    outline: none;
+    padding: 1px 6px !important;
+}
+
+#saveComponent button#add-settings:hover {
+    background: #a32d34;
+    border: 1px solid #a32d34;
+}
+
+ul#components_container {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#components_container li.edit-component-li {
+    text-indent: -.7em;
+    color: #fff;
+    margin-bottom: 5px;
+    padding-left: 50px;
+}
+
+#components_container li.edit-component-li::before {
+    content: "• ";
+    color: #a32d34;
+    font-size: 18px;
+    padding-right: 10px;
+}
+
+#components_container button {
+    float: right;
+    width: 70px;
+    margin-right: 10px;
+    background: #898989;
+    border: 1px solid #898989;
+    color: #fff;
+    outline: none;
+}
+
+#components_container button.edit-component {
+    float: right;
+    width: 70px;
+    margin-right: 0px;
+    background: #4b4b4b;
+    border: 1px solid #4b4b4b;
+    outline: none;
+}
+
+#components_container button:hover {
+    background: #a32d34;
+    border: 1px solid #a32d34;
+}
+
+#components_container button.edit-component:hover {
+    background: #a32d34;
+    border: 1px solid #a32d34;
+}
+
+#saveComponent hr {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+#saveComponent select#icon_list {
+    margin-bottom: 15px;
+}
+<<<<<<< HEAD
+/* E change style component */
+/* E new style */
+=======
+
+
+/* E change style component */
+
+.-tooltip {
+    padding: 8px; //    
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 3px rgba(0, 0, 0, .3);
+    -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .3);
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    position: absolute;
+    top: -61px;
+    right: -47px;
+    display: none; // right: 20%;
+    // opacity: 1 !important;
+}
+
+.tooltip {
+    position: absolute;
+    top: -61px;
+    right: -47px;
+    background-color: #555;
+    color: #fff;
+    display: none;
+    text-align: center;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 3px rgba(0, 0, 0, .3);
+    -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .3);
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+>>>>>>> rafa/feature/save-modal

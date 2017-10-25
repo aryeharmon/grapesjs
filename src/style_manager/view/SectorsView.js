@@ -33,6 +33,7 @@ module.exports = Backbone.View.extend({
    * @private
    */
   targetUpdated() {
+    window.editor.StyleManager.render();
     var em = this.target;
     var el = em.get('selectedComponent');
     const um = em.get('UndoManager');
@@ -139,9 +140,47 @@ module.exports = Backbone.View.extend({
     return rendered;
   },
 
+  template: _.template(`
+  <% if (parent) { %>
+    <section>
+      <div>Parent:</div> 
+      <ul>
+        <li><button class="parent_elem_btn">Parent (<%= $(parent).data('model').attributes.type || 'box' %>)</button></li>
+      </ul>
+    </section>
+  <% } %>
+
+  <section>
+    <div>Children:</div> 
+    <ul>
+      <% _.each(children, function(child, index) { %> 
+        <% if (child.tagName) { %> 
+         <li><button class="child_elem_btn" data-index="<%= index %>">Child (<%= $(child).data('model').attributes.type || 'box' %>)</button></li>
+        <% } %> 
+      <% }); %> 
+    </ul>
+  </section>
+  `),
+
   render() {
     var fragment = document.createDocumentFragment();
     this.$el.empty();
+
+    this.$el.html(this.template({
+      random: Math.random(),
+      parent: window.editor.getSelected() ? window.editor.getSelected().view.el.parentElement : null,
+      children: window.editor.getSelected() ? window.editor.getSelected().view.el.childNodes : [],
+    }));
+
+    this.$el.find('.parent_elem_btn').on('click', function() {
+      editor.select($(editor.getSelected().view.el.parentElement).data('model'))
+    });
+    this.$el.find('.child_elem_btn').on('click', function() {
+      editor.select($(editor.getSelected().view.el.childNodes[$(this).data('index')]).data('model'))
+    });
+// <%= $(parent).data('model').attributes.tagName %>
+    // alert($(window.editor.getSelected().view.el.parentElement).data('model').attributes.tagName)
+
 
     this.collection.each(function(model){
       this.addToCollection(model, fragment);
