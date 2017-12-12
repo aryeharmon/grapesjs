@@ -3,71 +3,78 @@ var Component = require('./Component');
 module.exports = Component.extend({
 
   defaults: _.extend({}, Component.prototype.defaults, {
-      type: 'table',
-      tagName: 'table',
-      droppable: ['tr', 'tbody', 'thead', 'tfoot'],
-      columns: 3,
-      rows: 2,
-      resizable: false,
-      /*
-      traits: [{
-        label: 'Columns',
-        name: 'columns',
-        changeProp: 1,
-      },{
-        label: 'Rows',
-        name: 'rows',
-        changeProp: 1,
-      }]
-      */
+    type: 'table',
+    tagName: 'table',
+    name: '',
+    // void: 1,
+    droppable: true,
+    resizable: true,
+    traits: [
+      {"type":"name","label":"Name","name":"name","default":"dddd","value":"ddd"},
+      {
+        label: 'datatable',
+        name: 'datatable',
+        // changeProp: 1,
+      },
+      {
+        label: 'repeat',
+        name: 'repeat',
+        // changeProp: 1,
+      },
+      {
+        label: 'in',
+        name: 'in',
+        // changeProp: 1,
+      }
+    ]
   }),
 
-  initialize(o, opt) {
-    Component.prototype.initialize.apply(this, arguments);
-    var components = this.get('components');
-    var rows = this.get('rows');
-    var columns = this.get('columns');
+  // initialize(o, opt) {
+  //   Component.prototype.initialize.apply(this, arguments);
+  //   var components = this.get('components');
+  //   var rows = this.get('rows');
+  //   var columns = this.get('columns');
 
-    // Init components if empty
-    if(!components.length){
-      var rowsToAdd = [];
+  //   // Init components if empty
+  //   if(!components.length){
+  //     var rowsToAdd = [];
 
-      while(rows--){
-        var columnsToAdd = [];
-        var clm = columns;
+  //     while(rows--){
+  //       var columnsToAdd = [];
+  //       var clm = columns;
 
-        while (clm--) {
-          columnsToAdd.push({
-            type: 'cell',
-            classes: ['cell']
-          });
-        }
+  //       while (clm--) {
+  //         columnsToAdd.push({
+  //           type: 'cell',
+  //           classes: ['cell']
+  //         });
+  //       }
 
-        rowsToAdd.push({
-          type: 'row',
-          classes: ['row'],
-          components: columnsToAdd
-        });
-      }
-      components.add(rowsToAdd);
-    }
+  //       rowsToAdd.push({
+  //         type: 'row',
+  //         classes: ['row'],
+  //         components: columnsToAdd
+  //       });
+  //     }
+  //     components.add(rowsToAdd);
+  //   }
 
-    // Clean table from non rows
-    var rowsColl = [];
-    components.each(model => {
-      if(model.get('type') != 'row'){
-        model.get('components').each(row => {
-          if(row.get('type') == 'row'){
-            row.collection = components;
-            rowsColl.push(row);
-          }
-        });
-      }else{
-        rowsColl.push(model);
-      }
-    });
-    components.reset(rowsColl);
-  },
+  //   // Clean table from non rows
+  //   var rowsColl = [];
+  //   components.each(model => {
+  //     if(model.get('type') != 'row'){
+  //       model.get('components').each(row => {
+  //         if(row.get('type') == 'row'){
+  //           row.collection = components;
+  //           rowsColl.push(row);
+  //         }
+  //       });
+  //     }else{
+  //       rowsColl.push(model);
+  //     }
+  //   });
+  //   components.reset(rowsColl);
+  // },
 
 },{
 

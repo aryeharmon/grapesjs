@@ -101,6 +101,7 @@ module.exports = () => {
       defaultCommands['open-blocks'] = require('./view/OpenBlocks');
       defaultCommands['open-assets'] = require('./view/OpenAssets');
       defaultCommands['open-region-editor'] = require('./view/OpenRegionEditor');
+      defaultCommands['open-table-editor'] = require('./view/OpenTableEditor');
       defaultCommands['show-offset'] = require('./view/ShowOffset');
       defaultCommands['select-parent'] = require('./view/SelectParent');
       defaultCommands.fullscreen = require('./view/Fullscreen');
