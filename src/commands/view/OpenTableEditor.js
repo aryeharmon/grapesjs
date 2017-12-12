@@ -61,7 +61,7 @@ module.exports = {
 
     that.modal.setTitle(that.opt.modalTitle || 'Table Editor');
 
-    var cols = atob(that.opt.target.get('attributes').datatable)
+    var cols = atob(that.opt.target.get('attributes').datatable || 'W10=')
 
     that.columns = cols ? JSON.parse(cols) : [{}];
 
