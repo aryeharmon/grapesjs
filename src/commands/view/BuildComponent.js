@@ -1,196 +1,159 @@
-/**
- *
- * * [add](#add)
- * * [get](#get)
- * * [has](#has)
- *
- * You can init the editor with all necessary commands via configuration
- *
- * ```js
- * var editor = grapesjs.init({
- * 	...
- *  commands: {...} // Check below for the properties
- * 	...
- * });
- * ```
- *
- * Before using methods you should get first the module from the editor instance, in this way:
- *
- * ```js
- * var commands = editor.Commands;
- * ```
- *
- * @module Commands
- * @param {Object} config Configurations
- * @param {Array<Object>} [config.defaults=[]] Array of possible commands
- * @example
- * ...
- * commands: {
- * 	defaults: [{
- * 		id: 'helloWorld',
- * 		run:  function(editor, sender){
- * 			alert('Hello world!');
- * 		},
- * 		stop:  function(editor, sender){
- * 			alert('Stop!');
- * 		},
- * 	}],
- * },
- * ...
- */
-import { isFunction } from 'underscore';
+var parse_str = require('locutus/php/strings/parse_str');
 
-module.exports = () => {
-  let em;
-  var c = {},
-  commands = {},
-  defaultCommands = {},
-  defaults = require('./config/config'),
-  AbsCommands = require('./view/CommandAbstract');
+var Component = function(obj) {
+  var that = this;
+  that.traits = [{
+    "type": "text",
+    "label": "JSON URL",
+    "name": "src"
+  },
+  {
+    "type": "checkbox",
+    "label": "Repeater",
+    "name": "Repeater"
+  }, {
+    "type": "number",
+    "label": "Max",
+    "name": "Max",
+    "default": "0",
+    "value": "10"
+  }, {
+    "type": "select",
+    "label": "Each Line",
+    "name": "line_count",
+    "options": [{
+      "value": "col-xs-12",
+      "name": "1"
+    }, {
+      "value": "col-xs-6",
+      "name": "2"
+    }, {
+      "value": "col-xs-4",
+      "name": "3"
+    }, {
+      "value": "col-xs-3",
+      "name": "4"
+    }, {
+      "value": "col-xs-2",
+      "name": "6"
+    }, {
+      "value": "col-xs-1",
+      "name": "12"
+    }]
+  }];
 
-  // Need it here as it would be used below
-  var add = function(id, obj) {
-    if (isFunction(obj)) {
-      obj = { run: obj };
-    }
+  if (obj) {
+    that.traits = obj.traits;
+    that.category = obj.category;
+    that.icon = obj.icon;
+    that.tagName = obj.tagName;
+    that.id = obj.id;
+  }
 
-    delete obj.initialize;
-    commands[id] = AbsCommands.extend(obj);
-    return this;
+  this.removeTrait = function(index) {
+    that.traits.splice(index, 1);
+  };
+  this.addTrait = function(type) {
+    that.traits.push({
+      type: type,
+      options: [],
+      label: '',
+      name: '',
+      default: '',
+      value: '',
+    });
   };
 
-  return {
-
-    /**
-     * Name of the module
-     * @type {String}
-     * @private
-     */
-    name: 'Commands',
-
-    /**
-     * Initialize module. Automatically called with a new instance of the editor
-     * @param {Object} config Configurations
-     * @private
-     */
-    init(config) {
-      c = config || {};
-      for (var name in defaults) {
-        if (!(name in c))
-          c[name] = defaults[name];
-      }
-      em = c.em;
-      var ppfx = c.pStylePrefix;
-      if(ppfx)
-        c.stylePrefix = ppfx + c.stylePrefix;
-
-      // Load commands passed via configuration
-      for( var k in c.defaults) {
-        var obj = c.defaults[k];
-        if(obj.id)
-          this.add(obj.id, obj);
-      }
-
-      const ViewCode = require('./view/ExportTemplate');
-      defaultCommands['select-comp'] = require('./view/SelectComponent');
-      defaultCommands['create-comp'] = require('./view/CreateComponent');
-      defaultCommands['delete-comp'] = require('./view/DeleteComponent');
-      defaultCommands['image-comp'] = require('./view/ImageComponent');
-      defaultCommands['move-comp'] = require('./view/MoveComponent');
-      defaultCommands['text-comp'] = require('./view/TextComponent');
-      defaultCommands['insert-custom'] = require('./view/InsertCustom');
-      defaultCommands['export-template'] = ViewCode;
-      defaultCommands['sw-visibility'] = require('./view/SwitchVisibility');
-      defaultCommands['open-layers'] = require('./view/OpenLayers');
-      defaultCommands['open-sm'] = require('./view/OpenStyleManager');
-      defaultCommands['open-tm'] = require('./view/OpenTraitManager');
-      defaultCommands['open-blocks'] = require('./view/OpenBlocks');
-      defaultCommands['open-assets'] = require('./view/OpenAssets');
-      defaultCommands['show-offset'] = require('./view/ShowOffset');
-      defaultCommands['select-parent'] = require('./view/SelectParent');
-      defaultCommands.fullscreen = require('./view/Fullscreen');
-      defaultCommands.preview = require('./view/Preview');
-      defaultCommands.resize = require('./view/Resize');
-      defaultCommands.drag = require('./view/Drag');
-
-      //custom
-      defaultCommands['build-component'] = require('./view/BuildComponent');
-      defaultCommands['open-table-editor'] = require('./view/OpenTableEditor');
-      defaultCommands['open-region-editor'] = require('./view/OpenRegionEditor');
-
-      defaultCommands['tlb-delete'] = {
-        run(ed) {
-          var sel = ed.getSelected();
-
-          if(!sel || !sel.get('removable')) {
-            console.warn('The element is not removable');
-            return;
-          }
-
-          ed.select(null);
-          sel.destroy();
-        },
-      };
+  this.addTraitOption = function(index) {
+      this.traits[index].options.push({
+        name: '',
+        value: '',
+      });
+  };
+  this.removeTraitOption = function(index, o_index) {
+    that.traits[index].options.splice(o_index, 1);
+  };
+};
 
 
+module.exports = {
+  run(editor, sender) {
+    var that = this;
 
+    this.component = new Component;
+    this.category_id = '';
 
+    this.render(editor);
 
-      defaultCommands['save'] = {
-        run(editor) {
+    // alert(editor.trigger);
+  },
+  get_form_data: function() {
+    var that = this;
 
+    var form_data = {};
 
+    parse_str($("#saveComponent").serialize(), form_data);
 
+    form_data.traits = $.map(form_data.traits, function(value, index) {
+      return [value];
+    });
 
+    for (var i = 0; i < form_data.traits.length; i++) {
+      var optionsObj = form_data.traits[i].options || {};
+      form_data.traits[i].options = $.map(optionsObj, function(value, index) {
+          return [value];
+      });
+    }
 
-var assetTemplate = `
+    $.extend(that.component, form_data);
+  },
+  render(editor) {
+    var that = this;
 
-<div style="overflow: hidden;">
-  <div style="float: left; width: 50%;">
-    <h4>New. Layout</h4>
-
-    <form id="NewLayoutForm" enctype="multipart/form-data">
-      <div class="form_item">
-        <label>Block <i style="color: red;">*</i></label>
-        <select name="block_id" required="required">
-          <% _.each(blocks, function(block) { %> 
-            <option value="<%= block.id %>"><%= block.name %></option>
-          <% }); %> 
-        </select>
+    this.modal = editor.Modal || null;
+    this.modal.setTitle('Component editor');
+    this.modal.setContent(`
+      <div>
+        <h3 class="component-editor-title">Add a new Category</h3>
+        <form id="saveCategory">
+          <input type="hidden" name="id" value="` + (this.category_id || '') + `"/>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="label" name="name" class="form-control" value="` + (window.categories[this.category_id] || {name: ''}).name + `">
+          </div>
+          <button type="submit" class="btn btn-default">Save</button>
+        </form>
       </div>
-      <div class="form_item">
-        <label>Name <i style="color: red;">*</i></label>
-        <input type="text" name="name" required="required">
-      </div>
-      <div class="form_item">
-        <label>Name <i style="color: red;">*</i></label>
-        <input type="file" name="image" required="required">
-      </div>
-      <div class="form_item">
-        <input type="submit" name="Save Layout">
-      </div>
-    </form>
-  </div>
 
-  <div style="float: left; width: 50%;">
-    <h4>New Block</h4>
+      <div>
+        <h3>Existing Categories</h3>
+        
+        <ul id="categories_container">
+        </ul>
 
-    <form id="NewBlockForm">
-      <div class="form_item">
-        <label>Category <i style="color: red;">*</i></label>
-        <select name="category_id" required="required">
-          <% _.each(categories, function(cat) { %> 
-            <option value="<%= cat.id %>"><%= cat.name %></option>
-          <% }); %> 
-        </select>
       </div>
-      <div class="form_item">
-        <label>Name <i style="color: red;">*</i></label>
-        <input type="text" name="name" required="required">
-      </div>
-      <div class="form_item">
-        <label>Icon <i style="color: red;">*</i></label>
-        <select name="icon" required="required">
+
+      <div>
+        <h3 class="component-editor-title">Add a new Component</h3>
+
+        <form id="saveComponent">
+          <input type="hidden" name="id" value="` + (that.component.id || '') + `"/>
+
+          <div class="form-group">
+            <label>Name</label>
+            <input type="label" name="tagName" class="form-control" value="` + (that.component.tagName || '') + `">
+          </div>
+
+          <div class="form-group">
+            <label>Category</label>
+            <select id="category-list" name="category" name="category">
+              <option></option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Icon</label>
+<select id="icon_list" name="icon" style="font-family:'FontAwesome'">
 <option value="fa-glass">&#xf000 icon-glass</option>
 <option value="fa-music">&#xf001 icon-music</option>
 <option value="fa-search">&#xf002 icon-search</option>
@@ -552,252 +515,277 @@ var assetTemplate = `
 <option value="fa-vk">&#xf189 icon-vk</option>
 <option value="fa-weibo">&#xf18a icon-weibo</option>
 <option value="fa-renren">&#xf18b icon-renren</option>
-        </select>
+</select>
+
+
+          </div>
+
+          <hr>
+
+
+          <div id="traits"></div>
+
+          <select class="add-type">
+            <option>text</option>
+            <option>email</option>
+            <option>password</option>
+            <option>number</option>
+            <option>checkbox</option>
+            <option>select</option>
+          </select>
+          <button id="add-settings" type="button" class="btn btn-default">Add Setting</button>
+          <hr>
+
+          <button type="submit" class="btn btn-default">Save</button>
+        </form>
+
       </div>
-      <div class="form_item">
-        <input type="submit" name="Save Block">
+
+
+
+      <div>
+        <h3>Existing Component</h3>
+        
+        <ul id="components_container">
+        </ul>
+
       </div>
-    </form>
-  </div>
-</div>
-`;
+    `);
+    this.modal.open();
 
-var template = _.template(assetTemplate);
+    if (window.components) {    
+      for (var id in window.components) {
+        $('#components_container').append(`<li class="edit-component-li" data-id="`+id+`">`+ window.components[id].tagName +` <button class="edit-component" data-id="`+id+`">Edit</button> <button class="remove-component" data-id="`+id+`">Delete</button></li>`);
+      }
+    }
+    
+    if (window.categories) {    
+      for (var id in window.categories) {
+        $('#categories_container').append(`<li class="edit-category-li" data-id="`+id+`">`+ window.categories[id].name +` <button class="edit-category" data-id="`+id+`">Edit</button> <button data-id="`+id+`" class="delete-category">Delete</button></li>`);
+        $('#category-list').append(`<option value="`+id+`">`+window.categories[id].name+`</option>`);
+      }
+    }
 
-    // var config = editor.getConfig();
-    var modal = editor.Modal;
+    $('#category-list').find('option[value="'+ this.component.category +'"]').prop('selected', true); 
+    $('#icon_list').find('option[value="'+ this.component.icon +'"]').prop('selected', true); 
 
-    modal.setTitle('Save Layout Or Block');
 
-    var content = template({
-      categories:categories,
-      blocks:blocks,
+    for (var i = 0; i < this.component.traits.length; i++) {
+      var trait = this.component.traits[i];
+      $('#traits').append('<input type="hidden" name="traits[' + i + '][type]" value="' + trait.type + '"/>');
+      $('#traits').append('<div><strong>' + trait.type + '</strong> <button type="button" class="remove-setting" data-i="' + i + '">Remove Setting</button></div>');
+
+      if (trait.type === 'text' || trait.type === 'checkbox' || trait.type === 'number' || trait.type === 'select' || trait.type === 'email' || trait.type === 'password') {
+        $('#traits').append(`
+          <div class="form-group">
+            <label>label</label>
+            <input type="label" name="traits[` + i + `][label]" class="form-control" value="` + (trait.label || "") + `">
+          </div>
+          <div class="form-group">
+            <label>name</label>
+            <input type="text" name="traits[` + i + `][name]" class="form-control" value="` + (trait.name || "") + `">
+          </div>
+          <div class="form-group">
+            <label>default</label>
+            <input type="text" name="traits[` + i + `][default]" class="form-control" value="` + (trait.default || "") + `">
+          </div>
+          <div class="form-group">
+            <label>value</label>
+            <input type="text" name="traits[` + i + `][value]" class="form-control" value="` + (trait.value || "") + `">
+          </div>
+        `);
+      }
+      if (trait.type === 'select') {
+        for (var n = 0; n < trait.options.length; n++) {
+          var option = trait.options[n];
+          $('#traits').append(`
+            <div><strong>Opotion ` + (n + 1) + ` </strong></div>
+            <div class="form-group">
+              <label>name</label>
+              <input type="text" name="traits[` + i + `][options][` + n + `][name]" class="form-control" value="` + (option.name || "") + `">
+            </div>
+          `);
+          $('#traits').append(`
+            <div>Opotion 1</div>
+            <div class="form-group">
+              <label>value</label>
+              <input type="text" name="traits[` + i + `][options][` + n + `][value]" class="form-control" value="` + (option.value || "") + `">
+            </div>
+          `);
+          $('#traits').append(`
+            <div>
+              <button type="button" class="remove-option" data-i="` + i + `" data-n="` + n + `">Remove Option</button>
+            </div>
+          `);
+        }
+        
+        $('#traits').append(`
+          <button type="button" class="add-option" data-i="` + i + `">Add Option</button>
+        `);
+      }
+      $('#traits').append('<hr>');
+    }
+
+
+
+
+
+    $("#add-settings").click(function(e) {
+      that.get_form_data();
+      that.component.addTrait($('.add-type').val());
+      that.render(editor);
+    });
+    $(".add-option").click(function(e) {
+      that.get_form_data();
+
+      var i = $(this).data('i');
+      that.component.addTraitOption(i);
+      that.render(editor);
+    });
+    $(".remove-option").click(function(e) {
+      that.get_form_data();
+
+      var i = $(this).data('i');
+      var n = $(this).data('n');
+
+      that.component.removeTraitOption(i, n);
+
+      that.render(editor);
     });
 
 
-    modal.setContent(content);
 
-    modal.open();
+    $(".edit-component").click(function(e) {
+      that.component = new Component(window.components[$(this).data('id')]);
 
-          var sel = editor.getSelected();
-          var html = sel.toHTML()
+      that.render(editor);
+    });
 
-          $("#NewLayoutForm").submit(function(e) {
-              e.preventDefault();    
-              var formData = new FormData(this);
-              formData.set('html', html)
+    $(".remove-component").click(function(e) {
+      that.category_id = $(this).data('id');
 
-              $.ajax({
-                  url: base_url + '/save-layout',
-                  type: 'POST',
-                  data: formData,
-                  success: function (data) {
-                      modal.close();
-                  },
-                  cache: false,
-                  contentType: false,
-                  processData: false
-              });
+      $.ajax({
+       type: "POST",
+       url: base_url + "/remove-component",
+       data: {id: $(this).data('id')},
+       success: function(data)
+       {
+        delete window.components[data];
+        that.render(editor);
+       }
+      });
+    });
+
+    $(".edit-category").click(function(e) {
+      that.category_id = $(this).data('id');
+
+      that.render(editor);
+    });
+
+    $(".delete-category").click(function(e) {
+      that.category_id = $(this).data('id');
+
+      $.ajax({
+       type: "POST",
+       url: base_url + "/remove-category",
+       data: {id: that.category_id},
+       success: function(data)
+       {
+        delete window.categories[data];
+        that.render(editor);
+       }
+      });
+    });
+
+
+    $(".remove-setting").click(function(e) {
+      that.get_form_data();
+      var i = $(this).data('i');
+
+      that.component.removeTrait(i);
+
+      that.render(editor);
+    });
+
+    $("#saveCategory").submit(function(e) {
+      e.preventDefault();
+
+      $.ajax({
+       type: "POST",
+       url: base_url + "/add-category",
+       data: $("#saveCategory").serialize(),
+       success: function(data)
+       {
+        window.categories = data;
+        that.category_id = '';
+        that.render(editor);
+       }
+      });
+
+    });
+
+    $("#saveComponent").submit(function(e) {
+      e.preventDefault();
+      that.get_form_data();
+      var url = base_url + "/save-component";
+
+      $.ajax({
+       type: "POST",
+       url: url,
+       data: $("#saveComponent").serialize(),
+       success: function(data)
+       {
+
+        var model = defaultModel.extend({
+            defaults: Object.assign({}, defaultModel.prototype.defaults, {
+              style: {
+                "min-height": '40px',
+                "display": 'block',
+              },
+              tagName: that.component.tagName,
+              classes: ['cutom-element-type'],
+              stylable: 'false',
+              draggable: '*',
+              droppable: true,
+              saveable: true,
+              traits: that.component.traits,
+            }),
+          },
+          {
+            isComponent: function(el) {
+              if(el.tagName == that.component.tagName.toUpperCase()){
+                return {type: that.component.tagName};
+              }
+            },
           });
 
-          $("form#NewBlockForm").submit(function(e) {
-              e.preventDefault();    
-              var data = {};
-              var formData = new FormData(this);
-
-              for (var pair of formData.entries()) {
-                data[pair[0]] = pair[1];
-              }
-              data.html = html;
-
-              $.ajax({
-                  url: base_url + '/save-block',
-                  type: 'POST',
-                  data: data,
-                  success: function (data) {
-                      modal.close();
-                  }
-              });
+        if (editor.DomComponents.getType(that.component.tagName)) {
+          editor.DomComponents.getType(that.component.tagName).model = model;
+        } else {
+          editor.DomComponents.addType(that.component.tagName, {
+            model: model,
+            view: defaultType.view,
           });
-
-        },
-      };
-
-
-
-
-
-
-
-
-      defaultCommands['tlb-clone'] = {
-        run(ed) {
-          var sel = ed.getSelected();
-
-          if(!sel || !sel.get('copyable')) {
-            console.warn('The element is not clonable');
-            return;
-          }
-
-          var collection = sel.collection;
-          var index = collection.indexOf(sel);
-          collection.add(sel.clone(), {at: index + 1});
-          ed.trigger('component:update', sel);
-        },
-      };
-
-      defaultCommands['tlb-move'] = {
-        run(ed, sender, opts) {
-          var sel = ed.getSelected();
-          var dragger;
-
-          if(!sel || !sel.get('draggable')) {
-            console.warn('The element is not draggable');
-            return;
-          }
-
-          const onStart = (e, opts) => {
-            console.log('start mouse pos ', opts.start);
-            console.log('el rect ', opts.elRect);
-            var el = opts.el;
-            el.style.position = 'absolute';
-            el.style.margin = 0;
-          };
-
-          const onEnd = (e, opts) => {
-            em.runDefault();
-            em.set('selectedComponent', sel);
-            ed.trigger('component:update', sel);
-            dragger && dragger.blur();
-          };
-
-          const onDrag = (e, opts) => {
-            console.log('Delta ', opts.delta);
-            console.log('Current ', opts.current);
-          };
-
-          var toolbarEl = ed.Canvas.getToolbarEl();
-          toolbarEl.style.display = 'none';
-          var em = ed.getModel();
-          em.stopDefault();
-
-          if (em.get('designerMode')) {
-            // TODO move grabbing func in editor/canvas from the Sorter
-            dragger = editor.runCommand('drag', {
-              el: sel.view.el,
-              options: {
-                event: opts && opts.event,
-                onStart,
-                onDrag,
-                onEnd
-              }
-            });
-          } else {
-            var cmdMove = ed.Commands.get('move-comp');
-            cmdMove.onEndMoveFromModel = onEnd;
-            cmdMove.initSorterFromModel(sel);
-          }
-
-
-          sel.set('status', 'selected');
-        },
-      };
-
-      // Core commands
-      defaultCommands['core:undo'] = e => e.UndoManager.undo();
-      defaultCommands['core:redo'] = e => e.UndoManager.redo();
-      defaultCommands['core:canvas-clear'] = e => {
-        e.DomComponents.clear();
-        e.CssComposer.clear();
-      };
-      defaultCommands['core:copy'] = ed => {
-        const em = ed.getModel();
-        const model = ed.getSelected();
-
-        if (model && model.get('copyable') && !ed.Canvas.isInputFocused()) {
-          em.set('clipboard', model);
         }
-      };
-      defaultCommands['core:paste'] = ed => {
-        const em = ed.getModel();
-        const clp = em.get('clipboard');
-        const model = ed.getSelected();
-        const coll = model && model.collection;
 
-        if (coll && clp && !ed.Canvas.isInputFocused()) {
-          const at = coll.indexOf(model) + 1;
-          coll.add(clp.clone(), { at });
-        }
-      };
 
-      if(c.em)
-        c.model = c.em.get('Canvas');
+        editor.BlockManager.add(data, {
+          label: that.component.tagName,
+          category: 'Custom Components',
+          attributes: {class:'fa fa-thermometer-full'},
+          content: {
+            type: that.component.tagName,
+          },
+        });
 
-      this.loadDefaultCommands()
+        that.component = new Component();
+        alert('saved');
+        that.render(editor);
 
-      return this;
-    },
+       }
+      });
+    });
 
-    /**
-     * Add new command to the collection
-     * @param	{string} id Command's ID
-     * @param	{Object|Function} command Object representing your command,
-     *  By passing just a function it's intended as a stateless command
-     *  (just like passing an object with only `run` method).
-     * @return {this}
-     * @example
-     * commands.add('myCommand', {
-     * 	run(editor, sender) {
-     * 		alert('Hello world!');
-     * 	},
-     * 	stop(editor, sender) {
-     * 	},
-     * });
-     * // As a function
-     * commands.add('myCommand2', editor => { ... });
-     * */
-    add,
 
-    /**
-     * Get command by ID
-     * @param	{string}	id Command's ID
-     * @return {Object} Object representing the command
-     * @example
-     * var myCommand = commands.get('myCommand');
-     * myCommand.run();
-     * */
-    get(id) {
-      var el = commands[id];
-
-      if(typeof el == 'function'){
-        el = new el(c);
-        commands[id]	= el;
-      }
-
-      return el;
-    },
-
-    /**
-     * Check if command exists
-     * @param	{string}	id Command's ID
-     * @return {Boolean}
-     * */
-    has(id) {
-      return !!commands[id];
-    },
-
-    /**
-     * Load default commands
-     * @return {this}
-     * @private
-     * */
-    loadDefaultCommands() {
-      for (var id in defaultCommands) {
-          this.add(id, defaultCommands[id]);
-      }
-
-      return this;
-    },
-  };
-
+  },
 };

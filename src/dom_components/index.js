@@ -94,6 +94,11 @@ module.exports = () => {
       view: require('./view/ComponentImageView'),
     },
     {
+      id: 'region',
+      model: require('./model/ComponentRegion'),
+      view: require('./view/ComponentRegionView'),
+    },
+    {
       id: 'script',
       model: require('./model/ComponentScript'),
       view: require('./view/ComponentScriptView'),

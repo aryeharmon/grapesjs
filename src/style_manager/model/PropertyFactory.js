@@ -92,6 +92,10 @@ module.exports = () => ({
         case 'background-image':
           obj.type = 'file';
           break;
+        case 'main-color':
+          obj.type = 'main-color';
+          break;
+
       }
 
       // Defaults

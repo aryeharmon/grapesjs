@@ -50,7 +50,7 @@ module.exports = () => {
       }
 
       defaultStorages.remote  = new RemoteStorage(c);
-      defaultStorages.local = new LocalStorage(c);
+      // defaultStorages.local = new LocalStorage(c);
       c.currentStorage = c.type;
       this.loadDefaultProviders().setCurrent(c.type);
       return this;

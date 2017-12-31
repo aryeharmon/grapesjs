@@ -25,6 +25,23 @@ module.exports = {
     modal.open();
     this.htmlEditor.setContent(editor.getHtml());
     this.cssEditor.setContent(editor.getCss());
+
+    var data = {
+      css: editor.getCss(),
+      html: editor.getHtml(),
+      _id: window.page ? window.page._id : 'ggggggg',
+    }
+    
+    window.$.ajax({
+      type: "POST",
+      url: base_url + '/storage/html',
+      data: data,
+      success: function(data) {
+        console.log('saved template.')
+      },
+      dataType: 'json'
+    });
+
   },
 
   stop(editor) {
