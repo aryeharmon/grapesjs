@@ -1999,7 +1999,7 @@ return /******/ (function(modules) { // webpackBootstrap
   return Backbone;
 });
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }),
 /* 1 */
@@ -3561,132 +3561,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscor
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getUnitFromValue = exports.normalizeFloat = exports.shallowDiff = exports.camelCase = exports.matches = exports.upFirst = exports.off = exports.on = undefined;
-
-var _underscore = __webpack_require__(1);
-
-var elProt = window.Element.prototype;
-var matches = elProt.matches || elProt.webkitMatchesSelector || elProt.mozMatchesSelector || elProt.msMatchesSelector;
-
-/**
- * Returns shallow diff between 2 objects
- * @param  {Object} objOrig
- * @param  {Objec} objNew
- * @return {Object}
- * @example
- * var a = {foo: 'bar', baz: 1, faz: 'sop'};
- * var b = {foo: 'bar', baz: 2, bar: ''};
- * shallowDiff(a, b);
- * // -> {baz: 2, faz: null, bar: ''};
- */
-var shallowDiff = function shallowDiff(objOrig, objNew) {
-  var result = {};
-  var keysNew = (0, _underscore.keys)(objNew);
-
-  for (var prop in objOrig) {
-    if (objOrig.hasOwnProperty(prop)) {
-      var origValue = objOrig[prop];
-      var newValue = objNew[prop];
-
-      if (keysNew.indexOf(prop) >= 0) {
-        if (origValue !== newValue) {
-          result[prop] = newValue;
-        }
-      } else {
-        result[prop] = null;
-      }
-    }
-  }
-
-  for (var _prop in objNew) {
-    if (objNew.hasOwnProperty(_prop)) {
-      if ((0, _underscore.isUndefined)(objOrig[_prop])) {
-        result[_prop] = objNew[_prop];
-      }
-    }
-  }
-
-  return result;
-};
-
-var on = function on(el, ev, fn) {
-  ev = ev.split(/\s+/);
-  el = el instanceof Array ? el : [el];
-
-  var _loop = function _loop(i) {
-    el.forEach(function (elem) {
-      return elem.addEventListener(ev[i], fn);
-    });
-  };
-
-  for (var i = 0; i < ev.length; ++i) {
-    _loop(i);
-  }
-};
-
-var off = function off(el, ev, fn) {
-  ev = ev.split(/\s+/);
-  el = el instanceof Array ? el : [el];
-
-  var _loop2 = function _loop2(i) {
-    el.forEach(function (elem) {
-      return elem.removeEventListener(ev[i], fn);
-    });
-  };
-
-  for (var i = 0; i < ev.length; ++i) {
-    _loop2(i);
-  }
-};
-
-var getUnitFromValue = function getUnitFromValue(value) {
-  return value.replace(parseFloat(value), '');
-};
-
-var upFirst = function upFirst(value) {
-  return value[0].toUpperCase() + value.toLowerCase().slice(1);
-};
-
-var camelCase = function camelCase(value) {
-  var values = value.split('-');
-  return values[0].toLowerCase() + values.slice(1).map(upFirst);
-};
-
-var normalizeFloat = function normalizeFloat(value) {
-  var step = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-  var valueDef = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-
-  var stepDecimals = 0;
-  if (isNaN(value)) return valueDef;
-  value = parseFloat(value);
-
-  if (Math.floor(value) !== value) {
-    var side = step.toString().split('.')[1];
-    stepDecimals = side ? side.length : 0;
-  }
-
-  return stepDecimals ? parseFloat(value.toFixed(stepDecimals)) : value;
-};
-
-exports.on = on;
-exports.off = off;
-exports.upFirst = upFirst;
-exports.matches = matches;
-exports.camelCase = camelCase;
-exports.shallowDiff = shallowDiff;
-exports.normalizeFloat = normalizeFloat;
-exports.getUnitFromValue = getUnitFromValue;
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone) {
 
 var _underscore = __webpack_require__(1);
@@ -4046,6 +3920,137 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getUnitFromValue = exports.normalizeFloat = exports.shallowDiff = exports.camelCase = exports.matches = exports.upFirst = exports.off = exports.on = undefined;
+
+var _underscore = __webpack_require__(1);
+
+var elProt = window.Element.prototype;
+var matches = elProt.matches || elProt.webkitMatchesSelector || elProt.mozMatchesSelector || elProt.msMatchesSelector;
+
+/**
+ * Returns shallow diff between 2 objects
+ * @param  {Object} objOrig
+ * @param  {Objec} objNew
+ * @return {Object}
+ * @example
+ * var a = {foo: 'bar', baz: 1, faz: 'sop'};
+ * var b = {foo: 'bar', baz: 2, bar: ''};
+ * shallowDiff(a, b);
+ * // -> {baz: 2, faz: null, bar: ''};
+ */
+var shallowDiff = function shallowDiff(objOrig, objNew) {
+  var result = {};
+  var keysNew = (0, _underscore.keys)(objNew);
+
+  for (var prop in objOrig) {
+    if (objOrig.hasOwnProperty(prop)) {
+      var origValue = objOrig[prop];
+      var newValue = objNew[prop];
+
+      if (keysNew.indexOf(prop) >= 0) {
+        if (origValue !== newValue) {
+          result[prop] = newValue;
+        }
+      } else {
+        result[prop] = null;
+      }
+    }
+  }
+
+  for (var _prop in objNew) {
+    if (objNew.hasOwnProperty(_prop)) {
+      if ((0, _underscore.isUndefined)(objOrig[_prop])) {
+        result[_prop] = objNew[_prop];
+      }
+    }
+  }
+
+  return result;
+};
+
+var on = function on(el, ev, fn) {
+  ev = ev.split(/\s+/);
+  el = el instanceof Array ? el : [el];
+
+  var _loop = function _loop(i) {
+    el.forEach(function (elem) {
+      return elem.addEventListener(ev[i], fn);
+    });
+  };
+
+  for (var i = 0; i < ev.length; ++i) {
+    _loop(i);
+  }
+};
+
+var off = function off(el, ev, fn) {
+  ev = ev.split(/\s+/);
+  el = el instanceof Array ? el : [el];
+
+  var _loop2 = function _loop2(i) {
+    el.forEach(function (elem) {
+      return elem.removeEventListener(ev[i], fn);
+    });
+  };
+
+  for (var i = 0; i < ev.length; ++i) {
+    _loop2(i);
+  }
+};
+
+var getUnitFromValue = function getUnitFromValue(value) {
+  return value.replace(parseFloat(value), '');
+};
+
+var upFirst = function upFirst(value) {
+  return value[0].toUpperCase() + value.toLowerCase().slice(1);
+};
+
+var camelCase = function camelCase(value) {
+  if (value) {
+    var values = value.split('-');
+    if (values[0] && values.slice(1)) {
+      return values[0].toLowerCase() + values.slice(1).map(upFirst);
+    }
+  }
+  return 'err';
+};
+
+var normalizeFloat = function normalizeFloat(value) {
+  var step = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+  var valueDef = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+  var stepDecimals = 0;
+  if (isNaN(value)) return valueDef;
+  value = parseFloat(value);
+
+  if (Math.floor(value) !== value) {
+    var side = step.toString().split('.')[1];
+    stepDecimals = side ? side.length : 0;
+  }
+
+  return stepDecimals ? parseFloat(value.toFixed(stepDecimals)) : value;
+};
+
+exports.on = on;
+exports.off = off;
+exports.upFirst = upFirst;
+exports.matches = matches;
+exports.camelCase = camelCase;
+exports.shallowDiff = shallowDiff;
+exports.normalizeFloat = normalizeFloat;
+exports.getUnitFromValue = getUnitFromValue;
+
+/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4056,7 +4061,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 var _Styleable = __webpack_require__(47);
 
@@ -4067,7 +4072,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var Backbone = __webpack_require__(0);
 var Components = __webpack_require__(49);
 var Selector = __webpack_require__(7);
-var Selectors = __webpack_require__(11);
+var Selectors = __webpack_require__(12);
 var Traits = __webpack_require__(153);
 
 var escapeRegExp = function escapeRegExp(str) {
@@ -4117,7 +4122,7 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
     // Indicates if it's possible to resize the component (at the moment implemented only on Image Components)
     // It's also possible to pass an object as options for the Resizer
-    resizable: false,
+    resizable: true,
 
     // Allow to edit the content of the component (used on Text components)
     editable: false,
@@ -4568,6 +4573,12 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
           command: 'tlb-delete'
         });
       }
+
+      tb.push({
+        attributes: { class: 'fa fa-floppy-o' },
+        command: 'save'
+      });
+
       model.set('toolbar', tb);
     }
   },
@@ -4820,7 +4831,7 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 module.exports = Backbone.View.extend({
   template: function template(model) {
@@ -16240,6 +16251,33 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;
 
 /***/ }),
 /* 11 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16272,7 +16310,7 @@ module.exports = Backbone.Collection.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16286,7 +16324,7 @@ var _TypeableCollection2 = _interopRequireDefault(_TypeableCollection);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Property = __webpack_require__(13);
+var Property = __webpack_require__(14);
 
 module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.default).extend({
   types: [{
@@ -16418,7 +16456,7 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
 });
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16564,7 +16602,7 @@ module.exports = __webpack_require__(0).Model.extend({
 });
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16635,14 +16673,14 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({
 
@@ -16708,33 +16746,6 @@ module.exports = ComponentView.extend({
     return this;
   }
 });
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
 
 /***/ }),
 /* 17 */
@@ -16870,7 +16881,7 @@ module.exports = Input.extend({
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 var Input = __webpack_require__(34);
 var Backbone = __webpack_require__(0);
@@ -17208,7 +17219,7 @@ module.exports = PropertyView.extend({
           prop.parent = model;
         }, this);
 
-        var PropertiesView = __webpack_require__(14);
+        var PropertiesView = __webpack_require__(15);
         var propsView = new PropertiesView(this.getPropsConfig());
         this.$props = propsView.render().$el;
         this.$el.find('#' + this.pfx + 'input-holder').append(this.$props);
@@ -17476,10 +17487,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
-var ToolbarView = __webpack_require__(189);
-var Toolbar = __webpack_require__(191);
+var ToolbarView = __webpack_require__(191);
+var Toolbar = __webpack_require__(193);
 var key = __webpack_require__(24);
 var $ = __webpack_require__(0).$;
 var showOffsets = void 0;
@@ -17577,6 +17588,19 @@ module.exports = {
       this.onFrameScroll(e);
       this.updateAttached();
     }
+    var model = $(trg).data('model');
+    if (model != 'undefined') {
+
+      if (!model.get("selectable")) {
+        var comp = model && model.parent();
+
+        // recurse through the parent() chain until a selectable parent is found
+        while (comp && !comp.get("hoverable")) {
+          comp = comp.parent();
+        }
+        trg = comp.view.el;
+      }
+    }
 
     var pos = this.getElementPos(trg);
     this.updateBadge(trg, pos);
@@ -17668,7 +17692,21 @@ module.exports = {
   onClick: function onClick(e) {
     e.stopPropagation();
     var model = $(e.target).data('model');
-    model && this.editor.select(model);
+    if (typeof model != 'undefined') {
+      if (model.get("selectable")) {
+
+        model && this.editor.select(model);
+      } else {
+        var comp = model && model.parent();
+
+        // recurse through the parent() chain until a selectable parent is found
+        while (comp && !comp.get("selectable")) {
+          comp = comp.parent();
+        }
+
+        comp && editor.select(comp);
+      }
+    }
   },
 
 
@@ -20071,7 +20109,7 @@ module.exports = function () {
   var c = {},
       defaults = __webpack_require__(118),
       Sectors = __webpack_require__(119),
-      Properties = __webpack_require__(12),
+      Properties = __webpack_require__(13),
       SectorsView = __webpack_require__(131);
   var properties = void 0;
   var sectors, SectView;
@@ -20657,7 +20695,7 @@ module.exports = Backbone.View.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Property = __webpack_require__(13);
+var Property = __webpack_require__(14);
 
 module.exports = Property.extend({
 
@@ -20682,7 +20720,7 @@ module.exports = Property.extend({
 
   init: function init() {
     var properties = this.get('properties') || [];
-    var Properties = __webpack_require__(12);
+    var Properties = __webpack_require__(13);
     this.set('properties', new Properties(properties));
     this.listenTo(this, 'change:value', this.updateValues);
   },
@@ -20878,7 +20916,7 @@ module.exports = PropertyCompositeView.extend({
     var self = this;
     var model = this.model;
     var fieldEl = this.el.querySelector('[data-layers-wrapper]');
-    var PropertiesView = __webpack_require__(14);
+    var PropertiesView = __webpack_require__(15);
     var propsConfig = {
       target: this.target,
       propTarget: this.propTarget,
@@ -21200,7 +21238,7 @@ module.exports = PropertyView.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Property = __webpack_require__(13);
+var Property = __webpack_require__(14);
 
 module.exports = Property.extend({
 
@@ -21220,7 +21258,7 @@ module.exports = Property.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Property = __webpack_require__(13);
+var Property = __webpack_require__(14);
 var InputNumber = __webpack_require__(18);
 
 module.exports = Property.extend({
@@ -21785,7 +21823,7 @@ var _Styleable2 = _interopRequireDefault(_Styleable);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Backbone = __webpack_require__(0);
-var Selectors = __webpack_require__(11);
+var Selectors = __webpack_require__(12);
 
 module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
@@ -21940,7 +21978,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 var _ParserHtml = __webpack_require__(26);
 
@@ -22262,7 +22300,7 @@ module.exports = Backbone.View.extend({
    * @private
    * */
   addToCollection: function addToCollection(model, fragmentEl, index) {
-    if (!this.compView) this.compView = __webpack_require__(3);
+    if (!this.compView) this.compView = __webpack_require__(2);
     var fragment = fragmentEl || null,
         viewObject = this.compView;
 
@@ -22355,7 +22393,8 @@ module.exports = Component.extend({
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'text',
     droppable: false,
-    editable: true
+    editable: true,
+    traits: ['id', 'title', 'data-angular']
   })
 
 });
@@ -22367,9 +22406,9 @@ module.exports = Component.extend({
 "use strict";
 
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({
 
@@ -22705,7 +22744,7 @@ module.exports = _.extend({}, CreateComponent, {
 
 var _underscore = __webpack_require__(1);
 
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 var ItemsView = void 0;
 
 module.exports = __webpack_require__(0).View.extend({
@@ -23214,7 +23253,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 module.exports = function () {
   var defaultConfig = __webpack_require__(61);
   var Editor = __webpack_require__(62);
-  var PluginManager = __webpack_require__(221);
+  var PluginManager = __webpack_require__(227);
   var plugins = new PluginManager();
   var editors = [];
 
@@ -23227,7 +23266,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.71',
+    version: '0.12.75',
 
     /**
      * Initializes an editor based on passed options
@@ -23380,7 +23419,7 @@ module.exports = function (config) {
   var c = config || {},
       defaults = __webpack_require__(63),
       EditorModel = __webpack_require__(64),
-      EditorView = __webpack_require__(220);
+      EditorView = __webpack_require__(226);
 
   for (var name in defaults) {
     if (!(name in c)) c[name] = defaults[name];
@@ -24179,12 +24218,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var deps = [__webpack_require__(65), __webpack_require__(69), __webpack_require__(70), __webpack_require__(73), __webpack_require__(81), __webpack_require__(86), __webpack_require__(89), __webpack_require__(93), __webpack_require__(97), __webpack_require__(109), __webpack_require__(115), __webpack_require__(32), __webpack_require__(133), __webpack_require__(139), __webpack_require__(144), __webpack_require__(151), __webpack_require__(179), __webpack_require__(185), __webpack_require__(211)];
+var deps = [__webpack_require__(65), __webpack_require__(69), __webpack_require__(70), __webpack_require__(73), __webpack_require__(81), __webpack_require__(86), __webpack_require__(89), __webpack_require__(93), __webpack_require__(97), __webpack_require__(109), __webpack_require__(115), __webpack_require__(32), __webpack_require__(133), __webpack_require__(139), __webpack_require__(144), __webpack_require__(151), __webpack_require__(181), __webpack_require__(187), __webpack_require__(217)];
 
 var Backbone = __webpack_require__(0);
 var timedInterval = void 0;
 
-__webpack_require__(219)({
+__webpack_require__(225)({
   Backbone: Backbone,
   $: Backbone.$
 });
@@ -24753,7 +24792,7 @@ module.exports = function () {
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 var $ = Backbone.$;
 
@@ -25725,6 +25764,28 @@ module.exports = Backbone.View.extend({
         opts.avoidUpdateStyle = 1;
       }
 
+      // aryeh edit
+      if ($('.gjs-pn-btn.fa.fa-bars.gjs-pn-active').length === 0) {
+        if (modelToDrop.type !== 'region') {
+          if (dst.parentNode.tagName === 'BODY' || dst.className.indexOf('flex-start') === -1) {
+            // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
+            // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
+            targetCollection.add("<div class='flex-start'></div>", opts);
+            var targetCollection = $($(dst).children()[opts.at]).data('collection');
+            // targetCollection.add("<div></div>", opt);
+
+            targetCollection.add("<div></div>", opts);
+            var targetCollection = $($($(dst).children()[opts.at]).find('div')).data('collection');
+
+            opts.at++;
+          } else if (dst.className.indexOf('flex-start') > -1) {
+            targetCollection.add("<div></div>", opts);
+            var targetCollection = $($(dst).children()[opts.at]).data('collection');
+          }
+        }
+      }
+      // end aryeh edit
+
       created = targetCollection.add(modelToDrop, opts);
 
       if (!dropContent) {
@@ -25786,7 +25847,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -29823,7 +29884,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 }));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }),
 /* 73 */
@@ -30866,7 +30927,7 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16), __webpack_require__(80)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11), __webpack_require__(80)))
 
 /***/ }),
 /* 80 */
@@ -31633,7 +31694,7 @@ module.exports = function (config) {
   var c = config || {},
       defaults = __webpack_require__(90),
       Selector = __webpack_require__(7),
-      Selectors = __webpack_require__(11),
+      Selectors = __webpack_require__(12),
       ClassTagsView = __webpack_require__(91);
   var selectors, selectorTags;
 
@@ -33013,13 +33074,13 @@ module.exports = __webpack_require__(0).Model.extend({
       }
     });
 
-    if (selectorStrNoAdd && found || rule.get('selectorsAdd')) {
-      var style = rule.styleToString();
+    // if ((selectorStrNoAdd && found) || rule.get('selectorsAdd')) {
+    var style = rule.styleToString();
 
-      if (style) {
-        result += selectorStr + '{' + style + '}';
-      }
+    if (style) {
+      result += selectorStr + '{' + style + '}';
     }
+    // }
 
     return result;
   }
@@ -35603,7 +35664,7 @@ var _RichTextEditor = __webpack_require__(116);
 
 var _RichTextEditor2 = _interopRequireDefault(_RichTextEditor);
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35928,7 +35989,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // The initial version of this RTE was borrowed from https://github.com/jaredreich/pell
 // and adapted to the GrapesJS's need
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -36308,7 +36369,7 @@ module.exports = __webpack_require__(0).Collection.extend({
 var _underscore = __webpack_require__(1);
 
 var Backbone = __webpack_require__(0);
-var Properties = __webpack_require__(12);
+var Properties = __webpack_require__(13);
 var PropertyFactory = __webpack_require__(130);
 
 module.exports = Backbone.Model.extend({
@@ -36413,6 +36474,7 @@ module.exports = __webpack_require__(8).extend({
   setValue: function setValue(value) {
     var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
+    var that = this;
     var em = this.em;
     var editor = em ? em.get('Editor') : '';
 
@@ -36423,11 +36485,11 @@ module.exports = __webpack_require__(8).extend({
         var root_style = editor.CssComposer.getAll().models[i];
       }
     }
-    alert(root_style);
-    // this.inputInst.setValue(root_style.attributes.style[this.property], opts);
+    if (root_style) {
+      this.inputInst.setValue(root_style.attributes.style[this.property], opts);
+    }
   },
   onRender: function onRender() {
-
     var em = this.em;
     var editor = em ? em.get('Editor') : '';
 
@@ -36438,12 +36500,20 @@ module.exports = __webpack_require__(8).extend({
           var root_style = editor.CssComposer.getAll().models[i];
         }
       }
-      root_style.attributes.style[that.property] = value;
+
+      if (!that.input.value) {
+        return;
+      }
+
+      root_style.attributes.style[that.property] = that.input.value;
       root_style.setStyle(root_style.attributes.style, opt); // update css composer
 
-      var iframe = $('.gjs-frame')[0];
+      var iframe = window.$('.gjs-frame')[0];
       var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-      $(innerDoc).find(':root').css(that.property, value);
+
+      console.log(that.input.value);
+
+      window.$(innerDoc).find(':root').css(that.property, that.input.value);
     };
 
     if (!this.input) {
@@ -38881,7 +38951,7 @@ module.exports = Backbone.Model.extend({
   },
 
   initialize: function initialize() {
-    var Properties = __webpack_require__(12);
+    var Properties = __webpack_require__(13);
     var properties = this.get('properties');
     var value = this.get('value');
     this.set('properties', properties instanceof Properties ? properties : new Properties(properties));
@@ -39186,7 +39256,7 @@ module.exports = Backbone.View.extend({
     this.$el[active ? 'addClass' : 'removeClass'](pfx + 'active');
   },
   render: function render() {
-    var PropertiesView = __webpack_require__(14);
+    var PropertiesView = __webpack_require__(15);
     var propsConfig = this.propsConfig;
     var className = this.pfx + 'layer';
     var model = this.model;
@@ -39857,7 +39927,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */(function(_) {
 
 var Backbone = __webpack_require__(0);
-var PropertiesView = __webpack_require__(14);
+var PropertiesView = __webpack_require__(15);
 
 module.exports = Backbone.View.extend({
 
@@ -40755,7 +40825,7 @@ module.exports = function () {
       CssRule = __webpack_require__(46),
       CssRules = __webpack_require__(141),
       CssRulesView = __webpack_require__(142);
-  var Selectors = __webpack_require__(11);
+  var Selectors = __webpack_require__(12);
   var Selector = __webpack_require__(7);
 
   var rules, rulesView;
@@ -41723,7 +41793,7 @@ module.exports = function () {
   var em = void 0;
   var defaults = __webpack_require__(152);
   var Component = __webpack_require__(4);
-  var ComponentView = __webpack_require__(3);
+  var ComponentView = __webpack_require__(2);
   var Components = __webpack_require__(49);
   var ComponentsView = __webpack_require__(50);
 
@@ -41767,19 +41837,23 @@ module.exports = function () {
   }, {
     id: 'image',
     model: __webpack_require__(21),
-    view: __webpack_require__(15)
+    view: __webpack_require__(16)
   }, {
-    id: 'script',
+    id: 'region',
     model: __webpack_require__(173),
     view: __webpack_require__(174)
   }, {
-    id: 'svg',
+    id: 'script',
     model: __webpack_require__(175),
     view: __webpack_require__(176)
   }, {
-    id: 'textnode',
+    id: 'svg',
     model: __webpack_require__(177),
     view: __webpack_require__(178)
+  }, {
+    id: 'textnode',
+    model: __webpack_require__(179),
+    view: __webpack_require__(180)
   }, {
     id: 'text',
     model: __webpack_require__(51),
@@ -42451,7 +42525,7 @@ module.exports = Component.extend({
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({});
 
@@ -42506,7 +42580,7 @@ module.exports = Component.extend({
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({});
 
@@ -42526,14 +42600,41 @@ module.exports = Component.extend({
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'table',
     tagName: 'table',
-    droppable: ['tbody', 'thead', 'tfoot']
-  }),
+    droppable: ['tbody', 'thead', 'tfoot'],
+    traits: [{ "type": "name", "label": "Name", "name": "name", "default": "dddd", "value": "ddd" }, {
+      label: 'datatable',
+      name: 'datatable'
+      // changeProp: 1,
+    }, {
+      label: 'repeat',
+      name: 'repeat'
+      // changeProp: 1,
+    }, {
+      label: 'in',
+      name: 'in'
+      // changeProp: 1,
+    }, {
+      label: 'ng-click',
+      name: 'ng-click'
+      // changeProp: 1,
+    }, {
+      label: 'ng-if',
+      name: 'ng-if'
+      // changeProp: 1,
+    }, {
+      label: 'ng-class',
+      name: 'ng-class'
+      // changeProp: 1,
+    }]
 
-  initialize: function initialize(o, opt) {
-    Component.prototype.initialize.apply(this, arguments);
-    var components = this.get('components');
-    !components.length && components.add({ type: 'tbody' });
-  }
+  })
+
+  // initialize(o, opt) {
+  //   Component.prototype.initialize.apply(this, arguments);
+  //   const components = this.get('components');
+  //   !components.length && components.add({ type: 'tbody' });
+  // },
+
 }, {
   isComponent: function isComponent(el) {
     var result = '';
@@ -42554,11 +42655,73 @@ module.exports = Component.extend({
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({
-  events: {}
-});
+
+  tagName: 'table',
+
+  events: {
+    'dblclick': 'openModal',
+    'click': 'initResize'
+  },
+
+  initialize: function initialize(o) {
+    ComponentView.prototype.initialize.apply(this, arguments);
+    // this.listenTo(this.model, 'change:src', this.updateSrc);
+    this.listenTo(this.model, 'dblclick active', this.openModal);
+    this.classEmpty = this.ppfx + 'plh-image';
+
+    if (this.config.modal) this.modal = this.config.modal;
+
+    if (this.config.am) this.am = this.config.am;
+  },
+
+
+  /**
+   * Update src attribute
+   * @private
+   * */
+  updateSrc: function updateSrc() {
+    var src = this.model.get("src");
+    this.$el.attr('src', src);
+    if (!src) this.$el.addClass(this.classEmpty);else this.$el.removeClass(this.classEmpty);
+  },
+
+
+  /**
+   * Open dialog for image changing
+   * @param  {Object}  e  Event
+   * @private
+   * */
+  openModal: function openModal(e) {
+    var em = this.opts.config.em;
+    var editor = em ? em.get('Editor') : '';
+
+    if (editor) {
+      editor.runCommand('open-table-editor', {
+        target: this.model,
+        onSelect: function onSelect() {
+          editor.Modal.close();
+        }
+      });
+    }
+  }
+}
+
+// render() {
+//   this.updateAttributes();
+//   this.updateClasses();
+
+//   var actCls = this.$el.attr('class') || '';
+//   if(!this.model.get('src'))
+//     this.$el.attr('class', (actCls + ' ' + this.classEmpty).trim());
+
+//   // Avoid strange behaviours while try to drag
+//   this.$el.attr('onmousedown', 'return false');
+//   return this;
+// },
+);
 
 /***/ }),
 /* 162 */
@@ -42598,7 +42761,7 @@ module.exports = ComponentTableBody.extend({
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({});
 
@@ -42610,7 +42773,7 @@ module.exports = ComponentView.extend({});
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({});
 
@@ -42652,7 +42815,7 @@ module.exports = ComponentTableBody.extend({
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({});
 
@@ -42768,7 +42931,7 @@ module.exports = Component.extend({
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(15);
+var ComponentView = __webpack_require__(16);
 
 module.exports = ComponentView.extend({
 
@@ -43220,8 +43383,8 @@ module.exports = Component.extend({
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(15);
-var OComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(16);
+var OComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({
 
@@ -43352,6 +43515,203 @@ var Component = __webpack_require__(4);
 module.exports = Component.extend({
 
   defaults: _.extend({}, Component.prototype.defaults, {
+    type: 'region',
+    tagName: 'region',
+    name: '',
+    // void: 1,
+    droppable: true,
+    resizable: true
+    // traits: [{"type":"name","label":"Name","name":"name","default":"dddd","value":"ddd"}]
+  }),
+
+  initialize: function initialize(o, opt) {
+    Component.prototype.initialize.apply(this, arguments);
+    var attr = this.get('attributes');
+    if (attr.name) this.set('name', attr.name);
+  },
+  initToolbar: function initToolbar() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    Component.prototype.initToolbar.apply(this, args);
+
+    if (this.sm && this.sm.get) {
+      var cmd = this.sm.get('Commands');
+      var cmdName = 'image-editor';
+
+      // Add Image Editor button only if the default command exists
+      if (cmd.has(cmdName)) {
+        var tb = this.get('toolbar');
+        tb.push({
+          attributes: { class: 'fa fa-pencil' },
+          command: cmdName
+        });
+        this.set('toolbar', tb);
+      }
+    }
+  },
+
+
+  /**
+   * Returns object of attributes for HTML
+   * @return {Object}
+   * @private
+   */
+  getAttrToHTML: function getAttrToHTML() {
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    var attr = Component.prototype.getAttrToHTML.apply(this, args);
+    delete attr.onmousedown;
+    var name = this.get('name');
+    // attr.class = 'region';
+    // attr.id = 'region';
+
+    if (name) {
+      attr.name = name;
+      // attr.class += " " + name;
+    }
+    return attr;
+  },
+
+
+  /**
+   * Parse uri
+   * @param  {string} uri
+   * @return {object}
+   * @private
+   */
+  parseUri: function parseUri(uri) {
+    var el = document.createElement('a');
+    el.href = uri;
+    var query = {};
+    var qrs = el.search.substring(1).split('&');
+    for (var i = 0; i < qrs.length; i++) {
+      var pair = qrs[i].split('=');
+      var name = decodeURIComponent(pair[0]);
+      if (name) query[name] = decodeURIComponent(pair[1]);
+    }
+    return {
+      hostname: el.hostname,
+      pathname: el.pathname,
+      protocol: el.protocol,
+      search: el.search,
+      hash: el.hash,
+      port: el.port,
+      query: query
+    };
+  }
+}, {
+
+  /**
+   * Detect if the passed element is a valid component.
+   * In case the element is valid an object abstracted
+   * from the element will be returned
+   * @param {HTMLElement}
+   * @return {Object}
+   * @private
+   */
+  isComponent: function isComponent(el) {
+    var result = '';
+    if (el.tagName == 'REGION') {
+      result = { type: 'region' };
+    }
+    return result;
+  }
+});
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 174 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Backbone = __webpack_require__(0);
+var ComponentView = __webpack_require__(2);
+
+module.exports = ComponentView.extend({
+
+  tagName: 'region',
+
+  events: {
+    'dblclick': 'openModal',
+    'click': 'initResize'
+  },
+
+  initialize: function initialize(o) {
+    ComponentView.prototype.initialize.apply(this, arguments);
+    // this.listenTo(this.model, 'change:src', this.updateSrc);
+    this.listenTo(this.model, 'dblclick active', this.openModal);
+    this.classEmpty = this.ppfx + 'plh-image';
+
+    if (this.config.modal) this.modal = this.config.modal;
+
+    if (this.config.am) this.am = this.config.am;
+  },
+
+
+  /**
+   * Update src attribute
+   * @private
+   * */
+  updateSrc: function updateSrc() {
+    var src = this.model.get("src");
+    this.$el.attr('src', src);
+    if (!src) this.$el.addClass(this.classEmpty);else this.$el.removeClass(this.classEmpty);
+  },
+
+
+  /**
+   * Open dialog for image changing
+   * @param  {Object}  e  Event
+   * @private
+   * */
+  openModal: function openModal(e) {
+    var em = this.opts.config.em;
+    var editor = em ? em.get('Editor') : '';
+
+    if (editor) {
+      editor.runCommand('open-region-editor', {
+        target: this.model,
+        onSelect: function onSelect() {
+          editor.Modal.close();
+          editor.AssetManager.setTarget(null);
+        }
+      });
+    }
+  }
+}
+
+// render() {
+//   this.updateAttributes();
+//   this.updateClasses();
+
+//   var actCls = this.$el.attr('class') || '';
+//   if(!this.model.get('src'))
+//     this.$el.attr('class', (actCls + ' ' + this.classEmpty).trim());
+
+//   // Avoid strange behaviours while try to drag
+//   this.$el.attr('onmousedown', 'return false');
+//   return this;
+// },
+);
+
+/***/ }),
+/* 175 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(_) {
+
+var Component = __webpack_require__(4);
+
+module.exports = Component.extend({
+
+  defaults: _.extend({}, Component.prototype.defaults, {
     type: 'script',
     droppable: false,
     draggable: false,
@@ -43375,14 +43735,14 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 174 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(15);
+var ComponentView = __webpack_require__(16);
 
 module.exports = ComponentView.extend({
 
@@ -43416,7 +43776,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 175 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43456,13 +43816,13 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 176 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var ComponentView = __webpack_require__(3);
+var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({
 
@@ -43473,7 +43833,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 177 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43506,7 +43866,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 178 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43517,19 +43877,19 @@ var Backbone = __webpack_require__(0);
 module.exports = Backbone.View.extend({});
 
 /***/ }),
-/* 179 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(180),
-      Canvas = __webpack_require__(181),
-      CanvasView = __webpack_require__(183);
+      defaults = __webpack_require__(182),
+      Canvas = __webpack_require__(183),
+      CanvasView = __webpack_require__(185);
   var canvas;
   var frameRect;
 
@@ -43952,7 +44312,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 180 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43996,14 +44356,14 @@ module.exports = {
 };
 
 /***/ }),
-/* 181 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var Frame = __webpack_require__(182);
+var Frame = __webpack_require__(184);
 
 module.exports = Backbone.Model.extend({
 
@@ -44020,7 +44380,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 182 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44040,13 +44400,13 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 183 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
-var FrameView = __webpack_require__(184);
+var FrameView = __webpack_require__(186);
 var $ = Backbone.$;
 
 module.exports = Backbone.View.extend({
@@ -44356,7 +44716,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 184 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44418,11 +44778,11 @@ module.exports = __webpack_require__(0).View.extend({
 });
 
 /***/ }),
-/* 185 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(_) {
 
 var _underscore = __webpack_require__(1);
 
@@ -44431,8 +44791,8 @@ module.exports = function () {
   var c = {},
       commands = {},
       defaultCommands = {},
-      defaults = __webpack_require__(186),
-      AbsCommands = __webpack_require__(187);
+      defaults = __webpack_require__(188),
+      AbsCommands = __webpack_require__(189);
 
   // Need it here as it would be used below
   var add = function add(id, obj) {
@@ -44474,27 +44834,32 @@ module.exports = function () {
         if (obj.id) this.add(obj.id, obj);
       }
 
-      var ViewCode = __webpack_require__(188);
+      var ViewCode = __webpack_require__(190);
       defaultCommands['select-comp'] = __webpack_require__(22);
       defaultCommands['create-comp'] = __webpack_require__(23);
-      defaultCommands['delete-comp'] = __webpack_require__(193);
-      defaultCommands['image-comp'] = __webpack_require__(194);
-      defaultCommands['move-comp'] = __webpack_require__(195);
-      defaultCommands['text-comp'] = __webpack_require__(196);
+      defaultCommands['delete-comp'] = __webpack_require__(195);
+      defaultCommands['image-comp'] = __webpack_require__(196);
+      defaultCommands['move-comp'] = __webpack_require__(197);
+      defaultCommands['text-comp'] = __webpack_require__(198);
       defaultCommands['insert-custom'] = __webpack_require__(54);
       defaultCommands['export-template'] = ViewCode;
-      defaultCommands['sw-visibility'] = __webpack_require__(197);
-      defaultCommands['open-layers'] = __webpack_require__(198);
-      defaultCommands['open-sm'] = __webpack_require__(201);
-      defaultCommands['open-tm'] = __webpack_require__(202);
-      defaultCommands['open-blocks'] = __webpack_require__(203);
-      defaultCommands['open-assets'] = __webpack_require__(204);
-      defaultCommands['show-offset'] = __webpack_require__(205);
-      defaultCommands['select-parent'] = __webpack_require__(206);
-      defaultCommands.fullscreen = __webpack_require__(207);
-      defaultCommands.preview = __webpack_require__(208);
-      defaultCommands.resize = __webpack_require__(209);
-      defaultCommands.drag = __webpack_require__(210);
+      defaultCommands['sw-visibility'] = __webpack_require__(199);
+      defaultCommands['open-layers'] = __webpack_require__(200);
+      defaultCommands['open-sm'] = __webpack_require__(203);
+      defaultCommands['open-tm'] = __webpack_require__(204);
+      defaultCommands['open-blocks'] = __webpack_require__(205);
+      defaultCommands['open-assets'] = __webpack_require__(206);
+      defaultCommands['show-offset'] = __webpack_require__(207);
+      defaultCommands['select-parent'] = __webpack_require__(208);
+      defaultCommands.fullscreen = __webpack_require__(209);
+      defaultCommands.preview = __webpack_require__(210);
+      defaultCommands.resize = __webpack_require__(211);
+      defaultCommands.drag = __webpack_require__(212);
+
+      //custom
+      defaultCommands['build-component'] = __webpack_require__(213);
+      defaultCommands['open-table-editor'] = __webpack_require__(215);
+      defaultCommands['open-region-editor'] = __webpack_require__(216);
 
       defaultCommands['tlb-delete'] = {
         run: function run(ed) {
@@ -44507,6 +44872,92 @@ module.exports = function () {
 
           ed.select(null);
           sel.destroy();
+        }
+      };
+
+      defaultCommands['save'] = {
+        run: function run(editor) {
+
+          var assetTemplate = '\n\n<div style="overflow: hidden;">\n  <div style="float: left; width: 50%;">\n    <h4>New. Layout</h4>\n\n    <form id="NewLayoutForm" enctype="multipart/form-data">\n      <div class="form_item">\n        <label>Block <i style="color: red;">*</i></label>\n        <select name="block_id" required="required">\n          <% _.each(blocks, function(block) { %> \n            <option value="<%= block.id %>"><%= block.name %></option>\n          <% }); %> \n        </select>\n      </div>\n      <div class="form_item">\n        <label>Name <i style="color: red;">*</i></label>\n        <input type="text" name="name" required="required">\n      </div>\n      <div class="form_item">\n        <label>Name <i style="color: red;">*</i></label>\n        <input type="file" name="image" required="required">\n      </div>\n      <div class="form_item">\n        <input type="submit" name="Save Layout">\n      </div>\n    </form>\n  </div>\n\n  <div style="float: left; width: 50%;">\n    <h4>New Block</h4>\n\n    <form id="NewBlockForm">\n      <div class="form_item">\n        <label>Category <i style="color: red;">*</i></label>\n        <select name="category_id" required="required">\n          <% _.each(categories, function(cat) { %> \n            <option value="<%= cat.id %>"><%= cat.name %></option>\n          <% }); %> \n        </select>\n      </div>\n      <div class="form_item">\n        <label>Name <i style="color: red;">*</i></label>\n        <input type="text" name="name" required="required">\n      </div>\n      <div class="form_item">\n        <label>Icon <i style="color: red;">*</i></label>\n        <select name="icon" required="required">\n<option value="fa-glass">&#xf000 icon-glass</option>\n<option value="fa-music">&#xf001 icon-music</option>\n<option value="fa-search">&#xf002 icon-search</option>\n<option value="fa-envelope-alt">&#xf003 icon-envelope-alt</option>\n<option value="fa-heart">&#xf004 icon-heart</option>\n<option value="fa-star">&#xf005 icon-star</option>\n<option value="fa-star-empty">&#xf006 icon-star-empty</option>\n<option value="fa-user">&#xf007 icon-user</option>\n<option value="fa-film">&#xf008 icon-film</option>\n<option value="fa-th-large">&#xf009 icon-th-large</option>\n<option value="fa-th">&#xf00a icon-th</option>\n<option value="fa-th-list">&#xf00b icon-th-list</option>\n<option value="fa-ok">&#xf00c icon-ok</option>\n<option value="fa-remove">&#xf00d icon-remove</option>\n<option value="fa-zoom-in">&#xf00e icon-zoom-in</option>\n<option value="fa-zoom-out">&#xf010 icon-zoom-out</option>\n<option value="fa-off">&#xf011 icon-off</option>\n<option value="fa-signal">&#xf012 icon-signal</option>\n<option value="fa-cog">&#xf013 icon-cog</option>\n<option value="fa-trash">&#xf014 icon-trash</option>\n<option value="fa-home">&#xf015 icon-home</option>\n<option value="fa-file-alt">&#xf016 icon-file-alt</option>\n<option value="fa-time">&#xf017 icon-time</option>\n<option value="fa-road">&#xf018 icon-road</option>\n<option value="fa-download-alt">&#xf019 icon-download-alt</option>\n<option value="fa-download">&#xf01a icon-download</option>\n<option value="fa-upload">&#xf01b icon-upload</option>\n<option value="fa-inbox">&#xf01c icon-inbox</option>\n<option value="fa-play-circle">&#xf01d icon-play-circle</option>\n<option value="fa-repeat">&#xf01e icon-repeat</option>\n<option value="fa-refresh">&#xf021 icon-refresh</option>\n<option value="fa-list-alt">&#xf022 icon-list-alt</option>\n<option value="fa-lock">&#xf023 icon-lock</option>\n<option value="fa-flag">&#xf024 icon-flag</option>\n<option value="fa-headphones">&#xf025 icon-headphones</option>\n<option value="fa-volume-off">&#xf026 icon-volume-off</option>\n<option value="fa-volume-down">&#xf027 icon-volume-down</option>\n<option value="fa-volume-up">&#xf028 icon-volume-up</option>\n<option value="fa-qrcode">&#xf029 icon-qrcode</option>\n<option value="fa-barcode">&#xf02a icon-barcode</option>\n<option value="fa-tag">&#xf02b icon-tag</option>\n<option value="fa-tags">&#xf02c icon-tags</option>\n<option value="fa-book">&#xf02d icon-book</option>\n<option value="fa-bookmark">&#xf02e icon-bookmark</option>\n<option value="fa-print">&#xf02f icon-print</option>\n<option value="fa-camera">&#xf030 icon-camera</option>\n<option value="fa-font">&#xf031 icon-font</option>\n<option value="fa-bold">&#xf032 icon-bold</option>\n<option value="fa-italic">&#xf033 icon-italic</option>\n<option value="fa-text-height">&#xf034 icon-text-height</option>\n<option value="fa-text-width">&#xf035 icon-text-width</option>\n<option value="fa-align-left">&#xf036 icon-align-left</option>\n<option value="fa-align-center">&#xf037 icon-align-center</option>\n<option value="fa-align-right">&#xf038 icon-align-right</option>\n<option value="fa-align-justify">&#xf039 icon-align-justify</option>\n<option value="fa-list">&#xf03a icon-list</option>\n<option value="fa-indent-left">&#xf03b icon-indent-left</option>\n<option value="fa-indent-right">&#xf03c icon-indent-right</option>\n<option value="fa-facetime-video">&#xf03d icon-facetime-video</option>\n<option value="fa-picture">&#xf03e icon-picture</option>\n<option value="fa-pencil">&#xf040 icon-pencil</option>\n<option value="fa-map-marker">&#xf041 icon-map-marker</option>\n<option value="fa-adjust">&#xf042 icon-adjust</option>\n<option value="fa-tint">&#xf043 icon-tint</option>\n<option value="fa-edit">&#xf044 icon-edit</option>\n<option value="fa-share">&#xf045 icon-share</option>\n<option value="fa-check">&#xf046 icon-check</option>\n<option value="fa-move">&#xf047 icon-move</option>\n<option value="fa-step-backward">&#xf048 icon-step-backward</option>\n<option value="fa-fast-backward">&#xf049 icon-fast-backward</option>\n<option value="fa-backward">&#xf04a icon-backward</option>\n<option value="fa-play">&#xf04b icon-play</option>\n<option value="fa-pause">&#xf04c icon-pause</option>\n<option value="fa-stop">&#xf04d icon-stop</option>\n<option value="fa-forward">&#xf04e icon-forward</option>\n<option value="fa-fast-forward">&#xf050 icon-fast-forward</option>\n<option value="fa-step-forward">&#xf051 icon-step-forward</option>\n<option value="fa-eject">&#xf052 icon-eject</option>\n<option value="fa-chevron-left">&#xf053 icon-chevron-left</option>\n<option value="fa-chevron-right">&#xf054 icon-chevron-right</option>\n<option value="fa-plus-sign">&#xf055 icon-plus-sign</option>\n<option value="fa-minus-sign">&#xf056 icon-minus-sign</option>\n<option value="fa-remove-sign">&#xf057 icon-remove-sign</option>\n<option value="fa-ok-sign">&#xf058 icon-ok-sign</option>\n<option value="fa-question-sign">&#xf059 icon-question-sign</option>\n<option value="fa-info-sign">&#xf05a icon-info-sign</option>\n<option value="fa-screenshot">&#xf05b icon-screenshot</option>\n<option value="fa-remove-circle">&#xf05c icon-remove-circle</option>\n<option value="fa-ok-circle">&#xf05d icon-ok-circle</option>\n<option value="fa-ban-circle">&#xf05e icon-ban-circle</option>\n<option value="fa-arrow-left">&#xf060 icon-arrow-left</option>\n<option value="fa-arrow-right">&#xf061 icon-arrow-right</option>\n<option value="fa-arrow-up">&#xf062 icon-arrow-up</option>\n<option value="fa-arrow-down">&#xf063 icon-arrow-down</option>\n<option value="fa-share-alt">&#xf064 icon-share-alt</option>\n<option value="fa-resize-full">&#xf065 icon-resize-full</option>\n<option value="fa-resize-small">&#xf066 icon-resize-small</option>\n<option value="fa-plus">&#xf067 icon-plus</option>\n<option value="fa-minus">&#xf068 icon-minus</option>\n<option value="fa-asterisk">&#xf069 icon-asterisk</option>\n<option value="fa-exclamation-sign">&#xf06a icon-exclamation-sign</option>\n<option value="fa-gift">&#xf06b icon-gift</option>\n<option value="fa-leaf">&#xf06c icon-leaf</option>\n<option value="fa-fire">&#xf06d icon-fire</option>\n<option value="fa-eye-open">&#xf06e icon-eye-open</option>\n<option value="fa-eye-close">&#xf070 icon-eye-close</option>\n<option value="fa-warning-sign">&#xf071 icon-warning-sign</option>\n<option value="fa-plane">&#xf072 icon-plane</option>\n<option value="fa-calendar">&#xf073 icon-calendar</option>\n<option value="fa-random">&#xf074 icon-random</option>\n<option value="fa-comment">&#xf075 icon-comment</option>\n<option value="fa-magnet">&#xf076 icon-magnet</option>\n<option value="fa-chevron-up">&#xf077 icon-chevron-up</option>\n<option value="fa-chevron-down">&#xf078 icon-chevron-down</option>\n<option value="fa-retweet">&#xf079 icon-retweet</option>\n<option value="fa-shopping-cart">&#xf07a icon-shopping-cart</option>\n<option value="fa-folder-close">&#xf07b icon-folder-close</option>\n<option value="fa-folder-open">&#xf07c icon-folder-open</option>\n<option value="fa-resize-vertical">&#xf07d icon-resize-vertical</option>\n<option value="fa-resize-horizontal">&#xf07e icon-resize-horizontal</option>\n<option value="fa-bar-chart">&#xf080 icon-bar-chart</option>\n<option value="fa-twitter-sign">&#xf081 icon-twitter-sign</option>\n<option value="fa-facebook-sign">&#xf082 icon-facebook-sign</option>\n<option value="fa-camera-retro">&#xf083 icon-camera-retro</option>\n<option value="fa-key">&#xf084 icon-key</option>\n<option value="fa-cogs">&#xf085 icon-cogs</option>\n<option value="fa-comments">&#xf086 icon-comments</option>\n<option value="fa-thumbs-up-alt">&#xf087 icon-thumbs-up-alt</option>\n<option value="fa-thumbs-down-alt">&#xf088 icon-thumbs-down-alt</option>\n<option value="fa-star-half">&#xf089 icon-star-half</option>\n<option value="fa-heart-empty">&#xf08a icon-heart-empty</option>\n<option value="fa-signout">&#xf08b icon-signout</option>\n<option value="fa-linkedin-sign">&#xf08c icon-linkedin-sign</option>\n<option value="fa-pushpin">&#xf08d icon-pushpin</option>\n<option value="fa-external-link">&#xf08e icon-external-link</option>\n<option value="fa-signin">&#xf090 icon-signin</option>\n<option value="fa-trophy">&#xf091 icon-trophy</option>\n<option value="fa-github-sign">&#xf092 icon-github-sign</option>\n<option value="fa-upload-alt">&#xf093 icon-upload-alt</option>\n<option value="fa-lemon">&#xf094 icon-lemon</option>\n<option value="fa-phone">&#xf095 icon-phone</option>\n<option value="fa-check-empty">&#xf096 icon-check-empty</option>\n<option value="fa-bookmark-empty">&#xf097 icon-bookmark-empty</option>\n<option value="fa-phone-sign">&#xf098 icon-phone-sign</option>\n<option value="fa-twitter">&#xf099 icon-twitter</option>\n<option value="fa-facebook">&#xf09a icon-facebook</option>\n<option value="fa-github">&#xf09b icon-github</option>\n<option value="fa-unlock">&#xf09c icon-unlock</option>\n<option value="fa-credit-card">&#xf09d icon-credit-card</option>\n<option value="fa-rss">&#xf09e icon-rss</option>\n<option value="fa-hdd">&#xf0a0 icon-hdd</option>\n<option value="fa-bullhorn">&#xf0a1 icon-bullhorn</option>\n<option value="fa-bell">&#xf0a2 icon-bell</option>\n<option value="fa-certificate">&#xf0a3 icon-certificate</option>\n<option value="fa-hand-right">&#xf0a4 icon-hand-right</option>\n<option value="fa-hand-left">&#xf0a5 icon-hand-left</option>\n<option value="fa-hand-up">&#xf0a6 icon-hand-up</option>\n<option value="fa-hand-down">&#xf0a7 icon-hand-down</option>\n<option value="fa-circle-arrow-left">&#xf0a8 icon-circle-arrow-left</option>\n<option value="fa-circle-arrow-right">&#xf0a9 icon-circle-arrow-right</option>\n<option value="fa-circle-arrow-up">&#xf0aa icon-circle-arrow-up</option>\n<option value="fa-circle-arrow-down">&#xf0ab icon-circle-arrow-down</option>\n<option value="fa-globe">&#xf0ac icon-globe</option>\n<option value="fa-wrench">&#xf0ad icon-wrench</option>\n<option value="fa-tasks">&#xf0ae icon-tasks</option>\n<option value="fa-filter">&#xf0b0 icon-filter</option>\n<option value="fa-briefcase">&#xf0b1 icon-briefcase</option>\n<option value="fa-fullscreen">&#xf0b2 icon-fullscreen</option>\n<option value="fa-group">&#xf0c0 icon-group</option>\n<option value="fa-link">&#xf0c1 icon-link</option>\n<option value="fa-cloud">&#xf0c2 icon-cloud</option>\n<option value="fa-beaker">&#xf0c3 icon-beaker</option>\n<option value="fa-cut">&#xf0c4 icon-cut</option>\n<option value="fa-copy">&#xf0c5 icon-copy</option>\n<option value="fa-paper-clip">&#xf0c6 icon-paper-clip</option>\n<option value="fa-save">&#xf0c7 icon-save</option>\n<option value="fa-sign-blank">&#xf0c8 icon-sign-blank</option>\n<option value="fa-reorder">&#xf0c9 icon-reorder</option>\n<option value="fa-list-ul">&#xf0ca icon-list-ul</option>\n<option value="fa-list-ol">&#xf0cb icon-list-ol</option>\n<option value="fa-strikethrough">&#xf0cc icon-strikethrough</option>\n<option value="fa-underline">&#xf0cd icon-underline</option>\n<option value="fa-table">&#xf0ce icon-table</option>\n<option value="fa-magic">&#xf0d0 icon-magic</option>\n<option value="fa-truck">&#xf0d1 icon-truck</option>\n<option value="fa-pinterest">&#xf0d2 icon-pinterest</option>\n<option value="fa-pinterest-sign">&#xf0d3 icon-pinterest-sign</option>\n<option value="fa-google-plus-sign">&#xf0d4 icon-google-plus-sign</option>\n<option value="fa-google-plus">&#xf0d5 icon-google-plus</option>\n<option value="fa-money">&#xf0d6 icon-money</option>\n<option value="fa-caret-down">&#xf0d7 icon-caret-down</option>\n<option value="fa-caret-up">&#xf0d8 icon-caret-up</option>\n<option value="fa-caret-left">&#xf0d9 icon-caret-left</option>\n<option value="fa-caret-right">&#xf0da icon-caret-right</option>\n<option value="fa-columns">&#xf0db icon-columns</option>\n<option value="fa-sort">&#xf0dc icon-sort</option>\n<option value="fa-sort-down">&#xf0dd icon-sort-down</option>\n<option value="fa-sort-up">&#xf0de icon-sort-up</option>\n<option value="fa-envelope">&#xf0e0 icon-envelope</option>\n<option value="fa-linkedin">&#xf0e1 icon-linkedin</option>\n<option value="fa-undo">&#xf0e2 icon-undo</option>\n<option value="fa-legal">&#xf0e3 icon-legal</option>\n<option value="fa-dashboard">&#xf0e4 icon-dashboard</option>\n<option value="fa-comment-alt">&#xf0e5 icon-comment-alt</option>\n<option value="fa-comments-alt">&#xf0e6 icon-comments-alt</option>\n<option value="fa-bolt">&#xf0e7 icon-bolt</option>\n<option value="fa-sitemap">&#xf0e8 icon-sitemap</option>\n<option value="fa-umbrella">&#xf0e9 icon-umbrella</option>\n<option value="fa-paste">&#xf0ea icon-paste</option>\n<option value="fa-lightbulb">&#xf0eb icon-lightbulb</option>\n<option value="fa-exchange">&#xf0ec icon-exchange</option>\n<option value="fa-cloud-download">&#xf0ed icon-cloud-download</option>\n<option value="fa-cloud-upload">&#xf0ee icon-cloud-upload</option>\n<option value="fa-user-md">&#xf0f0 icon-user-md</option>\n<option value="fa-stethoscope">&#xf0f1 icon-stethoscope</option>\n<option value="fa-suitcase">&#xf0f2 icon-suitcase</option>\n<option value="fa-bell-alt">&#xf0f3 icon-bell-alt</option>\n<option value="fa-coffee">&#xf0f4 icon-coffee</option>\n<option value="fa-food">&#xf0f5 icon-food</option>\n<option value="fa-file-text-alt">&#xf0f6 icon-file-text-alt</option>\n<option value="fa-building">&#xf0f7 icon-building</option>\n<option value="fa-hospital">&#xf0f8 icon-hospital</option>\n<option value="fa-ambulance">&#xf0f9 icon-ambulance</option>\n<option value="fa-medkit">&#xf0fa icon-medkit</option>\n<option value="fa-fighter-jet">&#xf0fb icon-fighter-jet</option>\n<option value="fa-beer">&#xf0fc icon-beer</option>\n<option value="fa-h-sign">&#xf0fd icon-h-sign</option>\n<option value="fa-plus-sign-alt">&#xf0fe icon-plus-sign-alt</option>\n<option value="fa-double-angle-left">&#xf100 icon-double-angle-left</option>\n<option value="fa-double-angle-right">&#xf101 icon-double-angle-right</option>\n<option value="fa-double-angle-up">&#xf102 icon-double-angle-up</option>\n<option value="fa-double-angle-down">&#xf103 icon-double-angle-down</option>\n<option value="fa-angle-left">&#xf104 icon-angle-left</option>\n<option value="fa-angle-right">&#xf105 icon-angle-right</option>\n<option value="fa-angle-up">&#xf106 icon-angle-up</option>\n<option value="fa-angle-down">&#xf107 icon-angle-down</option>\n<option value="fa-desktop">&#xf108 icon-desktop</option>\n<option value="fa-laptop">&#xf109 icon-laptop</option>\n<option value="fa-tablet">&#xf10a icon-tablet</option>\n<option value="fa-mobile-phone">&#xf10b icon-mobile-phone</option>\n<option value="fa-circle-blank">&#xf10c icon-circle-blank</option>\n<option value="fa-quote-left">&#xf10d icon-quote-left</option>\n<option value="fa-quote-right">&#xf10e icon-quote-right</option>\n<option value="fa-spinner">&#xf110 icon-spinner</option>\n<option value="fa-circle">&#xf111 icon-circle</option>\n<option value="fa-reply">&#xf112 icon-reply</option>\n<option value="fa-github-alt">&#xf113 icon-github-alt</option>\n<option value="fa-folder-close-alt">&#xf114 icon-folder-close-alt</option>\n<option value="fa-folder-open-alt">&#xf115 icon-folder-open-alt</option>\n<option value="fa-expand-alt">&#xf116 icon-expand-alt</option>\n<option value="fa-collapse-alt">&#xf117 icon-collapse-alt</option>\n<option value="fa-smile">&#xf118 icon-smile</option>\n<option value="fa-frown">&#xf119 icon-frown</option>\n<option value="fa-meh">&#xf11a icon-meh</option>\n<option value="fa-gamepad">&#xf11b icon-gamepad</option>\n<option value="fa-keyboard">&#xf11c icon-keyboard</option>\n<option value="fa-flag-alt">&#xf11d icon-flag-alt</option>\n<option value="fa-flag-checkered">&#xf11e icon-flag-checkered</option>\n<option value="fa-terminal">&#xf120 icon-terminal</option>\n<option value="fa-code">&#xf121 icon-code</option>\n<option value="fa-reply-all">&#xf122 icon-reply-all</option>\n<option value="fa-mail-reply-all">&#xf122 icon-mail-reply-all</option>\n<option value="fa-star-half-empty">&#xf123 icon-star-half-empty</option>\n<option value="fa-location-arrow">&#xf124 icon-location-arrow</option>\n<option value="fa-crop">&#xf125 icon-crop</option>\n<option value="fa-code-fork">&#xf126 icon-code-fork</option>\n<option value="fa-unlink">&#xf127 icon-unlink</option>\n<option value="fa-question">&#xf128 icon-question</option>\n<option value="fa-info">&#xf129 icon-info</option>\n<option value="fa-exclamation">&#xf12a icon-exclamation</option>\n<option value="fa-superscript">&#xf12b icon-superscript</option>\n<option value="fa-subscript">&#xf12c icon-subscript</option>\n<option value="fa-eraser">&#xf12d icon-eraser</option>\n<option value="fa-puzzle-piece">&#xf12e icon-puzzle-piece</option>\n<option value="fa-microphone">&#xf130 icon-microphone</option>\n<option value="fa-microphone-off">&#xf131 icon-microphone-off</option>\n<option value="fa-shield">&#xf132 icon-shield</option>\n<option value="fa-calendar-empty">&#xf133 icon-calendar-empty</option>\n<option value="fa-fire-extinguisher">&#xf134 icon-fire-extinguisher</option>\n<option value="fa-rocket">&#xf135 icon-rocket</option>\n<option value="fa-maxcdn">&#xf136 icon-maxcdn</option>\n<option value="fa-chevron-sign-left">&#xf137 icon-chevron-sign-left</option>\n<option value="fa-chevron-sign-right">&#xf138 icon-chevron-sign-right</option>\n<option value="fa-chevron-sign-up">&#xf139 icon-chevron-sign-up</option>\n<option value="fa-chevron-sign-down">&#xf13a icon-chevron-sign-down</option>\n<option value="fa-html5">&#xf13b icon-html5</option>\n<option value="fa-css3">&#xf13c icon-css3</option>\n<option value="fa-anchor">&#xf13d icon-anchor</option>\n<option value="fa-unlock-alt">&#xf13e icon-unlock-alt</option>\n<option value="fa-bullseye">&#xf140 icon-bullseye</option>\n<option value="fa-ellipsis-horizontal">&#xf141 icon-ellipsis-horizontal</option>\n<option value="fa-ellipsis-vertical">&#xf142 icon-ellipsis-vertical</option>\n<option value="fa-rss-sign">&#xf143 icon-rss-sign</option>\n<option value="fa-play-sign">&#xf144 icon-play-sign</option>\n<option value="fa-ticket">&#xf145 icon-ticket</option>\n<option value="fa-minus-sign-alt">&#xf146 icon-minus-sign-alt</option>\n<option value="fa-check-minus">&#xf147 icon-check-minus</option>\n<option value="fa-level-up">&#xf148 icon-level-up</option>\n<option value="fa-level-down">&#xf149 icon-level-down</option>\n<option value="fa-check-sign">&#xf14a icon-check-sign</option>\n<option value="fa-edit-sign">&#xf14b icon-edit-sign</option>\n<option value="fa-external-link-sign">&#xf14c icon-external-link-sign</option>\n<option value="fa-share-sign">&#xf14d icon-share-sign</option>\n<option value="fa-compass">&#xf14e icon-compass</option>\n<option value="fa-collapse">&#xf150 icon-collapse</option>\n<option value="fa-collapse-top">&#xf151 icon-collapse-top</option>\n<option value="fa-expand">&#xf152 icon-expand</option>\n<option value="fa-eur">&#xf153 icon-eur</option>\n<option value="fa-gbp">&#xf154 icon-gbp</option>\n<option value="fa-usd">&#xf155 icon-usd</option>\n<option value="fa-inr">&#xf156 icon-inr</option>\n<option value="fa-jpy">&#xf157 icon-jpy</option>\n<option value="fa-cny">&#xf158 icon-cny</option>\n<option value="fa-krw">&#xf159 icon-krw</option>\n<option value="fa-btc">&#xf15a icon-btc</option>\n<option value="fa-file">&#xf15b icon-file</option>\n<option value="fa-file-text">&#xf15c icon-file-text</option>\n<option value="fa-sort-by-alphabet">&#xf15d icon-sort-by-alphabet</option>\n<option value="fa-sort-by-alphabet-alt">&#xf15e icon-sort-by-alphabet-alt</option>\n<option value="fa-sort-by-attributes">&#xf160 icon-sort-by-attributes</option>\n<option value="fa-sort-by-attributes-alt">&#xf161 icon-sort-by-attributes-alt</option>\n<option value="fa-sort-by-order">&#xf162 icon-sort-by-order</option>\n<option value="fa-sort-by-order-alt">&#xf163 icon-sort-by-order-alt</option>\n<option value="fa-thumbs-up">&#xf164 icon-thumbs-up</option>\n<option value="fa-thumbs-down">&#xf165 icon-thumbs-down</option>\n<option value="fa-youtube-sign">&#xf166 icon-youtube-sign</option>\n<option value="fa-youtube">&#xf167 icon-youtube</option>\n<option value="fa-xing">&#xf168 icon-xing</option>\n<option value="fa-xing-sign">&#xf169 icon-xing-sign</option>\n<option value="fa-youtube-play">&#xf16a icon-youtube-play</option>\n<option value="fa-dropbox">&#xf16b icon-dropbox</option>\n<option value="fa-stackexchange">&#xf16c icon-stackexchange</option>\n<option value="fa-instagram">&#xf16d icon-instagram</option>\n<option value="fa-flickr">&#xf16e icon-flickr</option>\n<option value="fa-adn">&#xf170 icon-adn</option>\n<option value="fa-bitbucket">&#xf171 icon-bitbucket</option>\n<option value="fa-bitbucket-sign">&#xf172 icon-bitbucket-sign</option>\n<option value="fa-tumblr">&#xf173 icon-tumblr</option>\n<option value="fa-tumblr-sign">&#xf174 icon-tumblr-sign</option>\n<option value="fa-long-arrow-down">&#xf175 icon-long-arrow-down</option>\n<option value="fa-long-arrow-up">&#xf176 icon-long-arrow-up</option>\n<option value="fa-long-arrow-left">&#xf177 icon-long-arrow-left</option>\n<option value="fa-long-arrow-right">&#xf178 icon-long-arrow-right</option>\n<option value="fa-apple">&#xf179 icon-apple</option>\n<option value="fa-windows">&#xf17a icon-windows</option>\n<option value="fa-android">&#xf17b icon-android</option>\n<option value="fa-linux">&#xf17c icon-linux</option>\n<option value="fa-dribbble">&#xf17d icon-dribbble</option>\n<option value="fa-skype">&#xf17e icon-skype</option>\n<option value="fa-foursquare">&#xf180 icon-foursquare</option>\n<option value="fa-trello">&#xf181 icon-trello</option>\n<option value="fa-female">&#xf182 icon-female</option>\n<option value="fa-male">&#xf183 icon-male</option>\n<option value="fa-gittip">&#xf184 icon-gittip</option>\n<option value="fa-sun">&#xf185 icon-sun</option>\n<option value="fa-moon">&#xf186 icon-moon</option>\n<option value="fa-archive">&#xf187 icon-archive</option>\n<option value="fa-bug">&#xf188 icon-bug</option>\n<option value="fa-vk">&#xf189 icon-vk</option>\n<option value="fa-weibo">&#xf18a icon-weibo</option>\n<option value="fa-renren">&#xf18b icon-renren</option>\n        </select>\n      </div>\n      <div class="form_item">\n        <input type="submit" name="Save Block">\n      </div>\n    </form>\n  </div>\n</div>\n';
+
+          var template = _.template(assetTemplate);
+
+          // var config = editor.getConfig();
+          var modal = editor.Modal;
+
+          modal.setTitle('Save Layout Or Block');
+
+          var content = template({
+            categories: categories,
+            blocks: blocks
+          });
+
+          modal.setContent(content);
+
+          modal.open();
+
+          var sel = editor.getSelected();
+          var html = sel.toHTML();
+
+          $("#NewLayoutForm").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            formData.set('html', html);
+
+            $.ajax({
+              url: base_url + '/save-layout',
+              type: 'POST',
+              data: formData,
+              success: function success(data) {
+                modal.close();
+              },
+              cache: false,
+              contentType: false,
+              processData: false
+            });
+          });
+
+          $("form#NewBlockForm").submit(function (e) {
+            e.preventDefault();
+            var data = {};
+            var formData = new FormData(this);
+
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = formData.entries()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var pair = _step.value;
+
+                data[pair[0]] = pair[1];
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                  _iterator.return();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+
+            data.html = html;
+
+            $.ajax({
+              url: base_url + '/save-block',
+              type: 'POST',
+              data: data,
+              success: function success(data) {
+                modal.close();
+              }
+            });
+          });
         }
       };
 
@@ -44724,9 +45175,10 @@ module.exports = function () {
     * },
     * ...
     */
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 186 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44757,7 +45209,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 187 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44884,7 +45336,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 188 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44917,6 +45369,22 @@ module.exports = {
     modal.open();
     this.htmlEditor.setContent(editor.getHtml());
     this.cssEditor.setContent(editor.getCss());
+
+    var data = {
+      css: editor.getCss(),
+      html: editor.getHtml(),
+      _id: window.page ? window.page._id : 'ggggggg'
+    };
+
+    window.$.ajax({
+      type: "POST",
+      url: base_url + '/storage/html',
+      data: data,
+      success: function success(data) {
+        console.log('saved template.');
+      },
+      dataType: 'json'
+    });
   },
   stop: function stop(editor) {
     var modal = editor.Modal;
@@ -44946,7 +45414,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 189 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44954,7 +45422,7 @@ module.exports = {
 
 var Backbone = __webpack_require__(0);
 var DomainViews = __webpack_require__(48);
-var ToolbarButtonView = __webpack_require__(190);
+var ToolbarButtonView = __webpack_require__(192);
 
 module.exports = DomainViews.extend({
 
@@ -44967,7 +45435,7 @@ module.exports = DomainViews.extend({
 });
 
 /***/ }),
-/* 190 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45009,19 +45477,19 @@ module.exports = Backbone.View.extend({
 });
 
 /***/ }),
-/* 191 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ToolbarButton = __webpack_require__(192);
+var ToolbarButton = __webpack_require__(194);
 
 module.exports = Backbone.Collection.extend({ model: ToolbarButton });
 
 /***/ }),
-/* 192 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45039,7 +45507,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 193 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45122,7 +45590,7 @@ module.exports = _.extend({}, SelectComponent, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 194 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45163,13 +45631,13 @@ module.exports = _.extend({}, InsertCustom, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 195 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 var SelectComponent = __webpack_require__(22);
 var SelectPosition = __webpack_require__(53);
@@ -45330,7 +45798,7 @@ module.exports = _.extend({}, SelectPosition, SelectComponent, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 196 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45367,7 +45835,7 @@ module.exports = _.extend({}, CreateComponent, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 197 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45383,13 +45851,13 @@ module.exports = {
 };
 
 /***/ }),
-/* 198 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone) {
 
-var Layers = __webpack_require__(199);
+var Layers = __webpack_require__(201);
 var $ = Backbone.$;
 
 module.exports = {
@@ -45426,7 +45894,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 199 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45435,7 +45903,7 @@ module.exports = {
 module.exports = function () {
   var itemsView = void 0;
   var config = {};
-  var defaults = __webpack_require__(200);
+  var defaults = __webpack_require__(202);
   var ItemView = __webpack_require__(55);
   var ItemsView = __webpack_require__(56);
 
@@ -45506,7 +45974,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 200 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45529,7 +45997,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 201 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45606,7 +46074,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 202 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45639,7 +46107,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 203 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45669,7 +46137,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 204 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45703,7 +46171,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 205 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45858,7 +46326,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 206 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45878,7 +46346,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 207 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45951,7 +46419,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 208 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46020,7 +46488,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 209 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46057,7 +46525,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 210 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46095,7 +46563,629 @@ module.exports = {
 };
 
 /***/ }),
-/* 211 */
+/* 213 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var parse_str = __webpack_require__(214);
+
+var Component = function Component(obj) {
+  var that = this;
+  that.traits = [{
+    "type": "text",
+    "label": "JSON URL",
+    "name": "src"
+  }, {
+    "type": "checkbox",
+    "label": "Repeater",
+    "name": "Repeater"
+  }, {
+    "type": "number",
+    "label": "Max",
+    "name": "Max",
+    "default": "0",
+    "value": "10"
+  }, {
+    "type": "select",
+    "label": "Each Line",
+    "name": "line_count",
+    "options": [{
+      "value": "col-xs-12",
+      "name": "1"
+    }, {
+      "value": "col-xs-6",
+      "name": "2"
+    }, {
+      "value": "col-xs-4",
+      "name": "3"
+    }, {
+      "value": "col-xs-3",
+      "name": "4"
+    }, {
+      "value": "col-xs-2",
+      "name": "6"
+    }, {
+      "value": "col-xs-1",
+      "name": "12"
+    }]
+  }];
+
+  if (obj) {
+    that.traits = obj.traits;
+    that.category = obj.category;
+    that.icon = obj.icon;
+    that.tagName = obj.tagName;
+    that.id = obj.id;
+  }
+
+  this.removeTrait = function (index) {
+    that.traits.splice(index, 1);
+  };
+  this.addTrait = function (type) {
+    that.traits.push({
+      type: type,
+      options: [],
+      label: '',
+      name: '',
+      default: '',
+      value: ''
+    });
+  };
+
+  this.addTraitOption = function (index) {
+    this.traits[index].options.push({
+      name: '',
+      value: ''
+    });
+  };
+  this.removeTraitOption = function (index, o_index) {
+    that.traits[index].options.splice(o_index, 1);
+  };
+};
+
+module.exports = {
+  run: function run(editor, sender) {
+    var that = this;
+
+    this.component = new Component();
+    this.category_id = '';
+
+    this.render(editor);
+
+    // alert(editor.trigger);
+  },
+
+  get_form_data: function get_form_data() {
+    var that = this;
+
+    var form_data = {};
+
+    parse_str($("#saveComponent").serialize(), form_data);
+
+    form_data.traits = $.map(form_data.traits, function (value, index) {
+      return [value];
+    });
+
+    for (var i = 0; i < form_data.traits.length; i++) {
+      var optionsObj = form_data.traits[i].options || {};
+      form_data.traits[i].options = $.map(optionsObj, function (value, index) {
+        return [value];
+      });
+    }
+
+    $.extend(that.component, form_data);
+  },
+  render: function render(editor) {
+    var that = this;
+
+    this.modal = editor.Modal || null;
+    this.modal.setTitle('Component editor');
+    this.modal.setContent("\n      <div>\n        <h3 class=\"component-editor-title\">Add a new Category</h3>\n        <form id=\"saveCategory\">\n          <input type=\"hidden\" name=\"id\" value=\"" + (this.category_id || '') + "\"/>\n          <div class=\"form-group\">\n            <label>Name</label>\n            <input type=\"label\" name=\"name\" class=\"form-control\" value=\"" + (window.categories[this.category_id] || { name: '' }).name + "\">\n          </div>\n          <button type=\"submit\" class=\"btn btn-default\">Save</button>\n        </form>\n      </div>\n\n      <div>\n        <h3>Existing Categories</h3>\n        \n        <ul id=\"categories_container\">\n        </ul>\n\n      </div>\n\n      <div>\n        <h3 class=\"component-editor-title\">Add a new Component</h3>\n\n        <form id=\"saveComponent\">\n          <input type=\"hidden\" name=\"id\" value=\"" + (that.component.id || '') + "\"/>\n\n          <div class=\"form-group\">\n            <label>Name</label>\n            <input type=\"label\" name=\"tagName\" class=\"form-control\" value=\"" + (that.component.tagName || '') + "\">\n          </div>\n\n          <div class=\"form-group\">\n            <label>Category</label>\n            <select id=\"category-list\" name=\"category\" name=\"category\">\n              <option></option>\n            </select>\n          </div>\n\n          <div class=\"form-group\">\n            <label>Icon</label>\n<select id=\"icon_list\" name=\"icon\" style=\"font-family:'FontAwesome'\">\n<option value=\"fa-glass\">&#xf000 icon-glass</option>\n<option value=\"fa-music\">&#xf001 icon-music</option>\n<option value=\"fa-search\">&#xf002 icon-search</option>\n<option value=\"fa-envelope-alt\">&#xf003 icon-envelope-alt</option>\n<option value=\"fa-heart\">&#xf004 icon-heart</option>\n<option value=\"fa-star\">&#xf005 icon-star</option>\n<option value=\"fa-star-empty\">&#xf006 icon-star-empty</option>\n<option value=\"fa-user\">&#xf007 icon-user</option>\n<option value=\"fa-film\">&#xf008 icon-film</option>\n<option value=\"fa-th-large\">&#xf009 icon-th-large</option>\n<option value=\"fa-th\">&#xf00a icon-th</option>\n<option value=\"fa-th-list\">&#xf00b icon-th-list</option>\n<option value=\"fa-ok\">&#xf00c icon-ok</option>\n<option value=\"fa-remove\">&#xf00d icon-remove</option>\n<option value=\"fa-zoom-in\">&#xf00e icon-zoom-in</option>\n<option value=\"fa-zoom-out\">&#xf010 icon-zoom-out</option>\n<option value=\"fa-off\">&#xf011 icon-off</option>\n<option value=\"fa-signal\">&#xf012 icon-signal</option>\n<option value=\"fa-cog\">&#xf013 icon-cog</option>\n<option value=\"fa-trash\">&#xf014 icon-trash</option>\n<option value=\"fa-home\">&#xf015 icon-home</option>\n<option value=\"fa-file-alt\">&#xf016 icon-file-alt</option>\n<option value=\"fa-time\">&#xf017 icon-time</option>\n<option value=\"fa-road\">&#xf018 icon-road</option>\n<option value=\"fa-download-alt\">&#xf019 icon-download-alt</option>\n<option value=\"fa-download\">&#xf01a icon-download</option>\n<option value=\"fa-upload\">&#xf01b icon-upload</option>\n<option value=\"fa-inbox\">&#xf01c icon-inbox</option>\n<option value=\"fa-play-circle\">&#xf01d icon-play-circle</option>\n<option value=\"fa-repeat\">&#xf01e icon-repeat</option>\n<option value=\"fa-refresh\">&#xf021 icon-refresh</option>\n<option value=\"fa-list-alt\">&#xf022 icon-list-alt</option>\n<option value=\"fa-lock\">&#xf023 icon-lock</option>\n<option value=\"fa-flag\">&#xf024 icon-flag</option>\n<option value=\"fa-headphones\">&#xf025 icon-headphones</option>\n<option value=\"fa-volume-off\">&#xf026 icon-volume-off</option>\n<option value=\"fa-volume-down\">&#xf027 icon-volume-down</option>\n<option value=\"fa-volume-up\">&#xf028 icon-volume-up</option>\n<option value=\"fa-qrcode\">&#xf029 icon-qrcode</option>\n<option value=\"fa-barcode\">&#xf02a icon-barcode</option>\n<option value=\"fa-tag\">&#xf02b icon-tag</option>\n<option value=\"fa-tags\">&#xf02c icon-tags</option>\n<option value=\"fa-book\">&#xf02d icon-book</option>\n<option value=\"fa-bookmark\">&#xf02e icon-bookmark</option>\n<option value=\"fa-print\">&#xf02f icon-print</option>\n<option value=\"fa-camera\">&#xf030 icon-camera</option>\n<option value=\"fa-font\">&#xf031 icon-font</option>\n<option value=\"fa-bold\">&#xf032 icon-bold</option>\n<option value=\"fa-italic\">&#xf033 icon-italic</option>\n<option value=\"fa-text-height\">&#xf034 icon-text-height</option>\n<option value=\"fa-text-width\">&#xf035 icon-text-width</option>\n<option value=\"fa-align-left\">&#xf036 icon-align-left</option>\n<option value=\"fa-align-center\">&#xf037 icon-align-center</option>\n<option value=\"fa-align-right\">&#xf038 icon-align-right</option>\n<option value=\"fa-align-justify\">&#xf039 icon-align-justify</option>\n<option value=\"fa-list\">&#xf03a icon-list</option>\n<option value=\"fa-indent-left\">&#xf03b icon-indent-left</option>\n<option value=\"fa-indent-right\">&#xf03c icon-indent-right</option>\n<option value=\"fa-facetime-video\">&#xf03d icon-facetime-video</option>\n<option value=\"fa-picture\">&#xf03e icon-picture</option>\n<option value=\"fa-pencil\">&#xf040 icon-pencil</option>\n<option value=\"fa-map-marker\">&#xf041 icon-map-marker</option>\n<option value=\"fa-adjust\">&#xf042 icon-adjust</option>\n<option value=\"fa-tint\">&#xf043 icon-tint</option>\n<option value=\"fa-edit\">&#xf044 icon-edit</option>\n<option value=\"fa-share\">&#xf045 icon-share</option>\n<option value=\"fa-check\">&#xf046 icon-check</option>\n<option value=\"fa-move\">&#xf047 icon-move</option>\n<option value=\"fa-step-backward\">&#xf048 icon-step-backward</option>\n<option value=\"fa-fast-backward\">&#xf049 icon-fast-backward</option>\n<option value=\"fa-backward\">&#xf04a icon-backward</option>\n<option value=\"fa-play\">&#xf04b icon-play</option>\n<option value=\"fa-pause\">&#xf04c icon-pause</option>\n<option value=\"fa-stop\">&#xf04d icon-stop</option>\n<option value=\"fa-forward\">&#xf04e icon-forward</option>\n<option value=\"fa-fast-forward\">&#xf050 icon-fast-forward</option>\n<option value=\"fa-step-forward\">&#xf051 icon-step-forward</option>\n<option value=\"fa-eject\">&#xf052 icon-eject</option>\n<option value=\"fa-chevron-left\">&#xf053 icon-chevron-left</option>\n<option value=\"fa-chevron-right\">&#xf054 icon-chevron-right</option>\n<option value=\"fa-plus-sign\">&#xf055 icon-plus-sign</option>\n<option value=\"fa-minus-sign\">&#xf056 icon-minus-sign</option>\n<option value=\"fa-remove-sign\">&#xf057 icon-remove-sign</option>\n<option value=\"fa-ok-sign\">&#xf058 icon-ok-sign</option>\n<option value=\"fa-question-sign\">&#xf059 icon-question-sign</option>\n<option value=\"fa-info-sign\">&#xf05a icon-info-sign</option>\n<option value=\"fa-screenshot\">&#xf05b icon-screenshot</option>\n<option value=\"fa-remove-circle\">&#xf05c icon-remove-circle</option>\n<option value=\"fa-ok-circle\">&#xf05d icon-ok-circle</option>\n<option value=\"fa-ban-circle\">&#xf05e icon-ban-circle</option>\n<option value=\"fa-arrow-left\">&#xf060 icon-arrow-left</option>\n<option value=\"fa-arrow-right\">&#xf061 icon-arrow-right</option>\n<option value=\"fa-arrow-up\">&#xf062 icon-arrow-up</option>\n<option value=\"fa-arrow-down\">&#xf063 icon-arrow-down</option>\n<option value=\"fa-share-alt\">&#xf064 icon-share-alt</option>\n<option value=\"fa-resize-full\">&#xf065 icon-resize-full</option>\n<option value=\"fa-resize-small\">&#xf066 icon-resize-small</option>\n<option value=\"fa-plus\">&#xf067 icon-plus</option>\n<option value=\"fa-minus\">&#xf068 icon-minus</option>\n<option value=\"fa-asterisk\">&#xf069 icon-asterisk</option>\n<option value=\"fa-exclamation-sign\">&#xf06a icon-exclamation-sign</option>\n<option value=\"fa-gift\">&#xf06b icon-gift</option>\n<option value=\"fa-leaf\">&#xf06c icon-leaf</option>\n<option value=\"fa-fire\">&#xf06d icon-fire</option>\n<option value=\"fa-eye-open\">&#xf06e icon-eye-open</option>\n<option value=\"fa-eye-close\">&#xf070 icon-eye-close</option>\n<option value=\"fa-warning-sign\">&#xf071 icon-warning-sign</option>\n<option value=\"fa-plane\">&#xf072 icon-plane</option>\n<option value=\"fa-calendar\">&#xf073 icon-calendar</option>\n<option value=\"fa-random\">&#xf074 icon-random</option>\n<option value=\"fa-comment\">&#xf075 icon-comment</option>\n<option value=\"fa-magnet\">&#xf076 icon-magnet</option>\n<option value=\"fa-chevron-up\">&#xf077 icon-chevron-up</option>\n<option value=\"fa-chevron-down\">&#xf078 icon-chevron-down</option>\n<option value=\"fa-retweet\">&#xf079 icon-retweet</option>\n<option value=\"fa-shopping-cart\">&#xf07a icon-shopping-cart</option>\n<option value=\"fa-folder-close\">&#xf07b icon-folder-close</option>\n<option value=\"fa-folder-open\">&#xf07c icon-folder-open</option>\n<option value=\"fa-resize-vertical\">&#xf07d icon-resize-vertical</option>\n<option value=\"fa-resize-horizontal\">&#xf07e icon-resize-horizontal</option>\n<option value=\"fa-bar-chart\">&#xf080 icon-bar-chart</option>\n<option value=\"fa-twitter-sign\">&#xf081 icon-twitter-sign</option>\n<option value=\"fa-facebook-sign\">&#xf082 icon-facebook-sign</option>\n<option value=\"fa-camera-retro\">&#xf083 icon-camera-retro</option>\n<option value=\"fa-key\">&#xf084 icon-key</option>\n<option value=\"fa-cogs\">&#xf085 icon-cogs</option>\n<option value=\"fa-comments\">&#xf086 icon-comments</option>\n<option value=\"fa-thumbs-up-alt\">&#xf087 icon-thumbs-up-alt</option>\n<option value=\"fa-thumbs-down-alt\">&#xf088 icon-thumbs-down-alt</option>\n<option value=\"fa-star-half\">&#xf089 icon-star-half</option>\n<option value=\"fa-heart-empty\">&#xf08a icon-heart-empty</option>\n<option value=\"fa-signout\">&#xf08b icon-signout</option>\n<option value=\"fa-linkedin-sign\">&#xf08c icon-linkedin-sign</option>\n<option value=\"fa-pushpin\">&#xf08d icon-pushpin</option>\n<option value=\"fa-external-link\">&#xf08e icon-external-link</option>\n<option value=\"fa-signin\">&#xf090 icon-signin</option>\n<option value=\"fa-trophy\">&#xf091 icon-trophy</option>\n<option value=\"fa-github-sign\">&#xf092 icon-github-sign</option>\n<option value=\"fa-upload-alt\">&#xf093 icon-upload-alt</option>\n<option value=\"fa-lemon\">&#xf094 icon-lemon</option>\n<option value=\"fa-phone\">&#xf095 icon-phone</option>\n<option value=\"fa-check-empty\">&#xf096 icon-check-empty</option>\n<option value=\"fa-bookmark-empty\">&#xf097 icon-bookmark-empty</option>\n<option value=\"fa-phone-sign\">&#xf098 icon-phone-sign</option>\n<option value=\"fa-twitter\">&#xf099 icon-twitter</option>\n<option value=\"fa-facebook\">&#xf09a icon-facebook</option>\n<option value=\"fa-github\">&#xf09b icon-github</option>\n<option value=\"fa-unlock\">&#xf09c icon-unlock</option>\n<option value=\"fa-credit-card\">&#xf09d icon-credit-card</option>\n<option value=\"fa-rss\">&#xf09e icon-rss</option>\n<option value=\"fa-hdd\">&#xf0a0 icon-hdd</option>\n<option value=\"fa-bullhorn\">&#xf0a1 icon-bullhorn</option>\n<option value=\"fa-bell\">&#xf0a2 icon-bell</option>\n<option value=\"fa-certificate\">&#xf0a3 icon-certificate</option>\n<option value=\"fa-hand-right\">&#xf0a4 icon-hand-right</option>\n<option value=\"fa-hand-left\">&#xf0a5 icon-hand-left</option>\n<option value=\"fa-hand-up\">&#xf0a6 icon-hand-up</option>\n<option value=\"fa-hand-down\">&#xf0a7 icon-hand-down</option>\n<option value=\"fa-circle-arrow-left\">&#xf0a8 icon-circle-arrow-left</option>\n<option value=\"fa-circle-arrow-right\">&#xf0a9 icon-circle-arrow-right</option>\n<option value=\"fa-circle-arrow-up\">&#xf0aa icon-circle-arrow-up</option>\n<option value=\"fa-circle-arrow-down\">&#xf0ab icon-circle-arrow-down</option>\n<option value=\"fa-globe\">&#xf0ac icon-globe</option>\n<option value=\"fa-wrench\">&#xf0ad icon-wrench</option>\n<option value=\"fa-tasks\">&#xf0ae icon-tasks</option>\n<option value=\"fa-filter\">&#xf0b0 icon-filter</option>\n<option value=\"fa-briefcase\">&#xf0b1 icon-briefcase</option>\n<option value=\"fa-fullscreen\">&#xf0b2 icon-fullscreen</option>\n<option value=\"fa-group\">&#xf0c0 icon-group</option>\n<option value=\"fa-link\">&#xf0c1 icon-link</option>\n<option value=\"fa-cloud\">&#xf0c2 icon-cloud</option>\n<option value=\"fa-beaker\">&#xf0c3 icon-beaker</option>\n<option value=\"fa-cut\">&#xf0c4 icon-cut</option>\n<option value=\"fa-copy\">&#xf0c5 icon-copy</option>\n<option value=\"fa-paper-clip\">&#xf0c6 icon-paper-clip</option>\n<option value=\"fa-save\">&#xf0c7 icon-save</option>\n<option value=\"fa-sign-blank\">&#xf0c8 icon-sign-blank</option>\n<option value=\"fa-reorder\">&#xf0c9 icon-reorder</option>\n<option value=\"fa-list-ul\">&#xf0ca icon-list-ul</option>\n<option value=\"fa-list-ol\">&#xf0cb icon-list-ol</option>\n<option value=\"fa-strikethrough\">&#xf0cc icon-strikethrough</option>\n<option value=\"fa-underline\">&#xf0cd icon-underline</option>\n<option value=\"fa-table\">&#xf0ce icon-table</option>\n<option value=\"fa-magic\">&#xf0d0 icon-magic</option>\n<option value=\"fa-truck\">&#xf0d1 icon-truck</option>\n<option value=\"fa-pinterest\">&#xf0d2 icon-pinterest</option>\n<option value=\"fa-pinterest-sign\">&#xf0d3 icon-pinterest-sign</option>\n<option value=\"fa-google-plus-sign\">&#xf0d4 icon-google-plus-sign</option>\n<option value=\"fa-google-plus\">&#xf0d5 icon-google-plus</option>\n<option value=\"fa-money\">&#xf0d6 icon-money</option>\n<option value=\"fa-caret-down\">&#xf0d7 icon-caret-down</option>\n<option value=\"fa-caret-up\">&#xf0d8 icon-caret-up</option>\n<option value=\"fa-caret-left\">&#xf0d9 icon-caret-left</option>\n<option value=\"fa-caret-right\">&#xf0da icon-caret-right</option>\n<option value=\"fa-columns\">&#xf0db icon-columns</option>\n<option value=\"fa-sort\">&#xf0dc icon-sort</option>\n<option value=\"fa-sort-down\">&#xf0dd icon-sort-down</option>\n<option value=\"fa-sort-up\">&#xf0de icon-sort-up</option>\n<option value=\"fa-envelope\">&#xf0e0 icon-envelope</option>\n<option value=\"fa-linkedin\">&#xf0e1 icon-linkedin</option>\n<option value=\"fa-undo\">&#xf0e2 icon-undo</option>\n<option value=\"fa-legal\">&#xf0e3 icon-legal</option>\n<option value=\"fa-dashboard\">&#xf0e4 icon-dashboard</option>\n<option value=\"fa-comment-alt\">&#xf0e5 icon-comment-alt</option>\n<option value=\"fa-comments-alt\">&#xf0e6 icon-comments-alt</option>\n<option value=\"fa-bolt\">&#xf0e7 icon-bolt</option>\n<option value=\"fa-sitemap\">&#xf0e8 icon-sitemap</option>\n<option value=\"fa-umbrella\">&#xf0e9 icon-umbrella</option>\n<option value=\"fa-paste\">&#xf0ea icon-paste</option>\n<option value=\"fa-lightbulb\">&#xf0eb icon-lightbulb</option>\n<option value=\"fa-exchange\">&#xf0ec icon-exchange</option>\n<option value=\"fa-cloud-download\">&#xf0ed icon-cloud-download</option>\n<option value=\"fa-cloud-upload\">&#xf0ee icon-cloud-upload</option>\n<option value=\"fa-user-md\">&#xf0f0 icon-user-md</option>\n<option value=\"fa-stethoscope\">&#xf0f1 icon-stethoscope</option>\n<option value=\"fa-suitcase\">&#xf0f2 icon-suitcase</option>\n<option value=\"fa-bell-alt\">&#xf0f3 icon-bell-alt</option>\n<option value=\"fa-coffee\">&#xf0f4 icon-coffee</option>\n<option value=\"fa-food\">&#xf0f5 icon-food</option>\n<option value=\"fa-file-text-alt\">&#xf0f6 icon-file-text-alt</option>\n<option value=\"fa-building\">&#xf0f7 icon-building</option>\n<option value=\"fa-hospital\">&#xf0f8 icon-hospital</option>\n<option value=\"fa-ambulance\">&#xf0f9 icon-ambulance</option>\n<option value=\"fa-medkit\">&#xf0fa icon-medkit</option>\n<option value=\"fa-fighter-jet\">&#xf0fb icon-fighter-jet</option>\n<option value=\"fa-beer\">&#xf0fc icon-beer</option>\n<option value=\"fa-h-sign\">&#xf0fd icon-h-sign</option>\n<option value=\"fa-plus-sign-alt\">&#xf0fe icon-plus-sign-alt</option>\n<option value=\"fa-double-angle-left\">&#xf100 icon-double-angle-left</option>\n<option value=\"fa-double-angle-right\">&#xf101 icon-double-angle-right</option>\n<option value=\"fa-double-angle-up\">&#xf102 icon-double-angle-up</option>\n<option value=\"fa-double-angle-down\">&#xf103 icon-double-angle-down</option>\n<option value=\"fa-angle-left\">&#xf104 icon-angle-left</option>\n<option value=\"fa-angle-right\">&#xf105 icon-angle-right</option>\n<option value=\"fa-angle-up\">&#xf106 icon-angle-up</option>\n<option value=\"fa-angle-down\">&#xf107 icon-angle-down</option>\n<option value=\"fa-desktop\">&#xf108 icon-desktop</option>\n<option value=\"fa-laptop\">&#xf109 icon-laptop</option>\n<option value=\"fa-tablet\">&#xf10a icon-tablet</option>\n<option value=\"fa-mobile-phone\">&#xf10b icon-mobile-phone</option>\n<option value=\"fa-circle-blank\">&#xf10c icon-circle-blank</option>\n<option value=\"fa-quote-left\">&#xf10d icon-quote-left</option>\n<option value=\"fa-quote-right\">&#xf10e icon-quote-right</option>\n<option value=\"fa-spinner\">&#xf110 icon-spinner</option>\n<option value=\"fa-circle\">&#xf111 icon-circle</option>\n<option value=\"fa-reply\">&#xf112 icon-reply</option>\n<option value=\"fa-github-alt\">&#xf113 icon-github-alt</option>\n<option value=\"fa-folder-close-alt\">&#xf114 icon-folder-close-alt</option>\n<option value=\"fa-folder-open-alt\">&#xf115 icon-folder-open-alt</option>\n<option value=\"fa-expand-alt\">&#xf116 icon-expand-alt</option>\n<option value=\"fa-collapse-alt\">&#xf117 icon-collapse-alt</option>\n<option value=\"fa-smile\">&#xf118 icon-smile</option>\n<option value=\"fa-frown\">&#xf119 icon-frown</option>\n<option value=\"fa-meh\">&#xf11a icon-meh</option>\n<option value=\"fa-gamepad\">&#xf11b icon-gamepad</option>\n<option value=\"fa-keyboard\">&#xf11c icon-keyboard</option>\n<option value=\"fa-flag-alt\">&#xf11d icon-flag-alt</option>\n<option value=\"fa-flag-checkered\">&#xf11e icon-flag-checkered</option>\n<option value=\"fa-terminal\">&#xf120 icon-terminal</option>\n<option value=\"fa-code\">&#xf121 icon-code</option>\n<option value=\"fa-reply-all\">&#xf122 icon-reply-all</option>\n<option value=\"fa-mail-reply-all\">&#xf122 icon-mail-reply-all</option>\n<option value=\"fa-star-half-empty\">&#xf123 icon-star-half-empty</option>\n<option value=\"fa-location-arrow\">&#xf124 icon-location-arrow</option>\n<option value=\"fa-crop\">&#xf125 icon-crop</option>\n<option value=\"fa-code-fork\">&#xf126 icon-code-fork</option>\n<option value=\"fa-unlink\">&#xf127 icon-unlink</option>\n<option value=\"fa-question\">&#xf128 icon-question</option>\n<option value=\"fa-info\">&#xf129 icon-info</option>\n<option value=\"fa-exclamation\">&#xf12a icon-exclamation</option>\n<option value=\"fa-superscript\">&#xf12b icon-superscript</option>\n<option value=\"fa-subscript\">&#xf12c icon-subscript</option>\n<option value=\"fa-eraser\">&#xf12d icon-eraser</option>\n<option value=\"fa-puzzle-piece\">&#xf12e icon-puzzle-piece</option>\n<option value=\"fa-microphone\">&#xf130 icon-microphone</option>\n<option value=\"fa-microphone-off\">&#xf131 icon-microphone-off</option>\n<option value=\"fa-shield\">&#xf132 icon-shield</option>\n<option value=\"fa-calendar-empty\">&#xf133 icon-calendar-empty</option>\n<option value=\"fa-fire-extinguisher\">&#xf134 icon-fire-extinguisher</option>\n<option value=\"fa-rocket\">&#xf135 icon-rocket</option>\n<option value=\"fa-maxcdn\">&#xf136 icon-maxcdn</option>\n<option value=\"fa-chevron-sign-left\">&#xf137 icon-chevron-sign-left</option>\n<option value=\"fa-chevron-sign-right\">&#xf138 icon-chevron-sign-right</option>\n<option value=\"fa-chevron-sign-up\">&#xf139 icon-chevron-sign-up</option>\n<option value=\"fa-chevron-sign-down\">&#xf13a icon-chevron-sign-down</option>\n<option value=\"fa-html5\">&#xf13b icon-html5</option>\n<option value=\"fa-css3\">&#xf13c icon-css3</option>\n<option value=\"fa-anchor\">&#xf13d icon-anchor</option>\n<option value=\"fa-unlock-alt\">&#xf13e icon-unlock-alt</option>\n<option value=\"fa-bullseye\">&#xf140 icon-bullseye</option>\n<option value=\"fa-ellipsis-horizontal\">&#xf141 icon-ellipsis-horizontal</option>\n<option value=\"fa-ellipsis-vertical\">&#xf142 icon-ellipsis-vertical</option>\n<option value=\"fa-rss-sign\">&#xf143 icon-rss-sign</option>\n<option value=\"fa-play-sign\">&#xf144 icon-play-sign</option>\n<option value=\"fa-ticket\">&#xf145 icon-ticket</option>\n<option value=\"fa-minus-sign-alt\">&#xf146 icon-minus-sign-alt</option>\n<option value=\"fa-check-minus\">&#xf147 icon-check-minus</option>\n<option value=\"fa-level-up\">&#xf148 icon-level-up</option>\n<option value=\"fa-level-down\">&#xf149 icon-level-down</option>\n<option value=\"fa-check-sign\">&#xf14a icon-check-sign</option>\n<option value=\"fa-edit-sign\">&#xf14b icon-edit-sign</option>\n<option value=\"fa-external-link-sign\">&#xf14c icon-external-link-sign</option>\n<option value=\"fa-share-sign\">&#xf14d icon-share-sign</option>\n<option value=\"fa-compass\">&#xf14e icon-compass</option>\n<option value=\"fa-collapse\">&#xf150 icon-collapse</option>\n<option value=\"fa-collapse-top\">&#xf151 icon-collapse-top</option>\n<option value=\"fa-expand\">&#xf152 icon-expand</option>\n<option value=\"fa-eur\">&#xf153 icon-eur</option>\n<option value=\"fa-gbp\">&#xf154 icon-gbp</option>\n<option value=\"fa-usd\">&#xf155 icon-usd</option>\n<option value=\"fa-inr\">&#xf156 icon-inr</option>\n<option value=\"fa-jpy\">&#xf157 icon-jpy</option>\n<option value=\"fa-cny\">&#xf158 icon-cny</option>\n<option value=\"fa-krw\">&#xf159 icon-krw</option>\n<option value=\"fa-btc\">&#xf15a icon-btc</option>\n<option value=\"fa-file\">&#xf15b icon-file</option>\n<option value=\"fa-file-text\">&#xf15c icon-file-text</option>\n<option value=\"fa-sort-by-alphabet\">&#xf15d icon-sort-by-alphabet</option>\n<option value=\"fa-sort-by-alphabet-alt\">&#xf15e icon-sort-by-alphabet-alt</option>\n<option value=\"fa-sort-by-attributes\">&#xf160 icon-sort-by-attributes</option>\n<option value=\"fa-sort-by-attributes-alt\">&#xf161 icon-sort-by-attributes-alt</option>\n<option value=\"fa-sort-by-order\">&#xf162 icon-sort-by-order</option>\n<option value=\"fa-sort-by-order-alt\">&#xf163 icon-sort-by-order-alt</option>\n<option value=\"fa-thumbs-up\">&#xf164 icon-thumbs-up</option>\n<option value=\"fa-thumbs-down\">&#xf165 icon-thumbs-down</option>\n<option value=\"fa-youtube-sign\">&#xf166 icon-youtube-sign</option>\n<option value=\"fa-youtube\">&#xf167 icon-youtube</option>\n<option value=\"fa-xing\">&#xf168 icon-xing</option>\n<option value=\"fa-xing-sign\">&#xf169 icon-xing-sign</option>\n<option value=\"fa-youtube-play\">&#xf16a icon-youtube-play</option>\n<option value=\"fa-dropbox\">&#xf16b icon-dropbox</option>\n<option value=\"fa-stackexchange\">&#xf16c icon-stackexchange</option>\n<option value=\"fa-instagram\">&#xf16d icon-instagram</option>\n<option value=\"fa-flickr\">&#xf16e icon-flickr</option>\n<option value=\"fa-adn\">&#xf170 icon-adn</option>\n<option value=\"fa-bitbucket\">&#xf171 icon-bitbucket</option>\n<option value=\"fa-bitbucket-sign\">&#xf172 icon-bitbucket-sign</option>\n<option value=\"fa-tumblr\">&#xf173 icon-tumblr</option>\n<option value=\"fa-tumblr-sign\">&#xf174 icon-tumblr-sign</option>\n<option value=\"fa-long-arrow-down\">&#xf175 icon-long-arrow-down</option>\n<option value=\"fa-long-arrow-up\">&#xf176 icon-long-arrow-up</option>\n<option value=\"fa-long-arrow-left\">&#xf177 icon-long-arrow-left</option>\n<option value=\"fa-long-arrow-right\">&#xf178 icon-long-arrow-right</option>\n<option value=\"fa-apple\">&#xf179 icon-apple</option>\n<option value=\"fa-windows\">&#xf17a icon-windows</option>\n<option value=\"fa-android\">&#xf17b icon-android</option>\n<option value=\"fa-linux\">&#xf17c icon-linux</option>\n<option value=\"fa-dribbble\">&#xf17d icon-dribbble</option>\n<option value=\"fa-skype\">&#xf17e icon-skype</option>\n<option value=\"fa-foursquare\">&#xf180 icon-foursquare</option>\n<option value=\"fa-trello\">&#xf181 icon-trello</option>\n<option value=\"fa-female\">&#xf182 icon-female</option>\n<option value=\"fa-male\">&#xf183 icon-male</option>\n<option value=\"fa-gittip\">&#xf184 icon-gittip</option>\n<option value=\"fa-sun\">&#xf185 icon-sun</option>\n<option value=\"fa-moon\">&#xf186 icon-moon</option>\n<option value=\"fa-archive\">&#xf187 icon-archive</option>\n<option value=\"fa-bug\">&#xf188 icon-bug</option>\n<option value=\"fa-vk\">&#xf189 icon-vk</option>\n<option value=\"fa-weibo\">&#xf18a icon-weibo</option>\n<option value=\"fa-renren\">&#xf18b icon-renren</option>\n</select>\n\n\n          </div>\n\n          <hr>\n\n\n          <div id=\"traits\"></div>\n\n          <select class=\"add-type\">\n            <option>text</option>\n            <option>email</option>\n            <option>password</option>\n            <option>number</option>\n            <option>checkbox</option>\n            <option>select</option>\n          </select>\n          <button id=\"add-settings\" type=\"button\" class=\"btn btn-default\">Add Setting</button>\n          <hr>\n\n          <button type=\"submit\" class=\"btn btn-default\">Save</button>\n        </form>\n\n      </div>\n\n\n\n      <div>\n        <h3>Existing Component</h3>\n        \n        <ul id=\"components_container\">\n        </ul>\n\n      </div>\n    ");
+    this.modal.open();
+
+    if (window.components) {
+      for (var id in window.components) {
+        $('#components_container').append("<li class=\"edit-component-li\" data-id=\"" + id + "\">" + window.components[id].tagName + " <button class=\"edit-component\" data-id=\"" + id + "\">Edit</button> <button class=\"remove-component\" data-id=\"" + id + "\">Delete</button></li>");
+      }
+    }
+
+    if (window.categories) {
+      for (var id in window.categories) {
+        $('#categories_container').append("<li class=\"edit-category-li\" data-id=\"" + id + "\">" + window.categories[id].name + " <button class=\"edit-category\" data-id=\"" + id + "\">Edit</button> <button data-id=\"" + id + "\" class=\"delete-category\">Delete</button></li>");
+        $('#category-list').append("<option value=\"" + id + "\">" + window.categories[id].name + "</option>");
+      }
+    }
+
+    $('#category-list').find('option[value="' + this.component.category + '"]').prop('selected', true);
+    $('#icon_list').find('option[value="' + this.component.icon + '"]').prop('selected', true);
+
+    for (var i = 0; i < this.component.traits.length; i++) {
+      var trait = this.component.traits[i];
+      $('#traits').append('<input type="hidden" name="traits[' + i + '][type]" value="' + trait.type + '"/>');
+      $('#traits').append('<div><strong>' + trait.type + '</strong> <button type="button" class="remove-setting" data-i="' + i + '">Remove Setting</button></div>');
+
+      if (trait.type === 'text' || trait.type === 'checkbox' || trait.type === 'number' || trait.type === 'select' || trait.type === 'email' || trait.type === 'password') {
+        $('#traits').append("\n          <div class=\"form-group\">\n            <label>label</label>\n            <input type=\"label\" name=\"traits[" + i + "][label]\" class=\"form-control\" value=\"" + (trait.label || "") + "\">\n          </div>\n          <div class=\"form-group\">\n            <label>name</label>\n            <input type=\"text\" name=\"traits[" + i + "][name]\" class=\"form-control\" value=\"" + (trait.name || "") + "\">\n          </div>\n          <div class=\"form-group\">\n            <label>default</label>\n            <input type=\"text\" name=\"traits[" + i + "][default]\" class=\"form-control\" value=\"" + (trait.default || "") + "\">\n          </div>\n          <div class=\"form-group\">\n            <label>value</label>\n            <input type=\"text\" name=\"traits[" + i + "][value]\" class=\"form-control\" value=\"" + (trait.value || "") + "\">\n          </div>\n        ");
+      }
+      if (trait.type === 'select') {
+        for (var n = 0; n < trait.options.length; n++) {
+          var option = trait.options[n];
+          $('#traits').append("\n            <div><strong>Opotion " + (n + 1) + " </strong></div>\n            <div class=\"form-group\">\n              <label>name</label>\n              <input type=\"text\" name=\"traits[" + i + "][options][" + n + "][name]\" class=\"form-control\" value=\"" + (option.name || "") + "\">\n            </div>\n          ");
+          $('#traits').append("\n            <div>Opotion 1</div>\n            <div class=\"form-group\">\n              <label>value</label>\n              <input type=\"text\" name=\"traits[" + i + "][options][" + n + "][value]\" class=\"form-control\" value=\"" + (option.value || "") + "\">\n            </div>\n          ");
+          $('#traits').append("\n            <div>\n              <button type=\"button\" class=\"remove-option\" data-i=\"" + i + "\" data-n=\"" + n + "\">Remove Option</button>\n            </div>\n          ");
+        }
+
+        $('#traits').append("\n          <button type=\"button\" class=\"add-option\" data-i=\"" + i + "\">Add Option</button>\n        ");
+      }
+      $('#traits').append('<hr>');
+    }
+
+    $("#add-settings").click(function (e) {
+      that.get_form_data();
+      that.component.addTrait($('.add-type').val());
+      that.render(editor);
+    });
+    $(".add-option").click(function (e) {
+      that.get_form_data();
+
+      var i = $(this).data('i');
+      that.component.addTraitOption(i);
+      that.render(editor);
+    });
+    $(".remove-option").click(function (e) {
+      that.get_form_data();
+
+      var i = $(this).data('i');
+      var n = $(this).data('n');
+
+      that.component.removeTraitOption(i, n);
+
+      that.render(editor);
+    });
+
+    $(".edit-component").click(function (e) {
+      that.component = new Component(window.components[$(this).data('id')]);
+
+      that.render(editor);
+    });
+
+    $(".remove-component").click(function (e) {
+      that.category_id = $(this).data('id');
+
+      $.ajax({
+        type: "POST",
+        url: base_url + "/remove-component",
+        data: { id: $(this).data('id') },
+        success: function success(data) {
+          delete window.components[data];
+          that.render(editor);
+        }
+      });
+    });
+
+    $(".edit-category").click(function (e) {
+      that.category_id = $(this).data('id');
+
+      that.render(editor);
+    });
+
+    $(".delete-category").click(function (e) {
+      that.category_id = $(this).data('id');
+
+      $.ajax({
+        type: "POST",
+        url: base_url + "/remove-category",
+        data: { id: that.category_id },
+        success: function success(data) {
+          delete window.categories[data];
+          that.render(editor);
+        }
+      });
+    });
+
+    $(".remove-setting").click(function (e) {
+      that.get_form_data();
+      var i = $(this).data('i');
+
+      that.component.removeTrait(i);
+
+      that.render(editor);
+    });
+
+    $("#saveCategory").submit(function (e) {
+      e.preventDefault();
+
+      $.ajax({
+        type: "POST",
+        url: base_url + "/add-category",
+        data: $("#saveCategory").serialize(),
+        success: function success(data) {
+          window.categories = data;
+          that.category_id = '';
+          that.render(editor);
+        }
+      });
+    });
+
+    $("#saveComponent").submit(function (e) {
+      e.preventDefault();
+      that.get_form_data();
+      var url = base_url + "/save-component";
+
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: $("#saveComponent").serialize(),
+        success: function success(data) {
+
+          var model = defaultModel.extend({
+            defaults: Object.assign({}, defaultModel.prototype.defaults, {
+              style: {
+                "min-height": '40px',
+                "display": 'block'
+              },
+              tagName: that.component.tagName,
+              classes: ['cutom-element-type'],
+              stylable: 'false',
+              draggable: '*',
+              droppable: true,
+              saveable: true,
+              traits: that.component.traits
+            })
+          }, {
+            isComponent: function isComponent(el) {
+              if (el.tagName == that.component.tagName.toUpperCase()) {
+                return { type: that.component.tagName };
+              }
+            }
+          });
+
+          if (editor.DomComponents.getType(that.component.tagName)) {
+            editor.DomComponents.getType(that.component.tagName).model = model;
+          } else {
+            editor.DomComponents.addType(that.component.tagName, {
+              model: model,
+              view: defaultType.view
+            });
+          }
+
+          editor.BlockManager.add(data, {
+            label: that.component.tagName,
+            category: 'Custom Components',
+            attributes: { class: 'fa fa-thermometer-full' },
+            content: {
+              type: that.component.tagName
+            }
+          });
+
+          that.component = new Component();
+          alert('saved');
+          that.render(editor);
+        }
+      });
+    });
+  }
+};
+
+/***/ }),
+/* 214 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+module.exports = function parse_str(str, array) {
+  // eslint-disable-line camelcase
+  //       discuss at: http://locutus.io/php/parse_str/
+  //      original by: Cagri Ekin
+  //      improved by: Michael White (http://getsprink.com)
+  //      improved by: Jack
+  //      improved by: Brett Zamir (http://brett-zamir.me)
+  //      bugfixed by: Onno Marsman (https://twitter.com/onnomarsman)
+  //      bugfixed by: Brett Zamir (http://brett-zamir.me)
+  //      bugfixed by: stag019
+  //      bugfixed by: Brett Zamir (http://brett-zamir.me)
+  //      bugfixed by: MIO_KODUKI (http://mio-koduki.blogspot.com/)
+  // reimplemented by: stag019
+  //         input by: Dreamer
+  //         input by: Zaide (http://zaidesthings.com/)
+  //         input by: David Pesta (http://davidpesta.com/)
+  //         input by: jeicquest
+  //           note 1: When no argument is specified, will put variables in global scope.
+  //           note 1: When a particular argument has been passed, and the
+  //           note 1: returned value is different parse_str of PHP.
+  //           note 1: For example, a=b=c&d====c
+  //        example 1: var $arr = {}
+  //        example 1: parse_str('first=foo&second=bar', $arr)
+  //        example 1: var $result = $arr
+  //        returns 1: { first: 'foo', second: 'bar' }
+  //        example 2: var $arr = {}
+  //        example 2: parse_str('str_a=Jack+and+Jill+didn%27t+see+the+well.', $arr)
+  //        example 2: var $result = $arr
+  //        returns 2: { str_a: "Jack and Jill didn't see the well." }
+  //        example 3: var $abc = {3:'a'}
+  //        example 3: parse_str('a[b]["c"]=def&a[q]=t+5', $abc)
+  //        example 3: var $result = $abc
+  //        returns 3: {"3":"a","a":{"b":{"c":"def"},"q":"t 5"}}
+
+  var strArr = String(str).replace(/^&/, '').replace(/&$/, '').split('&');
+  var sal = strArr.length;
+  var i;
+  var j;
+  var ct;
+  var p;
+  var lastObj;
+  var obj;
+  var undef;
+  var chr;
+  var tmp;
+  var key;
+  var value;
+  var postLeftBracketPos;
+  var keys;
+  var keysLen;
+
+  var _fixStr = function _fixStr(str) {
+    return decodeURIComponent(str.replace(/\+/g, '%20'));
+  };
+
+  var $global = typeof window !== 'undefined' ? window : global;
+  $global.$locutus = $global.$locutus || {};
+  var $locutus = $global.$locutus;
+  $locutus.php = $locutus.php || {};
+
+  if (!array) {
+    array = $global;
+  }
+
+  for (i = 0; i < sal; i++) {
+    tmp = strArr[i].split('=');
+    key = _fixStr(tmp[0]);
+    value = tmp.length < 2 ? '' : _fixStr(tmp[1]);
+
+    while (key.charAt(0) === ' ') {
+      key = key.slice(1);
+    }
+    if (key.indexOf('\x00') > -1) {
+      key = key.slice(0, key.indexOf('\x00'));
+    }
+    if (key && key.charAt(0) !== '[') {
+      keys = [];
+      postLeftBracketPos = 0;
+      for (j = 0; j < key.length; j++) {
+        if (key.charAt(j) === '[' && !postLeftBracketPos) {
+          postLeftBracketPos = j + 1;
+        } else if (key.charAt(j) === ']') {
+          if (postLeftBracketPos) {
+            if (!keys.length) {
+              keys.push(key.slice(0, postLeftBracketPos - 1));
+            }
+            keys.push(key.substr(postLeftBracketPos, j - postLeftBracketPos));
+            postLeftBracketPos = 0;
+            if (key.charAt(j + 1) !== '[') {
+              break;
+            }
+          }
+        }
+      }
+      if (!keys.length) {
+        keys = [key];
+      }
+      for (j = 0; j < keys[0].length; j++) {
+        chr = keys[0].charAt(j);
+        if (chr === ' ' || chr === '.' || chr === '[') {
+          keys[0] = keys[0].substr(0, j) + '_' + keys[0].substr(j + 1);
+        }
+        if (chr === '[') {
+          break;
+        }
+      }
+
+      obj = array;
+      for (j = 0, keysLen = keys.length; j < keysLen; j++) {
+        key = keys[j].replace(/^['"]/, '').replace(/['"]$/, '');
+        lastObj = obj;
+        if (key !== '' && key !== ' ' || j === 0) {
+          if (obj[key] === undef) {
+            obj[key] = {};
+          }
+          obj = obj[key];
+        } else {
+          // To insert new dimension
+          ct = -1;
+          for (p in obj) {
+            if (obj.hasOwnProperty(p)) {
+              if (+p > ct && p.match(/^\d+$/g)) {
+                ct = +p;
+              }
+            }
+          }
+          key = ct + 1;
+        }
+      }
+      lastObj[key] = value;
+    }
+  }
+};
+//# sourceMappingURL=parse_str.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+
+/***/ }),
+/* 215 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(_) {
+
+var assetTemplate = '\n<form id="TableEdit">\n  \n  <strong>Desktop</strong>\n\n  <div>\n  repeat: <input name="repeat" class="repeat" value="<%= repeat %>" placeholder="repeat">\n  </div>\n  <div>\n  in: <input name="in" class="in" value="<%= data_in %>" placefolder="in">\n  </div>\n\n  <div>\n  ng_click: <input name="ng_click" class="ng-click" value="<%= ng_click %>" placefolder="ng click">\n  </div>\n  <div>\n  ng_if: <input name="ng_if" class="ng-if" value="<%= ng_if %>" placefolder="ng if">\n  </div>\n  <div>\n  ng-class: <input name="ng_class" class="ng-class" value="<%= ng_class %>" placefolder="ng class">\n  </div>\n\n\n  <table width="100">\n    <tr>\n      <td>Column #</strong></td>\n      <td><strong>Rank</strong></td>\n      <td><strong>Name</strong></td>\n      <td><strong>Content</strong></td>\n      <td><strong>Editor View</strong></td>\n      <td><strong>Width</strong></td>\n      <td><strong>Actuons</strong></td>\n    </tr>\n    <% _.each(columns, function(col, index) { %> \n    <tr data-row="<%= index %>">\n      <td><%= index + 1 %></td>\n      <td>\n        <select name="rank[<%= index %>]">\n          <option <%= col.rank == \'1\' ? \'selected="selected"\' : \'\' %>>1</option>\n          <option <%= col.rank == \'2\' ? \'selected="selected"\' : \'\' %>>2</option>\n          <option <%= col.rank == \'3\' ? \'selected="selected"\' : \'\' %>>3</option>\n          <option <%= col.rank == \'4\' ? \'selected="selected"\' : \'\' %>>4</option>\n        </select>\n      </td>\n      <td>\n        <input name="name[<%= index %>]" value="<%= col.name %>">\n      </td>\n      <td>\n        <textarea name="content[<%= index %>]"><%= col.content %></textarea>\n      </td>\n      <td>\n        <textarea name="editor[<%= index %>]"><%= col.editor %></textarea>\n      </td>\n      <td>\n        <input type="number" name="width[<%= index %>]" value="<%= col.width %>">\n      </td>\n      <td>\n        <button type="button" class="remove-col" data-index="<%= index %>">Remove</button>\n      </td>\n    </tr>\n    <% }); %>\n  </table>\n\n  <button id="addColBtn" type="button" class="btn btn-primary">Add Column</button>\n  <button id="addTableBtn" type="button" class="submitTable btn btn-primary">Submit</button>\n</form>\n';
+
+module.exports = {
+
+  template: _.template(assetTemplate),
+
+  run: function run(editor, sender, opts) {
+    var that = this;
+    that.opt = opts || {};
+
+    // var config = editor.getConfig();
+    that.modal = editor.Modal;
+
+    that.modal.setTitle(that.opt.modalTitle || 'Table Editor');
+
+    var cols = atob(that.opt.target.get('attributes').datatable || 'W10=');
+    var ng_click = atob(that.opt.target.get('attributes').ng_click || 'IA==');
+    var ng_if = atob(that.opt.target.get('attributes').ng_if || 'IA==');
+    var ng_class = atob(that.opt.target.get('attributes').ng_class || 'IA==');
+
+    that.columns = cols ? JSON.parse(cols) : [{}];
+
+    var content = this.template({
+      columns: that.columns,
+      repeat: that.opt.target.get('attributes').repeat,
+      data_in: that.opt.target.get('attributes').in,
+      ng_click: ng_click,
+      ng_if: ng_if,
+      ng_class: ng_class
+    });
+
+    // $(that.modal.getContentEl()).html(content);
+    that.modal.setContent($('<div>').html(content));
+
+    that.modal.open();
+
+    that.events();
+  },
+
+  events: function events() {
+    var that = this;
+
+    $('#addColBtn').click(function (e) {
+      that.mapColumn();
+
+      setTimeout(function () {
+        that.columns.push({});
+
+        var content = that.template({
+          columns: that.columns,
+          repeat: $('#TableEdit .repeat').val(),
+          data_in: $('#TableEdit .in').val(),
+          ng_click: $('#TableEdit .ng-click').val(),
+          ng_if: $('#TableEdit .ng-if').val(),
+          ng_class: $('#TableEdit .ng-class').val()
+        });
+
+        // $(that.modal.getContentEl()).html(content);
+        that.modal.setContent($('<div>').html(content));
+
+        that.events();
+      }, 0);
+    });
+
+    $('.remove-col').click(function (e) {
+      var j = $(this);
+      that.mapColumn();
+
+      setTimeout(function () {
+        that.columns.splice(parseInt(j.data('index')), 1);
+
+        var content = that.template({
+          columns: that.columns,
+          repeat: $('#TableEdit .repeat').val(),
+          data_in: $('#TableEdit .in').val(),
+          ng_click: $('#TableEdit .ng-click').val(),
+          ng_if: $('#TableEdit .ng-if').val(),
+          ng_class: $('#TableEdit .ng-class').val()
+        });
+
+        that.modal.setContent($('<div>').html(content));
+        // $(that.modal.getContentEl()).html(content);
+
+        that.events();
+      }, 1);
+    });
+
+    // alert(that.opt.target.get('datatable'));
+
+    $('#addTableBtn').click(function (e) {
+      that.mapColumn();
+      setTimeout(function () {
+        that.opt.target.get('attributes').datatable = btoa(JSON.stringify(that.columns));
+        that.opt.target.get('attributes').repeat = $('#TableEdit .repeat').val();
+        that.opt.target.get('attributes').in = $('#TableEdit .in').val();
+
+        that.opt.target.get('attributes').ng_click = btoa($('#TableEdit .ng-click').val());
+        that.opt.target.get('attributes').ng_if = btoa($('#TableEdit .ng-if').val());
+        that.opt.target.get('attributes').ng_class = btoa($('#TableEdit .ng-class').val());
+        e.preventDefault();
+        that.modal.close();
+      }, 1);
+    });
+  },
+  mapColumn: function mapColumn() {
+    var that = this;
+    var form = $.extend({}, $('#TableEdit').serializeArray());
+
+    var fields = {};
+
+    for (var n in form) {
+      fields[form[n].name] = form[n].value;
+    }
+
+    for (var n = 0; n < that.columns.length; n++) {
+      var col = that.columns[n];
+
+      col.rank = fields['rank[' + n + ']'];
+      col.width = fields['width[' + n + ']'];
+      col.content = fields['content[' + n + ']'];
+      col.editor = fields['editor[' + n + ']'];
+      col.name = fields['name[' + n + ']'];
+    }
+  }
+};
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 216 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(_) {
+
+var assetTemplate = '\n<form id="NewRegionForm">\n  <div class="form-group">\n    <input name="region_name" value="<%= name %>" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter region name">\n  </div>\n  \n  <button type="submit" class="btn btn-primary">Submit</button>\n</form>\n';
+
+module.exports = {
+
+  template: _.template(assetTemplate),
+
+  run: function run(editor, sender, opts) {
+    var opt = opts || {};
+    // var config = editor.getConfig();
+    var modal = editor.Modal;
+
+    modal.setTitle(opt.modalTitle || 'Select a Region');
+
+    var content = this.template({
+      name: opts.target.get('name') || ''
+    });
+
+    modal.setContent(content);
+
+    modal.open();
+
+    $('#NewRegionForm').submit(function (e) {
+      var name = $("#NewRegionForm").find('input[name=region_name]').val();
+      opts.target.set('name', name);
+      modal.close();
+      e.preventDefault();
+    });
+  }
+};
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46133,10 +47223,10 @@ module.exports = {
  */
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(212),
-      Blocks = __webpack_require__(213),
-      BlockCategories = __webpack_require__(215),
-      BlocksView = __webpack_require__(216);
+      defaults = __webpack_require__(218),
+      Blocks = __webpack_require__(219),
+      BlockCategories = __webpack_require__(221),
+      BlocksView = __webpack_require__(222);
   var blocks, blocksVisible, blocksView;
   var categories = [];
 
@@ -46340,7 +47430,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 212 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46355,21 +47445,21 @@ module.exports = {
 };
 
 /***/ }),
-/* 213 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var Block = __webpack_require__(214);
+var Block = __webpack_require__(220);
 
 module.exports = Backbone.Collection.extend({
   model: Block
 });
 
 /***/ }),
-/* 214 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46384,7 +47474,8 @@ module.exports = Backbone.Model.extend({
     label: '',
     content: '',
     category: '',
-    attributes: {}
+    attributes: {},
+    children: []
   },
 
   initialize: function initialize() {
@@ -46404,7 +47495,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 215 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46417,15 +47508,15 @@ module.exports = Backbone.Collection.extend({
 });
 
 /***/ }),
-/* 216 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(_) {
 
 var Backbone = __webpack_require__(0);
-var BlockView = __webpack_require__(217);
-var CategoryView = __webpack_require__(218);
+var BlockView = __webpack_require__(223);
+var CategoryView = __webpack_require__(224);
 
 module.exports = Backbone.View.extend({
   initialize: function initialize(opts, config) {
@@ -46606,13 +47697,13 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 217 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(Backbone) {
+/* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
-var _mixins = __webpack_require__(2);
+var _mixins = __webpack_require__(3);
 
 module.exports = Backbone.View.extend({
 
@@ -46644,11 +47735,21 @@ module.exports = Backbone.View.extend({
       return;
     }
 
+    var children = this.model.get('children');
+
     this.config.em.refreshCanvas();
     var sorter = this.config.getSorter();
-    sorter.setDragHelper(this.el, e);
-    sorter.setDropContent(this.model.get('content'));
+
+    if (e.target.tagName === 'LI') {
+      sorter.setDragHelper(e.target, e);
+      sorter.setDropContent(children[$(e.target).data('id')].content);
+    } else {
+      sorter.setDragHelper(this.el, e);
+      sorter.setDropContent(this.model.get('content'));
+    }
+
     sorter.startSort(this.el);
+
     (0, _mixins.on)(document, 'mouseup', this.endDrag);
   },
 
@@ -46668,19 +47769,29 @@ module.exports = Backbone.View.extend({
     sorter.moved = 0;
     sorter.endMove();
   },
+
+
+  template: _.template('\n    <style>\n      .gjs-block:hover > .gjs-block-label .dropdown{\n          display: block !important;\n      }\n    </style>\n    <div class="<%= className %>-label" style="position: relative;">\n      <% if (children.length > 0) { %>\n      <div class="dropdown" style="display: none; position: absolute; top: -61px; right: -47px;">\n        <ul style="padding: 0;list-style: none;max-height: 150px;overflow: scroll;">\n          <% _.each(children, function(child, index){ %>\n            <li data-id="<%= index %>" style="display: block; width: 50px; height: 50px; background:url(<%= child.img %>)"></li>\n          <% }); %>\n        </ul>\n      </div>\n      <% } %>\n      <%= label %>\n    </div>\n  '),
+
   render: function render() {
-    var el = this.el;
-    var pfx = this.ppfx;
-    var className = pfx + 'block';
-    el.className += ' ' + className + ' ' + pfx + 'one-bg ' + pfx + 'four-color-h';
-    el.innerHTML = '<div class="' + className + '-label">' + this.model.get('label') + '</div>';
+    var children = this.model.get('children');
+
+    var className = this.ppfx + 'block';
+    this.$el.addClass(className);
+
+    this.el.innerHTML = this.template({
+      className: className,
+      label: this.model.get('label'),
+      children: children
+    });
+
     return this;
   }
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 218 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46757,7 +47868,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 219 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47100,7 +48211,7 @@ module.exports = function (_ref) {
 };
 
 /***/ }),
-/* 220 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47148,7 +48259,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 221 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47157,7 +48268,7 @@ module.exports = Backbone.View.extend({
 module.exports = function (config) {
 
   var c = config || {},
-      defaults = __webpack_require__(222);
+      defaults = __webpack_require__(228);
 
   // Set default options
   for (var name in defaults) {
@@ -47216,7 +48327,7 @@ module.exports = function (config) {
 };
 
 /***/ }),
-/* 222 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
