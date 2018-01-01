@@ -925,7 +925,7 @@ module.exports = Backbone.View.extend({
     var dragHelper = this.dragHelper;
 
     if(dragHelper) {
-      dragHelper.remove();
+      dragHelper.parentNode.removeChild(dragHelper);
       this.dragHelper = null;
     }
 
@@ -970,6 +970,28 @@ module.exports = Backbone.View.extend({
         opts.silent = false;
         opts.avoidUpdateStyle = 1;
       }
+
+      // aryeh edit
+      if ($('.gjs-pn-btn.fa.fa-bars.gjs-pn-active').length === 0) {
+        if (modelToDrop.type !== 'region') {
+          if (dst.parentNode.tagName === 'BODY' || dst.className.indexOf('flex-start') === -1) {
+            // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
+            // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
+            targetCollection.add("<div class='flex-start'></div>", opts);
+            var targetCollection = $($(dst).children()[opts.at]).data('collection');
+            // targetCollection.add("<div></div>", opt);
+
+            targetCollection.add("<div></div>", opts);
+            var targetCollection = $($($(dst).children()[opts.at]).find('div')).data('collection');
+
+            opts.at++;
+          } else if (dst.className.indexOf('flex-start') > -1) {
+            targetCollection.add("<div></div>", opts);
+            var targetCollection = $($(dst).children()[opts.at]).data('collection');
+          }
+        }
+      }
+      // end aryeh edit
 
       created = targetCollection.add(modelToDrop, opts);
 

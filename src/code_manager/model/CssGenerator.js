@@ -98,13 +98,13 @@ module.exports = require('backbone').Model.extend({
       }
     });
 
-    if ((selectorStrNoAdd && found) || rule.get('selectorsAdd')) {
+    // if ((selectorStrNoAdd && found) || rule.get('selectorsAdd')) {
       const style = rule.styleToString();
 
       if (style) {
         result += `${selectorStr}{${style}}`;
       }
-    }
+    // }
 
     return result;
   },

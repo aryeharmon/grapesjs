@@ -4,15 +4,13 @@ import { on, off, getUnitFromValue} from 'utils/mixins';
 const ToolbarView = require('dom_components/view/ToolbarView');
 const Toolbar = require('dom_components/model/Toolbar');
 const key = require('keymaster');
-const Backbone = require('backbone');
+const $ = require('backbone').$;
 let showOffsets;
-const $ = Backbone.$;
 
 module.exports = {
 
   init(o) {
-    bindAll(this, 'onHover', 'onOut', 'onClick', 'onKeyPress',
-      'copyComp', 'pasteComp', 'onFrameScroll');
+    bindAll(this, 'onHover', 'onOut', 'onClick', 'onKeyPress', 'onFrameScroll');
   },
 
 
@@ -20,53 +18,11 @@ module.exports = {
     this.frameOff = this.canvasOff = this.adjScroll = null;
     var config  = this.config.em.get('Config');
     this.startSelectComponent();
-    this.toggleClipboard(config.copyPaste);
     var em = this.config.em;
     showOffsets = 1;
 
     em.on('component:update', this.updateAttached, this);
     em.on('change:canvasOffset', this.updateAttached, this);
-  },
-
-  /**
-   * Toggle clipboard function
-   * @param  {Boolean} active
-   * @return {this}
-   * @private
-   */
-  toggleClipboard(active) {
-    var en = active || 0;
-    if(en){
-      key('⌘+c, ctrl+c', this.copyComp);
-      key('⌘+v, ctrl+v', this.pasteComp);
-    }else{
-      key.unbind('⌘+c, ctrl+c');
-      key.unbind('⌘+v, ctrl+v');
-    }
-  },
-
-  /**
-   * Copy component to the clipboard
-   * @private
-   */
-  copyComp() {
-    var el = this.editorModel.get('selectedComponent');
-    if(el && el.get('copyable'))
-      this.editorModel.set('clipboard', el);
-  },
-
-  /**
-   * Paste component from clipboard
-   * @private
-   */
-  pasteComp() {
-    var clp = this.editorModel.get('clipboard'),
-        sel = this.editorModel.get('selectedComponent');
-    if(clp && sel && sel.collection){
-      var index = sel.collection.indexOf(sel),
-          clone = clp.clone();
-      sel.collection.add(clone, { at: index + 1 });
-    }
   },
 
   /**
@@ -143,6 +99,20 @@ module.exports = {
       this.adjScroll = 1;
       this.onFrameScroll(e);
       this.updateAttached();
+    }
+    var model = $(trg).data('model');
+    if (model != 'undefined') {
+
+      if (!model.get("selectable")) {
+        var comp = model && model.parent();
+
+        // recurse through the parent() chain until a selectable parent is found
+        while (comp && !comp.get("hoverable")) {
+          comp = comp.parent();
+        }
+        trg = comp.view.el;
+      }
+
     }
 
     var pos = this.getElementPos(trg);
@@ -230,7 +200,22 @@ module.exports = {
   onClick(e) {
     e.stopPropagation();
     const model = $(e.target).data('model');
-    model && this.editor.select(model);
+     if (typeof model != 'undefined') {
+      if (model.get("selectable")) {
+
+        model && this.editor.select(model);
+
+      } else {
+        var comp = model && model.parent();
+
+        // recurse through the parent() chain until a selectable parent is found
+        while (comp && !comp.get("selectable")) {
+          comp = comp.parent();
+        }
+
+        comp && editor.select(comp);
+      }
+    }
   },
 
   /**
@@ -580,7 +565,6 @@ module.exports = {
     this.stopSelectComponent();
     !opts.preserveSelected && em.setSelected(null);
     this.clean();
-    this.toggleClipboard();
     this.hideBadge();
     this.hideFixedElementOffset();
     this.canvas.getToolbarEl().style.display = 'none';

@@ -27,11 +27,23 @@ module.exports = Backbone.View.extend({
       return;
     }
 
+    var children = this.model.get('children');
+
     this.config.em.refreshCanvas();
     var sorter = this.config.getSorter();
-    sorter.setDragHelper(this.el, e);
-    sorter.setDropContent(this.model.get('content'));
+    
+
+    if (e.target.tagName === 'LI') {
+      sorter.setDragHelper(e.target, e);
+      sorter.setDropContent(children[$(e.target).data('id')].content);
+    } else {
+      sorter.setDragHelper(this.el, e);
+      sorter.setDropContent(this.model.get('content'));
+    }
+
     sorter.startSort(this.el);
+
+    
     on(document, 'mouseup', this.endDrag);
   },
 
@@ -51,13 +63,38 @@ module.exports = Backbone.View.extend({
     sorter.endMove();
   },
 
+  template: _.template(`
+    <style>
+      .gjs-block:hover > .gjs-block-label .dropdown{
+          display: block !important;
+      }
+    </style>
+    <div class="<%= className %>-label" style="position: relative;">
+      <% if (children.length > 0) { %>
+      <div class="dropdown" style="display: none; position: absolute; top: -61px; right: -47px;">
+        <ul style="padding: 0;list-style: none;max-height: 150px;overflow: scroll;">
+          <% _.each(children, function(child, index){ %>
+            <li data-id="<%= index %>" style="display: block; width: 50px; height: 50px; background:url(<%= child.img %>)"></li>
+          <% }); %>
+        </ul>
+      </div>
+      <% } %>
+      <%= label %>
+    </div>
+  `),
+
   render() {
-    const el = this.el;
-    const pfx = this.ppfx;
-    const className = `${pfx}block`;
-    el.className += ` ${className} ${pfx}one-bg ${pfx}four-color-h`;
-    el.innerHTML = `<div class="${className}-label">${this.model.get('label')}</div>`;
+    var children = this.model.get('children');
+
+    var className = this.ppfx + 'block';
+    this.$el.addClass(className);    
+
+    this.el.innerHTML = this.template({
+      className: className,
+      label: this.model.get('label'),
+      children: children,
+    });
+
     return this;
   },
-
 });

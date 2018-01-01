@@ -69,13 +69,17 @@ const getUnitFromValue = (value) => {
   return value.replace(parseFloat(value), '');
 }
 
-
 const upFirst = value => value[0].toUpperCase() + value.toLowerCase().slice(1);
 
 
 const camelCase = value => {
-  const values = value.split('-');
-  return values[0].toLowerCase() + values.slice(1).map(upFirst);
+  if (value) {
+    const values = value.split('-');
+    if (values[0] && values.slice(1)) {
+      return values[0].toLowerCase() + values.slice(1).map(upFirst);
+    }
+  }
+  return 'err';
 }
 
 const normalizeFloat = (value, step = 1, valueDef = 0) => {

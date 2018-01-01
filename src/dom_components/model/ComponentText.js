@@ -6,6 +6,7 @@ module.exports = Component.extend({
     type: 'text',
     droppable: false,
     editable: true,
+    traits: ['id', 'title', 'data-angular'],
   },
 
 });

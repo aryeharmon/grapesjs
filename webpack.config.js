@@ -15,7 +15,7 @@ module.exports = env => {
   if (env == 'prod') {
     plugins = [
       new webpack.optimize.ModuleConcatenationPlugin(),
-      new webpack.optimize.UglifyJsPlugin({ minimize:true, compressor: {warnings:false}}),
+      // new webpack.optimize.UglifyJsPlugin({ minimize:true, compressor: {warnings:false}}),
       new webpack.BannerPlugin(`${pkg.name} - ${pkg.version}`),
     ];
   } else if (env == 'dev') {

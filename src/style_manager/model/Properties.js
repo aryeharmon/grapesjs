@@ -4,6 +4,16 @@ const Property = require('./Property');
 module.exports = require('backbone').Collection.extend(TypeableCollection).extend({
   types: [
     {
+      id: 'main-color',
+      model: Property,
+      view: require('./../view/PropertyMainColorView'),
+      isType(value) {
+        if (value && value.type == 'main-color') {
+          return value;
+        }
+      }
+    },
+    {
       id: 'stack',
       model: require('./PropertyStack'),
       view: require('./../view/PropertyStackView'),

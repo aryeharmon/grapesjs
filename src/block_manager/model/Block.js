@@ -8,6 +8,7 @@ module.exports = Backbone.Model.extend({
     content: '',
     category: '',
     attributes: {},
+    children: [],
   },
 
   initialize(opts = {}) {

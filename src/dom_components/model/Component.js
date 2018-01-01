@@ -4,6 +4,7 @@ import Styleable from 'domain_abstract/model/Styleable';
 
 const Backbone = require('backbone');
 const Components = require('./Components');
+const Selector = require('selector_manager/model/Selector');
 const Selectors = require('selector_manager/model/Selectors');
 const Traits = require('trait_manager/model/Traits');
 
@@ -54,7 +55,7 @@ module.exports = Backbone.Model.extend(Styleable).extend({
 
     // Indicates if it's possible to resize the component (at the moment implemented only on Image Components)
     // It's also possible to pass an object as options for the Resizer
-    resizable: false,
+    resizable: true,
 
     // Allow to edit the content of the component (used on Text components)
     editable: false,
@@ -161,12 +162,57 @@ module.exports = Backbone.Model.extend(Styleable).extend({
     this.set('attributes', this.get('attributes') || {});
     this.listenTo(this, 'change:script', this.scriptUpdated);
     this.listenTo(this, 'change:traits', this.traitsUpdated);
+    this.listenTo(this, 'change:tagName', this.tagUpdated);
     this.loadTraits();
     this.initClasses();
     this.initComponents();
     this.initToolbar();
     this.set('status', '');
     this.init();
+  },
+
+  /**
+   * Check component's type
+   * @param  {string}  type Component type
+   * @return {Boolean}
+   * @example
+   * model.is('image')
+   * // -> false
+   */
+  is(type) {
+    return !!(this.get('type') == type);
+  },
+
+
+  /**
+   * Find inner models by query string
+   * ATTENTION: this method works only with alredy rendered component
+   * @param  {string}  query Query string
+   * @return {Array} Array of models
+   * @example
+   * model.find('div > .class');
+   * // -> [Component, Component, ...]
+   */
+  find(query) {
+    const result = [];
+
+    this.view.$el.find(query).each((el, i, $el) => {
+      const model = $el.data('model');
+      model && result.push(model);
+    });
+
+    return result;
+  },
+
+
+  /**
+   * Once the tag is updated I have to remove the node and replace it
+   */
+  tagUpdated() {
+    const coll = this.collection;
+    const at = coll.indexOf(this);
+    coll.remove(this);
+    coll.add(this, { at });
   },
 
 
@@ -280,6 +326,34 @@ module.exports = Backbone.Model.extend(Styleable).extend({
   setClass(classes) {
     this.get('classes').reset();
     return this.addClass(classes);
+  },
+
+
+  /**
+   * Remove classes
+   * @param {Array|string} classes Array or string of classes
+   * @return {Array} Array of removed selectors
+   * @example
+   * model.removeClass('class1');
+   * model.removeClass('class1 class2');
+   * model.removeClass(['class1', 'class2']);
+   * // -> [SelectorObject, ...]
+   */
+  removeClass(classes) {
+    const removed = [];
+    classes = isArray(classes) ? classes : [classes];
+    const selectors = this.get('classes');
+    const type = Selector.TYPE_CLASS;
+
+    classes.forEach(classe => {
+      const classes = classe.split(' ');
+      classes.forEach(name => {
+        const selector = selectors.where({ name, type })[0];
+        selector && removed.push(selectors.remove(selector));
+      })
+    });
+
+    return removed;
   },
 
 
@@ -426,6 +500,13 @@ module.exports = Backbone.Model.extend(Styleable).extend({
           command: 'tlb-delete',
         });
       }
+
+      tb.push({
+        attributes: {class: 'fa fa-floppy-o'},
+        command: 'save',
+      });
+
+
       model.set('toolbar', tb);
     }
   },

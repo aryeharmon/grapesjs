@@ -3,7 +3,7 @@ var ComponentView = require('./ComponentView');
 
 module.exports = ComponentView.extend({
 
-  tagName: 'table',
+  tagName: 'region',
 
   events: {
     'dblclick': 'openModal',
@@ -46,10 +46,11 @@ module.exports = ComponentView.extend({
     var editor = em ? em.get('Editor') : '';
 
     if(editor) {
-      editor.runCommand('open-table-editor', {
+      editor.runCommand('open-region-editor', {
         target: this.model,
         onSelect() {
           editor.Modal.close();
+          editor.AssetManager.setTarget(null);
         }
       });
     }
