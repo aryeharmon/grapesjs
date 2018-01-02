@@ -23266,7 +23266,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.75',
+    version: '0.12.77',
 
     /**
      * Initializes an editor based on passed options
@@ -31710,6 +31710,16 @@ module.exports = function (config) {
      * @private
      */
     name: 'SelectorManager',
+
+    /**
+     * Get configuration object
+     * @return {Object}
+     * @private
+     */
+    getConfig: function getConfig() {
+      return c;
+    },
+
 
     /**
      * Initialize module. Automatically called with a new instance of the editor
@@ -42992,7 +43002,7 @@ module.exports = Component.extend({
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'link',
     tagName: 'a',
-    traits: ['title', 'href', 'target']
+    traits: ['title', 'href', 'target', 'data-angular']
   }),
 
   /**
