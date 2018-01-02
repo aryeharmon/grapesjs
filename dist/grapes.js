@@ -23266,7 +23266,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.77',
+    version: '0.12.78',
 
     /**
      * Initializes an editor based on passed options
@@ -42216,6 +42216,7 @@ module.exports = function () {
      * @return {this}
      */
     clear: function clear() {
+      window.editor.CssComposer.getAll().reset();
       var c = this.getComponents();
       for (var i = 0, len = c.length; i < len; i++) {
         c.pop();

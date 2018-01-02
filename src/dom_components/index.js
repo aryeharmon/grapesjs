@@ -456,6 +456,7 @@ module.exports = () => {
      * @return {this}
      */
     clear() {
+      window.editor.CssComposer.getAll().reset();
       var c = this.getComponents();
       for(var i = 0, len = c.length; i < len; i++)
         c.pop();
