@@ -157,35 +157,37 @@ module.exports = Backbone.View.extend({
         }
         return o;
     } 
-    window.aryeh = target;
-    var styles = css(target.view.el);
-    $('.css-rule-list').html('');
-    for (var n = 0; n < styles.length; n++) {
-      if (styles[n].indexOf('*') === -1) {
-        if (styles[n].indexOf('gjs') === -1) {
-          $('.css-rule-list').append('<li><button data-rule="'+ styles[n] +'">'+ styles[n] +'</button></li>');
+
+    if (target) {    
+      var styles = css(target.view.el);
+      $('.css-rule-list').html('');
+      for (var n = 0; n < styles.length; n++) {
+        if (styles[n].indexOf('*') === -1) {
+          if (styles[n].indexOf('gjs') === -1) {
+            $('.css-rule-list').append('<li><button data-rule="'+ styles[n] +'">'+ styles[n] +'</button></li>');
+          }
         }
       }
+
+      $('.css-rule-list button').click(function() {
+        var $el = $(this);
+        
+
+        if ($el.hasClass('selected')) {
+          $('.css-rule-list button').removeClass('selected');
+          window.editor.pt.model = window.editor.old_model;
+          window.editor.pt.trigger('update');
+        } else {
+          $('.css-rule-list button').removeClass('selected');
+          $el.addClass('selected');
+
+          window.editor.old_model = editor.pt.model;
+          window.editor.pt.model = editor.CssComposer.getBySelectorsAdd($el.data('rule'));
+          window.editor.pt.trigger('update');
+        }
+
+      });
     }
-
-    $('.css-rule-list button').click(function() {
-      var $el = $(this);
-      
-
-      if ($el.hasClass('selected')) {
-        $('.css-rule-list button').removeClass('selected');
-        window.editor.pt.model = window.editor.old_model;
-        window.editor.pt.trigger('update');
-      } else {
-        $('.css-rule-list button').removeClass('selected');
-        $el.addClass('selected');
-
-        window.editor.old_model = editor.pt.model;
-        window.editor.pt.model = editor.CssComposer.getBySelectorsAdd($el.data('rule'));
-        window.editor.pt.trigger('update');
-      }
-
-    });
     // end aryeh edit
 
     if (target) {
