@@ -29,7 +29,13 @@ module.exports = Backbone.View.extend({
     <div id="<%= pfx %>label"><%= selectedLabel %></div>
     <div id="<%= pfx %>sel"></div>
     <div style="clear:both"></div>
-  </div>`),
+  </div>
+  <div>
+    <ul class="css-rule-list">
+      <li>123</li>
+    </ul>
+  <div>
+  `),
 
   events: {},
 
@@ -133,6 +139,54 @@ module.exports = Backbone.View.extend({
     this.compTarget = this.target.get('selectedComponent');
     const target = this.compTarget;
     let validSelectors = [];
+
+    // aryeh edit
+    function css(a) {
+        var iframe = window.$('.gjs-frame')[0];
+        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+        var sheets = innerDoc.styleSheets, o = [];
+        a.matches = a.matches || a.webkitMatchesSelector || a.mozMatchesSelector || a.msMatchesSelector || a.oMatchesSelector;
+        for (var i in sheets) {
+            var rules = sheets[i].rules || sheets[i].cssRules;
+            for (var r in rules) {
+                if (a.matches(rules[r].selectorText)) {
+                    o.push(rules[r].cssText.split('{')[0].trim());
+                }
+            }
+        }
+        return o;
+    } 
+    window.aryeh = target;
+    var styles = css(target.view.el);
+    $('.css-rule-list').html('');
+    for (var n = 0; n < styles.length; n++) {
+      if (styles[n].indexOf('*') === -1) {
+        if (styles[n].indexOf('gjs') === -1) {
+          $('.css-rule-list').append('<li><button data-rule="'+ styles[n] +'">'+ styles[n] +'</button></li>');
+        }
+      }
+    }
+
+    $('.css-rule-list button').click(function() {
+      var $el = $(this);
+      
+
+      if ($el.hasClass('selected')) {
+        $('.css-rule-list button').removeClass('selected');
+        window.editor.pt.model = window.editor.old_model;
+        window.editor.pt.trigger('update');
+      } else {
+        $('.css-rule-list button').removeClass('selected');
+        $el.addClass('selected');
+
+        window.editor.old_model = editor.pt.model;
+        window.editor.pt.model = editor.CssComposer.getBySelectorsAdd($el.data('rule'));
+        window.editor.pt.trigger('update');
+      }
+
+    });
+    // end aryeh edit
 
     if (target) {
       this.getStates().val(target.get('state'));
@@ -315,6 +369,7 @@ module.exports = Backbone.View.extend({
       pfx: this.pfx,
       ppfx: this.ppfx,
     }));
+  
     this.$input = this.$el.find('input#' + this.newInputId);
     this.$addBtn = this.$el.find('#' + this.addBtnId);
     this.$classes = this.$el.find('#' + this.pfx + 'tags-c');

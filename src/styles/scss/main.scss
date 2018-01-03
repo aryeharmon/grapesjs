@@ -752,3 +752,7 @@ $prefix: $app-prefix;
     opacity: 0;
   }
 }
+
+button.selected {
+  background: red;
+}
