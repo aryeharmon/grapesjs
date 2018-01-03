@@ -234,6 +234,18 @@ module.exports = () => {
         return rule;
       },
 
+      // aryeh add
+      getBySelectorsAdd(selectorsAdd) {
+        var rule = null;
+        rules.each(m => {
+          if(rule)
+            return;
+          if(m.config.selectorsAdd === selectorsAdd)
+            rule = m;
+        });
+        return rule;
+      },
+
       /**
        * Get the collection of rules
        * @return {Collection}

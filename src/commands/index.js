@@ -708,7 +708,7 @@ var template = _.template(assetTemplate);
       defaultCommands['core:redo'] = e => e.UndoManager.redo();
       defaultCommands['core:canvas-clear'] = e => {
         e.DomComponents.clear();
-        e.CssComposer.clear();
+        // e.CssComposer.clear();
       };
       defaultCommands['core:copy'] = ed => {
         const em = ed.getModel();

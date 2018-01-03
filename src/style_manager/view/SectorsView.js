@@ -55,6 +55,11 @@ module.exports = Backbone.View.extend({
     const config = em.get('Config');
     var classes = model.get('classes');
     var pt = this.propTarget;
+
+    // aryeh edits
+    editor.pt = pt;
+    // var iContainer = cc.getBySelectorsAdd('.table-build th');
+
     const state = !config.devicePreviewMode ? model.get('state') : '';
     const opts = { state };
     var stateStr = state ? `:${state}` : null;
@@ -99,6 +104,10 @@ module.exports = Backbone.View.extend({
     if (classes.length) {
       var valid = classes.getStyleable();
       var iContainer = cc.get(valid, state, media);
+
+      // aryeh edits
+      // editor.pt = pt;
+      // var iContainer = cc.getBySelectorsAdd('.table-build th');
 
       if (!iContainer && valid.length) {
         // I stop undo manager here as after adding the CSSRule (generally after

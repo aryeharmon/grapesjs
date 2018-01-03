@@ -29,6 +29,7 @@ var assetTemplate = `
       <td><strong>Content</strong></td>
       <td><strong>Editor View</strong></td>
       <td><strong>Width</strong></td>
+      <td><strong>Class</strong></td>
       <td><strong>Actuons</strong></td>
     </tr>
     <% _.each(columns, function(col, index) { %> 
@@ -53,6 +54,9 @@ var assetTemplate = `
       </td>
       <td>
         <input type="number" name="width[<%= index %>]" value="<%= col.width %>">
+      </td>
+      <td>
+        <input type="text" name="class[<%= index %>]" value="<%= col.class %>">
       </td>
       <td>
         <button type="button" class="remove-col" data-index="<%= index %>">Remove</button>
@@ -182,6 +186,7 @@ module.exports = {
 
       col.rank = fields['rank[' + n + ']'];
       col.width = fields['width[' + n + ']'];
+      col.class = fields['class[' + n + ']'];
       col.content = fields['content[' + n + ']'];
       col.editor = fields['editor[' + n + ']'];
       col.name = fields['name[' + n + ']'];
