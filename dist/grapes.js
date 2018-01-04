@@ -23265,7 +23265,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.156',
+    version: '0.12.159',
 
     /**
      * Initializes an editor based on passed options
@@ -25766,21 +25766,22 @@ module.exports = Backbone.View.extend({
       // aryeh edit
       if ($('.gjs-pn-btn.fa.fa-bars.gjs-pn-active').length === 0) {
         if (modelToDrop.type !== 'region') {
-          if (dst.parentNode.tagName === 'BODY' || dst.className.indexOf('flex-start') === -1) {
-            // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
-            // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
-            targetCollection.add("<div class='flex-start'></div>", opts);
-            var targetCollection = $($(dst).children()[opts.at]).data('collection');
-            // targetCollection.add("<div></div>", opt);
 
-            targetCollection.add("<div></div>", opts);
-            var targetCollection = $($($(dst).children()[opts.at]).find('div')).data('collection');
+          // if (dst.parentNode.tagName === 'BODY' || dst.className.indexOf('flex-start') === -1) {
+          //   // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
+          //   // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
+          //   targetCollection.add("<div class='flex-start'></div>", opts);
+          //   var targetCollection = $($(dst).children()[opts.at]).data('collection');
+          //   // targetCollection.add("<div></div>", opt);
 
-            opts.at++;
-          } else if (dst.className.indexOf('flex-start') > -1) {
-            targetCollection.add("<div></div>", opts);
-            var targetCollection = $($(dst).children()[opts.at]).data('collection');
-          }
+          //   targetCollection.add("<div></div>", opts);
+          //   var targetCollection = $($($(dst).children()[opts.at]).find('div')).data('collection');
+
+          //   opts.at++;
+          // } else if (dst.className.indexOf('flex-start') > -1) {
+          targetCollection.add("<div></div>", opts);
+          var targetCollection = $($(dst).children()[opts.at]).data('collection');
+          // }
         }
       }
       // end aryeh edit
