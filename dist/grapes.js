@@ -17693,8 +17693,7 @@ module.exports = {
     e.stopPropagation();
     var model = $(e.target).data('model');
     if (typeof model != 'undefined') {
-      if (model.get("selectable")) {
-
+      if (model.get("selectable") && !$(e.target).hasClass('flex-start')) {
         model && this.editor.select(model);
       } else {
         var comp = model && model.parent();
@@ -23266,7 +23265,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.146',
+    version: '0.12.155',
 
     /**
      * Initializes an editor based on passed options
@@ -46406,6 +46405,10 @@ module.exports = {
       comp = comp.parent();
     }
 
+    if (comp.view.$el.hasClass('flex-start')) {
+      comp = comp.parent();
+    }
+
     comp && editor.select(comp);
   }
 };
@@ -47084,7 +47087,7 @@ module.exports = function parse_str(str, array) {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(_) {
 
-var assetTemplate = '\n<form id="TableEdit">\n  \n  <strong>Desktop</strong>\n\n  <div>\n  repeat: <input name="repeat" class="repeat" value="<%= repeat %>" placeholder="repeat">\n  </div>\n  <div>\n  in: <input name="in" class="in" value="<%= data_in %>" placefolder="in">\n  </div>\n\n  <div>\n  ng_click: <input name="ng_click" class="ng-click" value="<%= ng_click %>" placefolder="ng click">\n  </div>\n  <div>\n  ng_if: <input name="ng_if" class="ng-if" value="<%= ng_if %>" placefolder="ng if">\n  </div>\n  <div>\n  ng-class: <input name="ng_class" class="ng-class" value="<%= ng_class %>" placefolder="ng class">\n  </div>\n\n\n  <table width="100">\n    <tr>\n      <td>Column #</strong></td>\n      <td><strong>Rank</strong></td>\n      <td><strong>Name</strong></td>\n      <td><strong>Content</strong></td>\n      <td><strong>Editor View</strong></td>\n      <td><strong>Width</strong></td>\n      <td><strong>Class</strong></td>\n      <td><strong>Actuons</strong></td>\n    </tr>\n    <% _.each(columns, function(col, index) { %> \n    <tr data-row="<%= index %>">\n      <td><%= index + 1 %></td>\n      <td>\n        <select name="rank[<%= index %>]">\n          <option <%= col.rank == \'1\' ? \'selected="selected"\' : \'\' %>>1</option>\n          <option <%= col.rank == \'2\' ? \'selected="selected"\' : \'\' %>>2</option>\n          <option <%= col.rank == \'3\' ? \'selected="selected"\' : \'\' %>>3</option>\n          <option <%= col.rank == \'4\' ? \'selected="selected"\' : \'\' %>>4</option>\n        </select>\n      </td>\n      <td>\n        <input name="name[<%= index %>]" value="<%= col.name %>">\n      </td>\n      <td>\n        <textarea name="content[<%= index %>]"><%= col.content %></textarea>\n      </td>\n      <td>\n        <textarea name="editor[<%= index %>]"><%= col.editor %></textarea>\n      </td>\n      <td>\n        <input type="number" name="width[<%= index %>]" value="<%= col.width %>">\n      </td>\n      <td>\n        <input type="text" name="class[<%= index %>]" value="<%= col.class %>">\n      </td>\n      <td>\n        <button type="button" class="remove-col" data-index="<%= index %>">Remove</button>\n      </td>\n    </tr>\n    <% }); %>\n  </table>\n\n  <button id="addColBtn" type="button" class="btn btn-primary">Add Column</button>\n  <button id="addTableBtn" type="button" class="submitTable btn btn-primary">Submit</button>\n</form>\n';
+var assetTemplate = '\n<form id="TableEdit">\n  \n  <strong>Desktop</strong>\n\n  <div>\n  repeat: <input name="repeat" class="repeat" value="<%= repeat %>" placeholder="repeat">\n  </div>\n  <div>\n  in: <input name="in" class="in" value="<%= data_in %>" placefolder="in">\n  </div>\n\n  <div>\n  ng_click: <input name="ng_click" class="ng-click" value="<%= ng_click %>" placefolder="ng click">\n  </div>\n  <div>\n  ng_if: <input name="ng_if" class="ng-if" value="<%= ng_if %>" placefolder="ng if">\n  </div>\n  <div>\n  ng-class: <input name="ng_class" class="ng-class" value="<%= ng_class %>" placefolder="ng class">\n  </div>\n\n\n  <table width="100">\n    <tr>\n      <td>Column #</strong></td>\n      <td><strong>Rank</strong></td>\n      <td><strong>Name</strong></td>\n      <td><strong>Content</strong></td>\n      <td><strong>Editor View</strong></td>\n      <td><strong>Width</strong></td>\n      <td><strong>Class</strong></td>\n      <td><strong>Actuons</strong></td>\n    </tr>\n    <% _.each(columns, function(col, index) { %> \n    <tr data-row="<%= index %>">\n      <td><%= index + 1 %></td>\n      <td>\n        <select name="rank[<%= index %>]">\n          <option <%= col.rank == \'1\' ? \'selected="selected"\' : \'\' %>>1</option>\n          <option <%= col.rank == \'2\' ? \'selected="selected"\' : \'\' %>>2</option>\n          <option <%= col.rank == \'3\' ? \'selected="selected"\' : \'\' %>>3</option>\n          <option <%= col.rank == \'4\' ? \'selected="selected"\' : \'\' %>>4</option>\n        </select>\n      </td>\n      <td>\n        <textarea name="name[<%= index %>]"><%= col.name %></textarea>\n      </td>\n      <td>\n        <textarea name="content[<%= index %>]"><%= col.content %></textarea>\n      </td>\n      <td>\n        <textarea name="editor[<%= index %>]"><%= col.editor %></textarea>\n      </td>\n      <td>\n        <input type="number" name="width[<%= index %>]" value="<%= col.width %>">\n      </td>\n      <td>\n        <input type="text" name="class[<%= index %>]" value="<%= col.class %>">\n      </td>\n      <td>\n        <button type="button" class="remove-col" data-index="<%= index %>">Remove</button>\n      </td>\n    </tr>\n    <% }); %>\n  </table>\n\n  <button id="addColBtn" type="button" class="btn btn-primary">Add Column</button>\n  <button id="addTableBtn" type="button" class="submitTable btn btn-primary">Submit</button>\n</form>\n';
 
 module.exports = {
 

@@ -201,8 +201,7 @@ module.exports = {
     e.stopPropagation();
     const model = $(e.target).data('model');
      if (typeof model != 'undefined') {
-      if (model.get("selectable")) {
-
+      if (model.get("selectable") && !$(e.target).hasClass('flex-start')) {
         model && this.editor.select(model);
 
       } else {

@@ -8,6 +8,10 @@ module.exports = {
       comp = comp.parent();
     }
 
+  if (comp.view.$el.hasClass('flex-start')) {
+    comp = comp.parent();
+  }
+
     comp && editor.select(comp);
   }
 

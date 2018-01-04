@@ -44,7 +44,7 @@ var assetTemplate = `
         </select>
       </td>
       <td>
-        <input name="name[<%= index %>]" value="<%= col.name %>">
+        <textarea name="name[<%= index %>]"><%= col.name %></textarea>
       </td>
       <td>
         <textarea name="content[<%= index %>]"><%= col.content %></textarea>
