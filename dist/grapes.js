@@ -23265,7 +23265,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.155',
+    version: '0.12.156',
 
     /**
      * Initializes an editor based on passed options
@@ -43072,7 +43072,7 @@ module.exports = Component.extend({
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'link',
     tagName: 'a',
-    traits: ['title', 'href', 'target', 'data-angular']
+    traits: ['title', 'href', 'target', 'data-angular', { type: 'text', name: 'ng-repeat', label: 'repeat' }]
   }),
 
   /**

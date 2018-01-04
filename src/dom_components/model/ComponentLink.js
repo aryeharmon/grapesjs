@@ -5,7 +5,7 @@ module.exports = Component.extend({
   defaults: { ...Component.prototype.defaults,
       type: 'link',
       tagName: 'a',
-      traits: ['title', 'href', 'target', 'data-angular'],
+      traits: ['title', 'href', 'target', 'data-angular', {type: 'text', name: 'ng-repeat', label: 'repeat'}],
   },
 
   /**
