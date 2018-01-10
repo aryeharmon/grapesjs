@@ -93,6 +93,16 @@ module.exports = require('backbone').Collection.extend(TypeableCollection).exten
         value.type = 'base';
         return value;
       }
+    },
+    {
+      id: 'radio-position',
+      model: require('./PropertyRadioPosition'),
+      view: require('./../view/PropertyRadioPositionView'), // 1. copy these js files and create them. ok let me know when done and i will continue helping you, ok
+      isType(value) {
+          if (value && value.type == 'radio-position') {
+              return value;
+          }
+      }
     }
   ],
 

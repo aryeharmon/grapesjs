@@ -53,7 +53,7 @@ module.exports = Backbone.View.extend({
     this.events['blur #' + this.newInputId] = 'endNewTag';
     this.events['keyup #' + this.newInputId] = 'onInputKeyUp';
     this.events['change #' + this.stateInputId] = 'stateChanged';
-
+    window.asfsafsafsaf = this.collection;
     this.target = this.config.em;
     this.em = this.target;
 
