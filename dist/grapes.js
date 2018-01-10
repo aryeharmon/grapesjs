@@ -23274,7 +23274,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.207',
+    version: '0.12.208',
 
     /**
      * Initializes an editor based on passed options
@@ -39534,6 +39534,9 @@ module.exports = __webpack_require__(5).extend({
 
     var model = this.model;
     var selected = window.editor.getSelected();
+    if (!selected.view.$el.closest('.flex-start > div')) {
+      return;
+    }
     var parent = selected.view.$el.closest('.flex-start > div').data('model');
     var modelToStyle = parent.view.em.get('StyleManager').getModelToStyle(parent);
     var style = modelToStyle.getStyle();

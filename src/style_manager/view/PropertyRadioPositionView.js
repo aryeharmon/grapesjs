@@ -94,6 +94,9 @@ module.exports = require('./PropertyView').extend({
 
     const model = this.model;
       var selected = window.editor.getSelected();
+      if (!selected.view.$el.closest('.flex-start > div')) {
+        return;
+      }
       var parent = selected.view.$el.closest('.flex-start > div').data('model');
       var modelToStyle = parent.view.em.get('StyleManager').getModelToStyle(parent);
       var style = modelToStyle.getStyle();
