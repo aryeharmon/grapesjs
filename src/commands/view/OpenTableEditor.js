@@ -19,7 +19,21 @@ var assetTemplate = `
   <div>
   ng-class: <input name="ng_class" class="ng-class" value="<%= ng_class %>" placefolder="ng class">
   </div>
-
+  <div>
+  Has search: <input type="checkbox" name="has_search" class="has-search"<% if (has_search == 'true') { %> checked="checked"<% } %>>
+  </div>
+  <div>
+  search-class: <input name="search_class" class="search-class" value="<%= search_class %>" placefolder="search class">
+  </div>
+  <div>
+  Has pagination: <input type="checkbox" name="has_pagination" class="has-pagination" <% if (has_pagination == 'true') { %> checked="checked"<% } %>>
+  </div>
+  <div>
+  pagination-class: <input name="pagination_class" class="pagination-class" value="<%= pagination_class %>" placefolder="pagination class">
+  </div>
+  <div>
+  pagination-per-page: <input name="pagination_per_page" type="number" class="pagination-per-page" value="<%= pagination_per_page %>" placefolder="10">
+  </div>
 
   <table width="100">
     <tr>
@@ -87,6 +101,11 @@ module.exports = {
     var ng_click = atob(that.opt.target.get('attributes').ng_click || 'IA==')
     var ng_if = atob(that.opt.target.get('attributes').ng_if || 'IA==')
     var ng_class = atob(that.opt.target.get('attributes').ng_class || 'IA==')
+    var has_search = atob(that.opt.target.get('attributes').has_search || 'IA==')
+    var search_class = atob(that.opt.target.get('attributes').search_class || 'IA==')
+    var has_pagination = atob(that.opt.target.get('attributes').has_pagination || 'IA==')
+    var pagination_class = atob(that.opt.target.get('attributes').pagination_class || 'IA==')
+    var pagination_per_page = atob(that.opt.target.get('attributes').pagination_per_page || 'IA==')
 
     that.columns = cols ? JSON.parse(cols) : [{}];
 
@@ -97,6 +116,11 @@ module.exports = {
       ng_click: ng_click,
       ng_if: ng_if,
       ng_class: ng_class,
+      has_search: has_search,
+      search_class: search_class,
+      has_pagination: has_pagination,
+      pagination_class: pagination_class,
+      pagination_per_page: pagination_per_page,
     });
 
     // $(that.modal.getContentEl()).html(content);
@@ -122,6 +146,11 @@ module.exports = {
           ng_click: $('#TableEdit .ng-click').val(),
           ng_if: $('#TableEdit .ng-if').val(),
           ng_class: $('#TableEdit .ng-class').val(),
+          has_search: $('#TableEdit .has-search')[0].checked,
+          search_class: $('#TableEdit .search-class').val(),
+          has_pagination: $('#TableEdit .has-pagination')[0].checked,
+          pagination_class: $('#TableEdit .pagination-class').val(),
+          pagination_per_page: $('#TableEdit .pagination-per-page').val(),
         });
 
         // $(that.modal.getContentEl()).html(content);
@@ -145,6 +174,12 @@ module.exports = {
           ng_click: $('#TableEdit .ng-click').val(),
           ng_if: $('#TableEdit .ng-if').val(),
           ng_class: $('#TableEdit .ng-class').val(),
+          has_search: $('#TableEdit .has-search')[0].checked,
+          search_class: $('#TableEdit .search-class').val(),
+          has_pagination: $('#TableEdit .has-pagination')[0].checked,
+          pagination_class: $('#TableEdit .pagination-class').val(),
+          pagination_per_page: $('#TableEdit .pagination-per-page').val(),
+
         });
 
         that.modal.setContent($('<div>').html(content));
@@ -166,6 +201,11 @@ module.exports = {
         that.opt.target.get('attributes').ng_click = btoa($('#TableEdit .ng-click').val());
         that.opt.target.get('attributes').ng_if = btoa($('#TableEdit .ng-if').val());
         that.opt.target.get('attributes').ng_class = btoa($('#TableEdit .ng-class').val());
+        that.opt.target.get('attributes').has_search = btoa($('#TableEdit .has-search')[0].checked);
+        that.opt.target.get('attributes').search_class = btoa($('#TableEdit .search-class').val());
+        that.opt.target.get('attributes').has_pagination = btoa($('#TableEdit .has-pagination')[0].checked);
+        that.opt.target.get('attributes').pagination_class = btoa($('#TableEdit .pagination-class').val());
+        that.opt.target.get('attributes').pagination_per_page = btoa($('#TableEdit .pagination-per-page').val());
         e.preventDefault();
         that.modal.close();
       }, 1);
