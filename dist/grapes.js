@@ -23274,7 +23274,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.208',
+    version: '0.12.211',
 
     /**
      * Initializes an editor based on passed options
@@ -39482,6 +39482,9 @@ module.exports = __webpack_require__(5).extend({
       var value = $('input[name=position]:checked').val();
       // var value = that.$input.parent().find('input:checked').val();
       var selected = window.editor.getSelected();
+      if (!selected.view.$el.closest('.flex-start > div').length) {
+        return;
+      }
       var parent = selected.view.$el.closest('.flex-start > div').data('model');
       // window.editor.select(parent);
       if (parent.attributes.classes && parent.attributes.classes.models.length === 0) {
@@ -39534,7 +39537,7 @@ module.exports = __webpack_require__(5).extend({
 
     var model = this.model;
     var selected = window.editor.getSelected();
-    if (!selected.view.$el.closest('.flex-start > div')) {
+    if (!selected.view.$el.closest('.flex-start > div').length) {
       return;
     }
     var parent = selected.view.$el.closest('.flex-start > div').data('model');

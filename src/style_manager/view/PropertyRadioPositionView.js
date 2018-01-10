@@ -41,6 +41,9 @@ module.exports = require('./PropertyView').extend({
         var value = $('input[name=position]:checked').val();
         // var value = that.$input.parent().find('input:checked').val();
           var selected = window.editor.getSelected();
+          if (!selected.view.$el.closest('.flex-start > div').length) {
+            return;
+          }
           var parent = selected.view.$el.closest('.flex-start > div').data('model');
           // window.editor.select(parent);
           if (parent.attributes.classes && parent.attributes.classes.models.length === 0) {
@@ -94,7 +97,7 @@ module.exports = require('./PropertyView').extend({
 
     const model = this.model;
       var selected = window.editor.getSelected();
-      if (!selected.view.$el.closest('.flex-start > div')) {
+      if (!selected.view.$el.closest('.flex-start > div').length) {
         return;
       }
       var parent = selected.view.$el.closest('.flex-start > div').data('model');
