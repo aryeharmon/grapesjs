@@ -334,6 +334,7 @@ module.exports = {
           const modelStyle = modelToStyle.getStyle();
           const currentWidth = modelStyle[keyWidth] || computedStyle[keyWidth];
           const currentHeight = modelStyle[keyHeight] || computedStyle[keyHeight];
+
           resizer.startDim.w = parseFloat(currentWidth);
           resizer.startDim.h = parseFloat(currentHeight);
           showOffsets = 0;
@@ -371,10 +372,19 @@ module.exports = {
           }
 
           if (!onlyWidth) {
-            style[keyHeight] = rect.h + config.unitHeight;
+
+            if (editor.getSelected().allow_height) {
+              style[keyHeight] = rect.h + config.unitHeight;
+              window.toastr.success('Height modifed');
+            } else {
+              $(el).css('height', rect.h + config.unitHeight);
+              window.toastr.warning('Height not modifed');
+            }
+
           }
 
           modelToStyle.setStyle(style, {avoidStore: 1});
+
           const updateEvent = `update:component:style`;
           em && em.trigger(`${updateEvent}:${keyHeight} ${updateEvent}:${keyWidth}`);
 

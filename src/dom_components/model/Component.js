@@ -506,6 +506,18 @@ module.exports = Backbone.Model.extend(Styleable).extend({
         command: 'save',
       });
 
+      tb.push({
+        attributes: {class: 'fa fa-text-height'},
+        command: function() {
+          editor.getSelected().allow_height = !editor.getSelected().allow_height;
+          if (editor.getSelected().allow_height) {
+            window.toastr.warning('Edit Height Enabled');
+          } else {
+            window.toastr.warning('Edit Height Disabled');
+          }
+        },
+      });
+
 
       model.set('toolbar', tb);
     }

@@ -4579,6 +4579,18 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
         command: 'save'
       });
 
+      tb.push({
+        attributes: { class: 'fa fa-text-height' },
+        command: function command() {
+          editor.getSelected().allow_height = !editor.getSelected().allow_height;
+          if (editor.getSelected().allow_height) {
+            window.toastr.warning('Edit Height Enabled');
+          } else {
+            window.toastr.warning('Edit Height Disabled');
+          }
+        }
+      });
+
       model.set('toolbar', tb);
     }
   },
@@ -17841,6 +17853,7 @@ module.exports = {
           var modelStyle = modelToStyle.getStyle();
           var currentWidth = modelStyle[keyWidth] || computedStyle[keyWidth];
           var currentHeight = modelStyle[keyHeight] || computedStyle[keyHeight];
+
           resizer.startDim.w = parseFloat(currentWidth);
           resizer.startDim.h = parseFloat(currentHeight);
           showOffsets = 0;
@@ -17883,10 +17896,18 @@ module.exports = {
           }
 
           if (!onlyWidth) {
-            style[keyHeight] = rect.h + config.unitHeight;
+
+            if (editor.getSelected().allow_height) {
+              style[keyHeight] = rect.h + config.unitHeight;
+              window.toastr.success('Height modifed');
+            } else {
+              $(el).css('height', rect.h + config.unitHeight);
+              window.toastr.warning('Height not modifed');
+            }
           }
 
           modelToStyle.setStyle(style, { avoidStore: 1 });
+
           var updateEvent = 'update:component:style';
           em && em.trigger(updateEvent + ':' + keyHeight + ' ' + updateEvent + ':' + keyWidth);
 
@@ -23274,7 +23295,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.211',
+    version: '0.12.231',
 
     /**
      * Initializes an editor based on passed options
