@@ -23295,7 +23295,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.231',
+    version: '0.12.240',
 
     /**
      * Initializes an editor based on passed options
@@ -24073,7 +24073,7 @@ module.exports = {
   noticeOnUnload: true,
 
   // Show paddings and margins
-  showOffsets: false,
+  showOffsets: true,
 
   // Show paddings and margins on selected component
   showOffsetsSelected: false,
@@ -24121,7 +24121,7 @@ module.exports = {
   tagVarEnd: ' ]}',
 
   // Return JS of components inside HTML from 'editor.getHtml()'
-  jsInHtml: true,
+  jsInHtml: false,
 
   // Show the wrapper component in the final code, eg. in editor.getHtml()
   exportWrapper: 0,
@@ -24550,13 +24550,25 @@ module.exports = Backbone.Model.extend({
     var config = this.config;
     var exportWrapper = config.exportWrapper;
     var wrappesIsBody = config.wrappesIsBody;
-    var js = config.jsInHtml ? this.getJs() : '';
+    var js = '';
     var wrp = this.get('DomComponents').getComponent();
     var html = this.get('CodeManager').getCode(wrp, 'html', {
       exportWrapper: exportWrapper, wrappesIsBody: wrappesIsBody
     });
     html += js ? '<script>' + js + '</script>' : '';
-    return html;
+
+    function stripScripts(s) {
+      var div = document.createElement('div');
+      div.innerHTML = s;
+      var scripts = div.getElementsByTagName('script');
+      var i = scripts.length;
+      while (i--) {
+        scripts[i].parentNode.removeChild(scripts[i]);
+      }
+      return div.innerHTML;
+    }
+
+    return stripScripts(html);
   },
 
 
@@ -32848,7 +32860,7 @@ module.exports = function () {
       defGenerators.html = new gHtml();
       defGenerators.css = new gCss();
       defGenerators.json = new gJson();
-      defGenerators.js = new gJs();
+      // defGenerators.js = new gJs();
       defViewers.CodeMirror = new eCM();
       this.loadDefaultGenerators().loadDefaultViewers();
 
@@ -33278,7 +33290,7 @@ module.exports = Backbone.Model.extend({
     for (var type in this.mapJs) {
       var mapType = this.mapJs[type];
       var ids = '#' + mapType.ids.join(', #');
-      code += '\n        var items = document.querySelectorAll(\'' + ids + '\');\n        for (var i = 0, len = items.length; i < len; i++) {\n          (function(){' + mapType.code + '}.bind(items[i]))();\n        }';
+      code += '\n        var itemss = document.querySelectorAll(\'' + ids + '\');\n        for (var i = 0, len = items.length; i < len; i++) {\n          (function(){' + mapType.code + '}.bind(items[i]))();\n        }';
     }
 
     return code;

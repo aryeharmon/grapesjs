@@ -300,13 +300,25 @@ module.exports = Backbone.Model.extend({
     const config = this.config;
     const exportWrapper = config.exportWrapper;
     const wrappesIsBody = config.wrappesIsBody;
-    const js = config.jsInHtml ? this.getJs() : '';
+    const js = '';
     var wrp  = this.get('DomComponents').getComponent();
     var html = this.get('CodeManager').getCode(wrp, 'html', {
       exportWrapper, wrappesIsBody
     });
     html += js ? `<script>${js}</script>` : '';
-    return html;
+
+ function stripScripts(s) {
+    var div = document.createElement('div');
+    div.innerHTML = s;
+    var scripts = div.getElementsByTagName('script');
+    var i = scripts.length;
+    while (i--) {
+      scripts[i].parentNode.removeChild(scripts[i]);
+    }
+    return div.innerHTML;
+  }
+
+    return stripScripts(html);
   },
 
   /**

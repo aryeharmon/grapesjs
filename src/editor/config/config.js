@@ -9,7 +9,7 @@ module.exports = {
   noticeOnUnload: true,
 
   // Show paddings and margins
-  showOffsets: false,
+  showOffsets: true,
 
   // Show paddings and margins on selected component
   showOffsetsSelected: false,
@@ -57,7 +57,7 @@ module.exports = {
   tagVarEnd: ' ]}',
 
   // Return JS of components inside HTML from 'editor.getHtml()'
-  jsInHtml: true,
+  jsInHtml: false,
 
   // Show the wrapper component in the final code, eg. in editor.getHtml()
   exportWrapper: 0,
