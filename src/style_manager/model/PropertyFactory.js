@@ -308,7 +308,8 @@ module.exports = () => ({
             'Tahoma, Geneva' + ss,
             'Times New Roman, Times, serif',
             'Trebuchet MS, Helvetica' + ss,
-            'Verdana, Geneva' + ss
+            'Verdana, Geneva' + ss,
+            'Roboto' + ss,
           ];
           obj.list = [];
           for(var j = 0, l = fonts.length; j < l; j++){
