@@ -136,6 +136,8 @@ module.exports = () => {
 
 
 
+      defaultCommands['maincolor'] = require('./view/mainColorPicker');
+
       defaultCommands['save'] = {
         run(editor) {
 
@@ -153,9 +155,9 @@ var assetTemplate = `
       <div class="form_item">
         <label>Block <i style="color: red;">*</i></label>
         <select name="block_id" required="required">
-          <% _.each(blocks, function(block) { %> 
+          <% _.each(blocks, function(block) { %>
             <option value="<%= block.id %>"><%= block.name %></option>
-          <% }); %> 
+          <% }); %>
         </select>
       </div>
       <div class="form_item">
@@ -179,9 +181,9 @@ var assetTemplate = `
       <div class="form_item">
         <label>Category <i style="color: red;">*</i></label>
         <select name="category_id" required="required">
-          <% _.each(categories, function(cat) { %> 
+          <% _.each(categories, function(cat) { %>
             <option value="<%= cat.id %>"><%= cat.name %></option>
-          <% }); %> 
+          <% }); %>
         </select>
       </div>
       <div class="form_item">
@@ -583,7 +585,7 @@ var template = _.template(assetTemplate);
           var html = sel.toHTML()
 
           $("#NewLayoutForm").submit(function(e) {
-              e.preventDefault();    
+              e.preventDefault();
               var formData = new FormData(this);
               formData.set('html', html)
 
@@ -601,7 +603,7 @@ var template = _.template(assetTemplate);
           });
 
           $("form#NewBlockForm").submit(function(e) {
-              e.preventDefault();    
+              e.preventDefault();
               var data = {};
               var formData = new FormData(this);
 

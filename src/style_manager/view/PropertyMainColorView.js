@@ -42,8 +42,6 @@ module.exports = require('./PropertyIntegerView').extend({
         var iframe = window.$('.gjs-frame')[0];
         var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
         
-        console.log(that.input.value);
-
         window.$(innerDoc).find(':root').css(that.property, that.input.value);
 
     };

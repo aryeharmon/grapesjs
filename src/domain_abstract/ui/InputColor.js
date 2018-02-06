@@ -32,11 +32,26 @@ module.exports = Input.extend({
    */
   setValue(val, opts = {}) {
     const model = this.model;
+
+    var original_val = val;
+
+    if (window.editor) {
+      for (var i = 0; i < window.editor.CssComposer.getAll().models.length; i++) {
+        if (window.editor.CssComposer.getAll().models[i].attributes.selectorsAdd === ':root') {
+          var root_style = window.editor.CssComposer.getAll().models[i];
+          if (val.indexOf('var(') > -1) {
+            var variable = val.replace('var(', '').replace(')', '');
+            val = root_style.attributes.style[variable];
+          }
+        }
+      }
+    }
+
     const value = val || model.get('defaults');
     const inputEl = this.getInputEl();
     const colorEl = this.getColorEl();
     const valueClr = value != 'none' ? value : '';
-    inputEl.value = value;
+    inputEl.value = original_val;
     colorEl.get(0).style.backgroundColor = valueClr;
 
     // This prevents from adding multiple thumbs in spectrum
@@ -68,6 +83,36 @@ module.exports = Input.extend({
       let changed = 0;
       let previousColor;
       this.$el.find(`[data-colorp-c]`).append(colorEl);
+
+      // aryeh edits
+      window.css_map = {};
+      var palette = [];
+      var iframe = window.$('.gjs-frame')[0];
+      if (iframe) {
+
+      var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+      var allCSS = [].slice.call(innerDoc.styleSheets)
+        .reduce(function(prev, styleSheet) {
+          if (!styleSheet.href) {
+            return prev + [].slice.call(styleSheet.cssRules)
+              .reduce(function(prev, cssRule) {
+                if (cssRule.selectorText == ':root') {
+                  var css = cssRule.cssText.split('{');
+                  css = css[1].replace('}','').split(';');
+                  for (var i = 0; i < css.length; i++) {
+                    var prop = css[i].split(':');
+                    if (prop.length == 2 && prop[0].indexOf('--') == 1) {
+                      palette.push(prop[1]);
+                      window.css_map[prop[1]] = prop[0];
+                    }
+                  }
+                }
+              }, '');
+          }
+        }, '');
+      }
+      // end edits
+
       colorEl.spectrum({
         containerClassName: `${ppfx}one-bg ${ppfx}two-color`,
         appendTo: elToAppend || 'body',
@@ -76,21 +121,22 @@ module.exports = Input.extend({
         showAlpha:   true,
         chooseText: 'Ok',
         cancelText: '⨯',
-        palette: [],
-
+        palette: [
+            palette
+        ],
         // config expanded here so that the functions below are not overridden
         ...colorPickerConfig,
 
         move(color) {
           const cl = getColor(color);
           cpStyle.backgroundColor = cl;
-          model.setValueFromInput(cl, 0);
+          model.setValueFromInput(window.css_map[cl] ? 'var(' + window.css_map[cl] + ')' : cl, 0);
         },
         change(color) {
           changed = 1;
           const cl = getColor(color);
           cpStyle.backgroundColor = cl;
-          model.setValueFromInput(cl);
+          model.setValueFromInput(window.css_map[cl] ? 'var(' + window.css_map[cl] + ')' : cl);
           self.noneColor = 0;
         },
         show(color) {
@@ -104,7 +150,7 @@ module.exports = Input.extend({
              }
              cpStyle.backgroundColor = previousColor;
              colorEl.spectrum('set', previousColor);
-             model.setValueFromInput(previousColor, 0);
+             model.setValueFromInput( window.css_map[previousColor] ? 'var(' + window.css_map[previousColor] + ')' : previousColor , 0);
            }
         }
       });

@@ -148,17 +148,21 @@ module.exports = Backbone.View.extend({
         var sheets = innerDoc.styleSheets, o = [];
         a.matches = a.matches || a.webkitMatchesSelector || a.mozMatchesSelector || a.msMatchesSelector || a.oMatchesSelector;
         for (var i in sheets) {
+          if (!sheets[i].href) {
             var rules = sheets[i].rules || sheets[i].cssRules;
-            for (var r in rules) {
+            if (rules) {
+              for (var r in rules) {
                 if (a.matches(rules[r].selectorText)) {
-                    o.push(rules[r].cssText.split('{')[0].trim());
+                  o.push(rules[r].cssText.split('{')[0].trim());
                 }
+              }
             }
+          }
         }
         return o;
-    } 
+    }
 
-    if (target) {    
+    if (target) {
       var styles = css(target.view.el);
       $('.css-rule-list').html('');
       for (var n = 0; n < styles.length; n++) {
@@ -171,7 +175,7 @@ module.exports = Backbone.View.extend({
 
       $('.css-rule-list button').click(function() {
         var $el = $(this);
-        
+
 
         if ($el.hasClass('selected')) {
           $('.css-rule-list button').removeClass('selected');
@@ -371,7 +375,7 @@ module.exports = Backbone.View.extend({
       pfx: this.pfx,
       ppfx: this.ppfx,
     }));
-  
+
     this.$input = this.$el.find('input#' + this.newInputId);
     this.$addBtn = this.$el.find('#' + this.addBtnId);
     this.$classes = this.$el.find('#' + this.pfx + 'tags-c');
