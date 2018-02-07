@@ -25715,7 +25715,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.290',
+    version: '0.12.301',
 
     /**
      * Initializes an editor based on passed options
@@ -48122,7 +48122,12 @@ var _mixins = __webpack_require__(3);
 module.exports = Backbone.View.extend({
 
   events: {
-    mousedown: 'startDrag'
+    mousedown: 'startDrag',
+    dblclick: 'test'
+  },
+
+  test: function test(e) {
+    $(this.$el.find('.dropdown')).toggle();
   },
 
   initialize: function initialize(o) {
@@ -48185,7 +48190,7 @@ module.exports = Backbone.View.extend({
   },
 
 
-  template: _.template('\n    <style>\n      .gjs-block:hover > .gjs-block-label .dropdown{\n          display: block !important;\n      }\n    </style>\n    <div class="<%= className %>-label" style="position: relative;">\n      <% if (children.length > 0) { %>\n      <div class="dropdown" style="display: none; position: absolute; top: -61px; right: -47px;">\n        <ul style="padding: 0;list-style: none;max-height: 150px;overflow: scroll;">\n          <% _.each(children, function(child, index){ %>\n            <li data-id="<%= index %>" style="display: block; width: 50px; height: 50px; background:url(<%= child.img %>)"></li>\n          <% }); %>\n        </ul>\n      </div>\n      <% } %>\n      <%= label %>\n    </div>\n  '),
+  template: _.template('\n    <style>\n      .dropdown {\n        position: absolute;\n        top: 20px;\n        left: 0;\n        width: 168px;\n        z-index: 6666666;\n        background: #c1baba;\n      }\n      .dropdown-item {\n        display: block;\n        width: 160px;\n        height: 160px;\n        background-size: 100%;\n      }\n    </style>\n    <div class="<%= className %>-label" style="position: relative;">\n      <% if (children.length > 0) { %>\n      <div class="dropdown" style="display: none;">\n        <ul style="padding: 0;list-style: none;max-height: 150px;overflow: scroll;">\n          <% _.each(children, function(child, index){ %>\n            <li data-id="<%= index %>"  class="dropdown-item" style="background:url(<%= child.img %>)"><%= child.name %></li>\n          <% }); %>\n        </ul>\n      </div>\n      <% } %>\n      <%= label %>\n    </div>\n  '),
 
   render: function render() {
     var children = this.model.get('children');

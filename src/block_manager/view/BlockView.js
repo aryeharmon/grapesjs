@@ -3,7 +3,12 @@ import {on, off} from 'utils/mixins';
 module.exports = Backbone.View.extend({
 
   events: {
-    mousedown: 'startDrag'
+    mousedown: 'startDrag',
+    dblclick: 'test',
+  },
+
+  test: function(e) {
+    $(this.$el.find('.dropdown')).toggle();
   },
 
   initialize(o, config = {}) {
@@ -31,7 +36,7 @@ module.exports = Backbone.View.extend({
 
     this.config.em.refreshCanvas();
     var sorter = this.config.getSorter();
-    
+
 
     if (e.target.tagName === 'LI') {
       sorter.setDragHelper(e.target, e);
@@ -43,7 +48,7 @@ module.exports = Backbone.View.extend({
 
     sorter.startSort(this.el);
 
-    
+
     on(document, 'mouseup', this.endDrag);
   },
 
@@ -65,16 +70,27 @@ module.exports = Backbone.View.extend({
 
   template: _.template(`
     <style>
-      .gjs-block:hover > .gjs-block-label .dropdown{
-          display: block !important;
+      .dropdown {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        width: 168px;
+        z-index: 6666666;
+        background: #c1baba;
+      }
+      .dropdown-item {
+        display: block;
+        width: 160px;
+        height: 160px;
+        background-size: 100%;
       }
     </style>
     <div class="<%= className %>-label" style="position: relative;">
       <% if (children.length > 0) { %>
-      <div class="dropdown" style="display: none; position: absolute; top: -61px; right: -47px;">
+      <div class="dropdown" style="display: none;">
         <ul style="padding: 0;list-style: none;max-height: 150px;overflow: scroll;">
           <% _.each(children, function(child, index){ %>
-            <li data-id="<%= index %>" style="display: block; width: 50px; height: 50px; background:url(<%= child.img %>)"></li>
+            <li data-id="<%= index %>"  class="dropdown-item" style="background:url(<%= child.img %>)"><%= child.name %></li>
           <% }); %>
         </ul>
       </div>
@@ -87,7 +103,7 @@ module.exports = Backbone.View.extend({
     var children = this.model.get('children');
 
     var className = this.ppfx + 'block';
-    this.$el.addClass(className);    
+    this.$el.addClass(className);
 
     this.el.innerHTML = this.template({
       className: className,
