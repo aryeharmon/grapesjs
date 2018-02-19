@@ -4688,7 +4688,7 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
   getName: function getName() {
     var customName = this.get('custom-name');
     var tag = this.get('tagName');
-    tag = tag == 'div' ? 'box' : tag;
+    tag = tag == 'div' ? 'Group' : tag;
     var name = this.get('type') || tag;
     name = name.charAt(0).toUpperCase() + name.slice(1);
     return customName || name;
@@ -25700,7 +25700,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.305',
+    version: '0.12.308',
 
     /**
      * Initializes an editor based on passed options
@@ -45320,6 +45320,8 @@ module.exports = function () {
 
           var sel = editor.getSelected();
           var html = sel.toHTML();
+
+          window.aryeh = sel;
 
           $("#NewLayoutForm").submit(function (e) {
             e.preventDefault();

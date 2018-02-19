@@ -582,7 +582,9 @@ var template = _.template(assetTemplate);
     modal.open();
 
           var sel = editor.getSelected();
-          var html = sel.toHTML()
+          var html = sel.toHTML();
+
+          window.aryeh = sel;
 
           $("#NewLayoutForm").submit(function(e) {
               e.preventDefault();
