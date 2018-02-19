@@ -43,10 +43,10 @@ import { isFunction } from 'underscore';
 module.exports = () => {
   let em;
   var c = {},
-  commands = {},
-  defaultCommands = {},
-  defaults = require('./config/config'),
-  AbsCommands = require('./view/CommandAbstract');
+    commands = {},
+    defaultCommands = {},
+    defaults = require('./config/config'),
+    AbsCommands = require('./view/CommandAbstract');
 
   // Need it here as it would be used below
   var add = function(id, obj) {
@@ -60,7 +60,6 @@ module.exports = () => {
   };
 
   return {
-
     /**
      * Name of the module
      * @type {String}
@@ -76,19 +75,16 @@ module.exports = () => {
     init(config) {
       c = config || {};
       for (var name in defaults) {
-        if (!(name in c))
-          c[name] = defaults[name];
+        if (!(name in c)) c[name] = defaults[name];
       }
       em = c.em;
       var ppfx = c.pStylePrefix;
-      if(ppfx)
-        c.stylePrefix = ppfx + c.stylePrefix;
+      if (ppfx) c.stylePrefix = ppfx + c.stylePrefix;
 
       // Load commands passed via configuration
-      for( var k in c.defaults) {
+      for (var k in c.defaults) {
         var obj = c.defaults[k];
-        if(obj.id)
-          this.add(obj.id, obj);
+        if (obj.id) this.add(obj.id, obj);
       }
 
       const ViewCode = require('./view/ExportTemplate');
@@ -122,14 +118,14 @@ module.exports = () => {
         run(ed) {
           var sel = ed.getSelected();
 
-          if(!sel || !sel.get('removable')) {
+          if (!sel || !sel.get('removable')) {
             console.warn('The element is not removable');
             return;
           }
 
           ed.select(null);
           sel.destroy();
-        },
+        }
       };
 
 
@@ -636,27 +632,40 @@ var template = _.template(assetTemplate);
         run(ed) {
           var sel = ed.getSelected();
 
-          if(!sel || !sel.get('copyable')) {
+          if (!sel || !sel.get('copyable')) {
             console.warn('The element is not clonable');
             return;
           }
 
           var collection = sel.collection;
           var index = collection.indexOf(sel);
-          collection.add(sel.clone(), {at: index + 1});
-          ed.trigger('component:update', sel);
-        },
+          const added = collection.add(sel.clone(), { at: index + 1 });
+          sel.emitUpdate();
+          ed.trigger('component:clone', added);
+        }
       };
 
       defaultCommands['tlb-move'] = {
         run(ed, sender, opts) {
-          var sel = ed.getSelected();
-          var dragger;
+          let dragger;
+          const em = ed.getModel();
+          const event = opts && opts.event;
+          const sel = ed.getSelected();
+          const toolbarStyle = ed.Canvas.getToolbarEl().style;
+          const nativeDrag = event.type == 'dragstart';
 
-          if(!sel || !sel.get('draggable')) {
+          const hideTlb = () => {
+            toolbarStyle.display = 'none';
+            em.stopDefault();
+          };
+
+          if (!sel || !sel.get('draggable')) {
             console.warn('The element is not draggable');
             return;
           }
+
+          // Without setTimeout the ghost image disappears
+          nativeDrag ? setTimeout(() => hideTlb, 0) : hideTlb();
 
           const onStart = (e, opts) => {
             console.log('start mouse pos ', opts.start);
@@ -668,8 +677,8 @@ var template = _.template(assetTemplate);
 
           const onEnd = (e, opts) => {
             em.runDefault();
-            em.set('selectedComponent', sel);
-            ed.trigger('component:update', sel);
+            em.setSelected(sel);
+            sel.emitUpdate();
             dragger && dragger.blur();
           };
 
@@ -678,31 +687,30 @@ var template = _.template(assetTemplate);
             console.log('Current ', opts.current);
           };
 
-          var toolbarEl = ed.Canvas.getToolbarEl();
-          toolbarEl.style.display = 'none';
-          var em = ed.getModel();
-          em.stopDefault();
-
           if (em.get('designerMode')) {
             // TODO move grabbing func in editor/canvas from the Sorter
             dragger = editor.runCommand('drag', {
               el: sel.view.el,
               options: {
-                event: opts && opts.event,
+                event,
                 onStart,
                 onDrag,
                 onEnd
               }
             });
           } else {
-            var cmdMove = ed.Commands.get('move-comp');
+            if (nativeDrag) {
+              event.dataTransfer.setDragImage(sel.view.el, 0, 0);
+              //sel.set('status', 'freezed');
+            }
+
+            const cmdMove = ed.Commands.get('move-comp');
             cmdMove.onEndMoveFromModel = onEnd;
             cmdMove.initSorterFromModel(sel);
           }
 
-
-          sel.set('status', 'selected');
-        },
+          sel.set('status', 'freezed-selected');
+        }
       };
 
       // Core commands
@@ -732,10 +740,9 @@ var template = _.template(assetTemplate);
         }
       };
 
-      if(c.em)
-        c.model = c.em.get('Canvas');
+      if (c.em) c.model = c.em.get('Canvas');
 
-      this.loadDefaultCommands()
+      this.loadDefaultCommands();
 
       return this;
     },
@@ -771,9 +778,9 @@ var template = _.template(assetTemplate);
     get(id) {
       var el = commands[id];
 
-      if(typeof el == 'function'){
+      if (typeof el == 'function') {
         el = new el(c);
-        commands[id]	= el;
+        commands[id] = el;
       }
 
       return el;
@@ -795,11 +802,10 @@ var template = _.template(assetTemplate);
      * */
     loadDefaultCommands() {
       for (var id in defaultCommands) {
-          this.add(id, defaultCommands[id]);
+        this.add(id, defaultCommands[id]);
       }
 
       return this;
-    },
+    }
   };
-
 };

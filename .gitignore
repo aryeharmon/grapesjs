@@ -16,3 +16,4 @@ node_modules/
 bower_components/
 grapesjs-*.tgz
 _index.html
+*.orig

@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 60);
+/******/ 	return __webpack_require__(__webpack_require__.s = 62);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -3561,11 +3561,145 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscor
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getUnitFromValue = exports.normalizeFloat = exports.shallowDiff = exports.camelCase = exports.matches = exports.upFirst = exports.hasDnd = exports.off = exports.on = undefined;
+
+var _underscore = __webpack_require__(1);
+
+var elProt = window.Element.prototype;
+var matches = elProt.matches || elProt.webkitMatchesSelector || elProt.mozMatchesSelector || elProt.msMatchesSelector;
+
+/**
+ * Returns shallow diff between 2 objects
+ * @param  {Object} objOrig
+ * @param  {Objec} objNew
+ * @return {Object}
+ * @example
+ * var a = {foo: 'bar', baz: 1, faz: 'sop'};
+ * var b = {foo: 'bar', baz: 2, bar: ''};
+ * shallowDiff(a, b);
+ * // -> {baz: 2, faz: null, bar: ''};
+ */
+var shallowDiff = function shallowDiff(objOrig, objNew) {
+  var result = {};
+  var keysNew = (0, _underscore.keys)(objNew);
+
+  for (var prop in objOrig) {
+    if (objOrig.hasOwnProperty(prop)) {
+      var origValue = objOrig[prop];
+      var newValue = objNew[prop];
+
+      if (keysNew.indexOf(prop) >= 0) {
+        if (origValue !== newValue) {
+          result[prop] = newValue;
+        }
+      } else {
+        result[prop] = null;
+      }
+    }
+  }
+
+  for (var _prop in objNew) {
+    if (objNew.hasOwnProperty(_prop)) {
+      if ((0, _underscore.isUndefined)(objOrig[_prop])) {
+        result[_prop] = objNew[_prop];
+      }
+    }
+  }
+
+  return result;
+};
+
+var on = function on(el, ev, fn) {
+  ev = ev.split(/\s+/);
+  el = el instanceof Array ? el : [el];
+
+  var _loop = function _loop(i) {
+    el.forEach(function (elem) {
+      return elem.addEventListener(ev[i], fn);
+    });
+  };
+
+  for (var i = 0; i < ev.length; ++i) {
+    _loop(i);
+  }
+};
+
+var off = function off(el, ev, fn) {
+  ev = ev.split(/\s+/);
+  el = el instanceof Array ? el : [el];
+
+  var _loop2 = function _loop2(i) {
+    el.forEach(function (elem) {
+      return elem.removeEventListener(ev[i], fn);
+    });
+  };
+
+  for (var i = 0; i < ev.length; ++i) {
+    _loop2(i);
+  }
+};
+
+var getUnitFromValue = function getUnitFromValue(value) {
+  return value.replace(parseFloat(value), '');
+};
+
+var upFirst = function upFirst(value) {
+  if (value[0] && value[0].toUpperCase) {
+    return value[0].toUpperCase() + value.toLowerCase().slice(1);
+  }
+  return '';
+};
+
+var camelCase = function camelCase(value) {
+  var values = value.split('-');
+  return values[0].toLowerCase() + values.slice(1).map(upFirst);
+};
+
+var normalizeFloat = function normalizeFloat(value) {
+  var step = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+  var valueDef = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+  var stepDecimals = 0;
+  if (isNaN(value)) return valueDef;
+  value = parseFloat(value);
+
+  if (Math.floor(value) !== value) {
+    var side = step.toString().split('.')[1];
+    stepDecimals = side ? side.length : 0;
+  }
+
+  return stepDecimals ? parseFloat(value.toFixed(stepDecimals)) : value;
+};
+
+var hasDnd = function hasDnd(em) {
+  return 'draggable' in document.createElement('i') && (em ? em.get('Config').nativeDnD : 1);
+};
+
+exports.on = on;
+exports.off = off;
+exports.hasDnd = hasDnd;
+exports.upFirst = upFirst;
+exports.matches = matches;
+exports.camelCase = camelCase;
+exports.shallowDiff = shallowDiff;
+exports.normalizeFloat = normalizeFloat;
+exports.getUnitFromValue = getUnitFromValue;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone) {
 
 var _underscore = __webpack_require__(1);
 
-var ComponentsView = __webpack_require__(51);
+var ComponentsView = __webpack_require__(52);
 
 module.exports = Backbone.View.extend({
   className: function className() {
@@ -3621,14 +3755,11 @@ module.exports = Backbone.View.extend({
    * @private
    */
   handleChange: function handleChange() {
-    var em = this.em;
-    if (em) {
-      var model = this.model;
-      em.trigger('component:update', model);
+    var model = this.model;
+    model.emitUpdate();
 
-      for (var prop in model.changed) {
-        em.trigger('component:update:' + prop, model);
-      }
+    for (var prop in model.changed) {
+      model.emitUpdate(prop);
     }
   },
 
@@ -3678,6 +3809,7 @@ module.exports = Backbone.View.extend({
     var selectedCls = pfx + 'selected';
     var selectedParentCls = selectedCls + '-parent';
     var freezedCls = ppfx + 'freezed';
+    this.$el.removeClass(selectedCls + ' ' + selectedParentCls + ' ' + freezedCls);
     var actualCls = el.getAttribute('class') || '';
     var cls = '';
 
@@ -3691,8 +3823,9 @@ module.exports = Backbone.View.extend({
       case 'freezed':
         cls = actualCls + ' ' + freezedCls;
         break;
-      default:
-        this.$el.removeClass(selectedCls + ' ' + selectedParentCls + ' ' + freezedCls);
+      case 'freezed-selected':
+        cls = actualCls + ' ' + freezedCls + ' ' + selectedCls;
+        break;
     }
 
     cls = cls.trim();
@@ -3762,7 +3895,7 @@ module.exports = Backbone.View.extend({
    * @private
    * */
   getClasses: function getClasses() {
-    var attr = this.model.get("attributes"),
+    var attr = this.model.get('attributes'),
         classes = attr['class'] || [];
     classes = (0, _underscore.isArray)(classes) ? classes : [classes];
 
@@ -3914,141 +4047,12 @@ module.exports = Backbone.View.extend({
     this.updateContent();
     this.renderChildren();
     this.updateScript();
+    this.onRender();
     return this;
-  }
+  },
+  onRender: function onRender() {}
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getUnitFromValue = exports.normalizeFloat = exports.shallowDiff = exports.camelCase = exports.matches = exports.upFirst = exports.off = exports.on = undefined;
-
-var _underscore = __webpack_require__(1);
-
-var elProt = window.Element.prototype;
-var matches = elProt.matches || elProt.webkitMatchesSelector || elProt.mozMatchesSelector || elProt.msMatchesSelector;
-
-/**
- * Returns shallow diff between 2 objects
- * @param  {Object} objOrig
- * @param  {Objec} objNew
- * @return {Object}
- * @example
- * var a = {foo: 'bar', baz: 1, faz: 'sop'};
- * var b = {foo: 'bar', baz: 2, bar: ''};
- * shallowDiff(a, b);
- * // -> {baz: 2, faz: null, bar: ''};
- */
-var shallowDiff = function shallowDiff(objOrig, objNew) {
-  var result = {};
-  var keysNew = (0, _underscore.keys)(objNew);
-
-  for (var prop in objOrig) {
-    if (objOrig.hasOwnProperty(prop)) {
-      var origValue = objOrig[prop];
-      var newValue = objNew[prop];
-
-      if (keysNew.indexOf(prop) >= 0) {
-        if (origValue !== newValue) {
-          result[prop] = newValue;
-        }
-      } else {
-        result[prop] = null;
-      }
-    }
-  }
-
-  for (var _prop in objNew) {
-    if (objNew.hasOwnProperty(_prop)) {
-      if ((0, _underscore.isUndefined)(objOrig[_prop])) {
-        result[_prop] = objNew[_prop];
-      }
-    }
-  }
-
-  return result;
-};
-
-var on = function on(el, ev, fn) {
-  ev = ev.split(/\s+/);
-  el = el instanceof Array ? el : [el];
-
-  var _loop = function _loop(i) {
-    el.forEach(function (elem) {
-      return elem.addEventListener(ev[i], fn);
-    });
-  };
-
-  for (var i = 0; i < ev.length; ++i) {
-    _loop(i);
-  }
-};
-
-var off = function off(el, ev, fn) {
-  ev = ev.split(/\s+/);
-  el = el instanceof Array ? el : [el];
-
-  var _loop2 = function _loop2(i) {
-    el.forEach(function (elem) {
-      return elem.removeEventListener(ev[i], fn);
-    });
-  };
-
-  for (var i = 0; i < ev.length; ++i) {
-    _loop2(i);
-  }
-};
-
-var getUnitFromValue = function getUnitFromValue(value) {
-  return value.replace(parseFloat(value), '');
-};
-
-var upFirst = function upFirst(value) {
-  return value[0].toUpperCase() + value.toLowerCase().slice(1);
-};
-
-var camelCase = function camelCase(value) {
-  if (value) {
-    var values = value.split('-');
-    if (values[0] && values.slice(1)) {
-      return values[0].toLowerCase() + values.slice(1).map(upFirst);
-    }
-  }
-  return 'err';
-};
-
-var normalizeFloat = function normalizeFloat(value) {
-  var step = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-  var valueDef = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-
-  var stepDecimals = 0;
-  if (isNaN(value)) return valueDef;
-  value = parseFloat(value);
-
-  if (Math.floor(value) !== value) {
-    var side = step.toString().split('.')[1];
-    stepDecimals = side ? side.length : 0;
-  }
-
-  return stepDecimals ? parseFloat(value.toFixed(stepDecimals)) : value;
-};
-
-exports.on = on;
-exports.off = off;
-exports.upFirst = upFirst;
-exports.matches = matches;
-exports.camelCase = camelCase;
-exports.shallowDiff = shallowDiff;
-exports.normalizeFloat = normalizeFloat;
-exports.getUnitFromValue = getUnitFromValue;
 
 /***/ }),
 /* 4 */
@@ -4061,7 +4065,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
 var _Styleable = __webpack_require__(48);
 
@@ -4070,23 +4074,27 @@ var _Styleable2 = _interopRequireDefault(_Styleable);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Backbone = __webpack_require__(0);
-var Components = __webpack_require__(50);
+var Components = __webpack_require__(51);
 var Selector = __webpack_require__(7);
 var Selectors = __webpack_require__(13);
-var Traits = __webpack_require__(156);
+var Traits = __webpack_require__(155);
+var componentList = {};
+var componentIndex = 0;
 
 var escapeRegExp = function escapeRegExp(str) {
   return str.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
 };
 
-module.exports = Backbone.Model.extend(_Styleable2.default).extend({
-
+var Component = Backbone.Model.extend(_Styleable2.default).extend({
   defaults: {
     // HTML tag of the component
     tagName: 'div',
 
     // Component type, eg. 'text', 'image', 'video', etc.
     type: '',
+
+    // Name of the component. Will be used, for example, in layers and badges
+    name: '',
 
     // True if the component is removable from the canvas
     removable: true,
@@ -4181,24 +4189,26 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
     propagate: '',
 
     /**
-      * Set an array of items to show up inside the toolbar (eg. move, clone, delete)
-      * when the component is selected
-      * toolbar: [{
-      *     attributes: {class: 'fa fa-arrows'},
-      *     command: 'tlb-move',
-      *   },{
-      *     attributes: {class: 'fa fa-clone'},
-      *     command: 'tlb-clone',
-      * }]
-    */
+     * Set an array of items to show up inside the toolbar (eg. move, clone, delete)
+     * when the component is selected
+     * toolbar: [{
+     *     attributes: {class: 'fa fa-arrows'},
+     *     command: 'tlb-move',
+     *   },{
+     *     attributes: {class: 'fa fa-clone'},
+     *     command: 'tlb-clone',
+     * }]
+     */
     toolbar: null
   },
 
   initialize: function initialize() {
+    var _this = this;
+
     var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    var em = opt.sm || opt.em || '';
+    var em = opt.em;
 
     // Propagate properties from parent if indicated
     var parent = this.parent();
@@ -4225,19 +4235,35 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
     opt.em = em;
     this.opt = opt;
-    this.sm = em;
     this.em = em;
     this.config = opt.config || {};
+    this.ccid = Component.createId(this);
     this.set('attributes', this.get('attributes') || {});
+    this.on('remove', this.handleRemove);
     this.listenTo(this, 'change:script', this.scriptUpdated);
     this.listenTo(this, 'change:traits', this.traitsUpdated);
     this.listenTo(this, 'change:tagName', this.tagUpdated);
-    this.loadTraits();
+    this.listenTo(this, 'change:attributes', this.attrUpdated);
     this.initClasses();
+    this.loadTraits();
     this.initComponents();
     this.initToolbar();
     this.set('status', '');
+    this.listenTo(this.get('classes'), 'add remove change', function () {
+      return _this.emitUpdate('classes');
+    });
     this.init();
+  },
+
+
+  /**
+   * Triggered on model remove
+   * @param {Model} removed Removed model
+   * @private
+   */
+  handleRemove: function handleRemove(removed) {
+    var em = this.em;
+    em && em.trigger('component:remove', removed);
   },
 
 
@@ -4266,12 +4292,27 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
   find: function find(query) {
     var result = [];
 
-    this.view.$el.find(query).each(function (el, i, $el) {
+    this.view.$el.find(query).each(function (el, i, $els) {
+      var $el = $els.eq(i);
       var model = $el.data('model');
       model && result.push(model);
     });
 
     return result;
+  },
+
+
+  /**
+   * Find closest model by query string
+   * ATTENTION: this method works only with alredy rendered component
+   * @param  {string}  query Query string
+   * @return {Component}
+   * @example
+   * model.closest('div');
+   */
+  closest: function closest(query) {
+    var result = this.view.$el.closest(query);
+    return result.length && result.data('model');
   },
 
 
@@ -4283,6 +4324,21 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
     var at = coll.indexOf(this);
     coll.remove(this);
     coll.add(this, { at: at });
+  },
+
+
+  /**
+   * Emit changes for each updated attribute
+   */
+  attrUpdated: function attrUpdated() {
+    var _this2 = this;
+
+    var attrPrev = _extends({}, this.previous('attributes'));
+    var attrCurrent = _extends({}, this.get('attributes'));
+    var diff = (0, _mixins.shallowDiff)(attrPrev, attrCurrent);
+    (0, _underscore.keys)(diff).forEach(function (pr) {
+      return _this2.trigger('change:attributes:' + pr);
+    });
   },
 
 
@@ -4307,6 +4363,18 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
     this.set('attributes', attrs);
   },
+
+
+  /**
+   * Add attributes to the model
+   * @param {Object} attrs Key value attributes
+   * @example
+   * model.addAttributes({id: 'test'});
+   */
+  addAttributes: function addAttributes(attrs) {
+    var newAttrs = _extends({}, this.getAttributes(), attrs);
+    this.setAttributes(newAttrs);
+  },
   getStyle: function getStyle() {
     var em = this.em;
 
@@ -4324,7 +4392,7 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
     return _Styleable2.default.getStyle.call(this);
   },
   setStyle: function setStyle() {
-    var _this = this;
+    var _this3 = this;
 
     var prop = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -4339,7 +4407,7 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
       this.rule = cc.setIdRule(this.getId(), prop, _extends({}, opts, { state: state }));
       var diff = (0, _mixins.shallowDiff)(propOrig, prop);
       (0, _underscore.keys)(diff).forEach(function (pr) {
-        return _this.trigger('change:style:' + pr);
+        return _this3.trigger('change:style:' + pr);
       });
     } else {
       prop = _Styleable2.default.setStyle.apply(this, arguments);
@@ -4355,7 +4423,7 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
    */
   getAttributes: function getAttributes() {
     var classes = [];
-    var attributes = this.get('attributes') || {};
+    var attributes = _extends({}, this.get('attributes'));
 
     // Add classes
     this.get('classes').each(function (cls) {
@@ -4440,7 +4508,7 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
     // is not visible
     var comps = new Components(null, this.opt);
     comps.parent = this;
-    comps.reset(this.get('components'));
+    !this.opt.avoidChildren && comps.reset(this.get('components'));
     this.set('components', comps);
     return this;
   },
@@ -4557,7 +4625,8 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
       }
       if (model.get('draggable')) {
         tb.push({
-          attributes: { class: 'fa fa-arrows' },
+          attributes: { class: 'fa fa-arrows', draggable: true },
+          //events: hasDnd(this.em) ? { dragstart: 'execCommand' } : '',
           command: 'tlb-move'
         });
       }
@@ -4573,24 +4642,6 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
           command: 'tlb-delete'
         });
       }
-
-      tb.push({
-        attributes: { class: 'fa fa-floppy-o' },
-        command: 'save'
-      });
-
-      tb.push({
-        attributes: { class: 'fa fa-text-height' },
-        command: function command() {
-          editor.getSelected().allow_height = !editor.getSelected().allow_height;
-          if (editor.getSelected().allow_height) {
-            window.toastr.warning('Edit Height Enabled');
-          } else {
-            window.toastr.warning('Edit Height Disabled');
-          }
-        }
-      });
-
       model.set('toolbar', tb);
     }
   },
@@ -4625,10 +4676,11 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
    */
   normalizeClasses: function normalizeClasses(arr) {
     var res = [];
+    var em = this.em;
 
-    if (!this.sm.get) return;
+    if (!em) return;
 
-    var clm = this.sm.get('SelectorManager');
+    var clm = em.get('SelectorManager');
     if (!clm) return;
 
     arr.forEach(function (val) {
@@ -4647,17 +4699,19 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
    * Override original clone method
    * @private
    */
-  clone: function clone(reset) {
+  clone: function clone() {
     var em = this.em;
     var style = this.getStyle();
-    var attr = (0, _underscore.clone)(this.attributes);
+    var attr = _extends({}, this.attributes);
+    var opts = _extends({}, this.opt);
+    attr.attributes = _extends({}, attr.attributes);
     delete attr.attributes.id;
     attr.components = [];
     attr.classes = [];
     attr.traits = [];
 
     this.get('components').each(function (md, i) {
-      attr.components[i] = md.clone(1);
+      attr.components[i] = md.clone();
     });
     this.get('traits').each(function (md, i) {
       attr.traits[i] = md.clone();
@@ -4668,16 +4722,13 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
     attr.status = '';
     attr.view = '';
-
-    if (reset) {
-      this.opt.collection = null;
-    }
+    opts.collection = null;
 
     if (em && em.getConfig('avoidInlineStyle') && !(0, _underscore.isEmpty)(style)) {
       attr.style = style;
     }
 
-    return new this.constructor(attr, this.opt);
+    return new this.constructor(attr, opts);
   },
 
 
@@ -4686,7 +4737,7 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
    * @return {string}
    * */
   getName: function getName() {
-    var customName = this.get('custom-name');
+    var customName = this.get('name') || this.get('custom-name');
     var tag = this.get('tagName');
     tag = tag == 'div' ? 'box' : tag;
     var name = this.get('type') || tag;
@@ -4763,11 +4814,10 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
     var obj = Backbone.Model.prototype.toJSON.apply(this, args);
     var scriptStr = this.getScriptString();
+    obj.attributes = this.getAttributes();
+    delete obj.attributes.class;
     delete obj.toolbar;
-
-    if (scriptStr) {
-      obj.script = scriptStr;
-    }
+    scriptStr && (obj.script = scriptStr);
 
     return obj;
   },
@@ -4779,7 +4829,17 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
    */
   getId: function getId() {
     var attrs = this.get('attributes') || {};
-    return attrs.id || this.cid;
+    return attrs.id || this.ccid || this.cid;
+  },
+
+
+  /**
+   * Get the DOM element of the model. This works only of the
+   * model is alredy rendered
+   * @return {HTMLElement}
+   */
+  getEl: function getEl() {
+    return this.view && this.view.el;
   },
 
 
@@ -4791,7 +4851,7 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
    * @private
    */
   getScriptString: function getScriptString(script) {
-    var _this2 = this;
+    var _this4 = this;
 
     var scr = script || this.get('script');
 
@@ -4806,21 +4866,25 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
       scr = scrStr.trim();
     }
 
-    var config = this.sm.config || {};
+    var config = this.em.getConfig();
     var tagVarStart = escapeRegExp(config.tagVarStart || '{[ ');
     var tagVarEnd = escapeRegExp(config.tagVarEnd || ' ]}');
-    var reg = new RegExp(tagVarStart + '(\\w+)' + tagVarEnd, 'g');
+    var reg = new RegExp(tagVarStart + '([\\w\\d-]*)' + tagVarEnd, 'g');
     scr = scr.replace(reg, function (match, v) {
       // If at least one match is found I have to track this change for a
       // better optimization inside JS generator
-      _this2.scriptUpdated();
-      return _this2.attributes[v];
+      _this4.scriptUpdated();
+      return _this4.attributes[v] || '';
     });
 
     return scr;
+  },
+  emitUpdate: function emitUpdate(property) {
+    var em = this.em;
+    var event = 'component:update' + (property ? ':' + property : '');
+    em && em.trigger(event, this);
   }
 }, {
-
   /**
    * Detect if the passed element is a valid component.
    * In case the element is valid an object abstracted
@@ -4831,8 +4895,30 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
    */
   isComponent: function isComponent(el) {
     return { tagName: el.tagName ? el.tagName.toLowerCase() : '' };
+  },
+
+
+  /**
+   * Relying simply on the number of components becomes a problem when you
+   * store and load them back, you might hit collisions with new components
+   * @param  {Model} model
+   * @return {string}
+   */
+  createId: function createId(model) {
+    componentIndex++;
+    // Testing 1000000 components with `+ 2` returns 0 collisions
+    var ilen = componentIndex.toString().length + 2;
+    var uid = (Math.random() + 1.1).toString(36).slice(-ilen);
+    var nextId = 'i' + uid;
+    componentList[nextId] = model;
+    return nextId;
+  },
+  getList: function getList() {
+    return componentList;
   }
 });
+
+module.exports = Component;
 
 /***/ }),
 /* 5 */
@@ -4843,7 +4929,11 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var clearProp = 'data-clear-style';
 
 module.exports = Backbone.View.extend({
   template: function template(model) {
@@ -4854,16 +4944,16 @@ module.exports = Backbone.View.extend({
     var pfx = this.pfx;
     var icon = model.get('icon');
     var info = model.get('info');
-    return '\n      <span class="' + pfx + 'icon ' + icon + '" title="' + info + '">\n        ' + model.get('name') + '\n      </span>\n      <b class="' + pfx + 'clear">&Cross;</b>\n    ';
+    return '\n      <span class="' + pfx + 'icon ' + icon + '" title="' + info + '">\n        ' + model.get('name') + '\n      </span>\n      <b class="' + pfx + 'clear" ' + clearProp + '>&Cross;</b>\n    ';
   },
   templateInput: function templateInput(model) {
     return '\n      <div class="' + this.ppfx + 'field">\n        <input placeholder="' + model.getDefaultValue() + '"/>\n      </div>\n    ';
   },
 
 
-  events: {
-    'change': 'inputValueChanged'
-  },
+  events: _defineProperty({
+    change: 'inputValueChanged'
+  }, 'click [' + clearProp + ']', 'clear'),
 
   initialize: function initialize() {
     var o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -4892,14 +4982,13 @@ module.exports = Backbone.View.extend({
     }
 
     em && em.on('update:component:style:' + this.property, this.targetUpdated);
+    //em && em.on(`styleable:change:${this.property}`, this.targetUpdated);
     this.listenTo(this.propTarget, 'update', this.targetUpdated);
     this.listenTo(model, 'destroy remove', this.remove);
     this.listenTo(model, 'change:value', this.modelValueChanged);
     this.listenTo(model, 'targetUpdated', this.targetUpdated);
     this.listenTo(model, 'change:visible', this.updateVisibility);
     this.listenTo(model, 'change:status', this.updateStatus);
-    this.events['click .' + pfx + 'clear'] = 'clear';
-    this.delegateEvents();
 
     var init = this.init && this.init.bind(this);
     init && init();
@@ -4941,9 +5030,9 @@ module.exports = Backbone.View.extend({
   /**
    * Clear the property from the target
    */
-  clear: function clear() {
-    var target = this.getTargetModel();
-    target.removeStyle(this.model.get('property'));
+  clear: function clear(e) {
+    e && e.stopPropagation();
+    this.model.clearValue();
     this.targetUpdated();
   },
 
@@ -4953,7 +5042,7 @@ module.exports = Backbone.View.extend({
    * @return {HTMLElement}
    */
   getClearEl: function getClearEl() {
-    return this.el.querySelector('.' + this.pfx + 'clear');
+    return this.el.querySelector('[' + clearProp + ']');
   },
 
 
@@ -4999,10 +5088,7 @@ module.exports = Backbone.View.extend({
    * Fired when the element of the property is updated
    */
   elementUpdated: function elementUpdated() {
-    this.model.set('status', 'updated');
-    var parent = this.model.parent;
-    var parentView = parent && parent.view;
-    parentView && parentView.elementUpdated();
+    this.setStatus('updated');
   },
   setStatus: function setStatus(value) {
     this.model.set('status', value);
@@ -5220,9 +5306,6 @@ module.exports = Backbone.View.extend({
    * @return {Boolean}
    */
   isTargetStylable: function isTargetStylable(target) {
-    if (this.model.get('id') == 'flex-width') {
-      //debugger;
-    }
     var trg = target || this.getTarget();
     var model = this.model;
     var property = model.get('property');
@@ -5288,7 +5371,7 @@ module.exports = Backbone.View.extend({
    * */
   setValue: function setValue(value) {
     var model = this.model;
-    var val = value || model.getDefaultValue();
+    var val = (0, _underscore.isUndefined)(value) ? model.getDefaultValue() : value;
     var input = this.getInputEl();
     input && (input.value = val);
   },
@@ -15016,7 +15099,6 @@ var TYPE_CLASS = 1;
 var TYPE_ID = 2;
 
 var Selector = Backbone.Model.extend({
-
   idAttribute: 'name',
 
   defaults: {
@@ -15099,8 +15181,9 @@ module.exports = Selector;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-module.exports = __webpack_require__(0).Model.extend({
+var _underscore = __webpack_require__(1);
 
+module.exports = __webpack_require__(0).Model.extend({
   defaults: {
     name: '',
     property: '',
@@ -15133,6 +15216,18 @@ module.exports = __webpack_require__(0).Model.extend({
 
     var init = this.init && this.init.bind(this);
     init && init();
+  },
+
+
+  /**
+   * Clear the value
+   * @return {this}
+   */
+  clearValue: function clearValue() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    this.set({ value: undefined }, opts);
+    return this;
   },
 
 
@@ -15226,13 +15321,13 @@ module.exports = __webpack_require__(0).Model.extend({
    */
   getFullValue: function getFullValue(val) {
     var fn = this.get('functionName');
-    var value = val || this.get('value');
+    var value = (0, _underscore.isUndefined)(val) ? this.get('value') : val;
 
-    if (fn) {
+    if (fn && !(0, _underscore.isUndefined)(value)) {
       value = fn + '(' + value + ')';
     }
 
-    return value;
+    return value || '';
   }
 });
 
@@ -15244,9 +15339,11 @@ module.exports = __webpack_require__(0).Model.extend({
 /* WEBPACK VAR INJECTION */(function(Backbone) {
 
 var InputNumber = __webpack_require__(18);
+var PropertyView = __webpack_require__(5);
 var $ = Backbone.$;
+var timeout = void 0;
 
-module.exports = __webpack_require__(5).extend({
+module.exports = PropertyView.extend({
   templateInput: function templateInput() {
     return '';
   },
@@ -15256,6 +15353,8 @@ module.exports = __webpack_require__(5).extend({
     this.listenTo(model, 'el:change', this.elementUpdated);
   },
   setValue: function setValue(value) {
+    var parsed = this.model.parseValue(value);
+    value = '' + parsed.value + parsed.unit;
     this.inputInst.setValue(value, { silent: 1 });
   },
   onRender: function onRender() {
@@ -15282,31 +15381,35 @@ module.exports = __webpack_require__(5).extend({
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
+
+var _underscore = __webpack_require__(1);
+
+var Backbone = __webpack_require__(0);
 var $ = Backbone.$;
 
 module.exports = Backbone.View.extend({
-
   events: {
-    'change': 'onChange'
+    change: 'onChange'
   },
 
   attributes: function attributes() {
     return this.model.get('attributes');
   },
   initialize: function initialize(o) {
-    var md = this.model;
+    var model = this.model;
+    var name = model.get('name');
+    var target = model.target;
     this.config = o.config || {};
     this.pfx = this.config.stylePrefix || '';
     this.ppfx = this.config.pStylePrefix || '';
-    this.target = md.target;
+    this.target = target;
     this.className = this.pfx + 'trait';
     this.labelClass = this.ppfx + 'label';
-    this.fieldClass = this.ppfx + 'field ' + this.ppfx + 'field-' + md.get('type');
+    this.fieldClass = this.ppfx + 'field ' + this.ppfx + 'field-' + model.get('type');
     this.inputhClass = this.ppfx + 'input-holder';
-    md.off('change:value', this.onValueChange);
-    this.listenTo(md, 'change:value', this.onValueChange);
+    model.off('change:value', this.onValueChange);
+    this.listenTo(model, 'change:value', this.onValueChange);
     this.tmpl = '<div class="' + this.fieldClass + '"><div class="' + this.inputhClass + '"></div></div>';
   },
 
@@ -15321,24 +15424,27 @@ module.exports = Backbone.View.extend({
   getValueForTarget: function getValueForTarget() {
     return this.model.get('value');
   },
+  setInputValue: function setInputValue(value) {
+    this.getInputEl().value = value;
+  },
 
 
   /**
    * On change callback
    * @private
    */
-  onValueChange: function onValueChange() {
-    var m = this.model;
+  onValueChange: function onValueChange(model, value) {
+    var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+    var mod = this.model;
     var trg = this.target;
-    var name = m.get('name');
-    var value = this.getValueForTarget();
-    // Chabge property if requested otherwise attributes
-    if (m.get('changeProp')) {
-      trg.set(name, value);
+    var name = mod.get('name');
+
+    if (opts.fromTarget) {
+      this.setInputValue(mod.get('value'));
     } else {
-      var attrs = _.clone(trg.get('attributes'));
-      attrs[name] = value;
-      trg.set('attributes', attrs);
+      var _value = this.getValueForTarget();
+      mod.setTargetValue(_value);
     }
   },
 
@@ -15435,7 +15541,6 @@ module.exports = Backbone.View.extend({
     return this;
   }
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
 /* 11 */
@@ -16439,33 +16544,34 @@ module.exports = g;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(_) {
 
-var Backbone = __webpack_require__(0);
+
+var _underscore = __webpack_require__(1);
+
 var Selector = __webpack_require__(7);
 
-module.exports = Backbone.Collection.extend({
+module.exports = __webpack_require__(0).Collection.extend({
   model: Selector,
 
   getStyleable: function getStyleable() {
-    return _.filter(this.models, function (item) {
+    return (0, _underscore.filter)(this.models, function (item) {
       return item.get('active') && !item.get('private');
     });
   },
   getValid: function getValid() {
-    return _.filter(this.models, function (item) {
+    return (0, _underscore.filter)(this.models, function (item) {
       return !item.get('private');
     });
   },
-  getFullString: function getFullString() {
+  getFullString: function getFullString(collection) {
     var result = [];
-    this.each(function (selector) {
+    var coll = collection || this;
+    coll.forEach(function (selector) {
       return result.push(selector.getFullName());
     });
     return result.join('').trim();
   }
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 14 */
@@ -16473,6 +16579,8 @@ module.exports = Backbone.Collection.extend({
 
 "use strict";
 
+
+var _require$Collection$e;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -16482,13 +16590,15 @@ var _TypeableCollection2 = _interopRequireDefault(_TypeableCollection);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var Property = __webpack_require__(8);
 
-module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.default).extend({
+module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.default).extend((_require$Collection$e = {
   types: [{
     id: 'main-color',
     model: Property,
-    view: __webpack_require__(123),
+    view: __webpack_require__(122),
     isType: function isType(value) {
       if (value && value.type == 'main-color') {
         return value;
@@ -16496,7 +16606,7 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
     }
   }, {
     id: 'stack',
-    model: __webpack_require__(124),
+    model: __webpack_require__(123),
     view: __webpack_require__(37),
     isType: function isType(value) {
       if (value && value.type == 'stack') {
@@ -16550,8 +16660,8 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
     }
   }, {
     id: 'slider',
-    model: __webpack_require__(129),
-    view: __webpack_require__(130),
+    model: __webpack_require__(128),
+    view: __webpack_require__(129),
     isType: function isType(value) {
       if (value && value.type == 'slider') {
         return value;
@@ -16576,8 +16686,8 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
     }
   }, {
     id: 'radio-position',
-    model: __webpack_require__(131),
-    view: __webpack_require__(132), // 1. copy these js files and create them. ok let me know when done and i will continue helping you, ok
+    model: __webpack_require__(130),
+    view: __webpack_require__(131), // 1. copy these js files and create them. ok let me know when done and i will continue helping you, ok
     isType: function isType(value) {
       if (value && value.type == 'radio-position') {
         return value;
@@ -16593,34 +16703,32 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
       return cloned;
     }));
     return collection;
-  },
-
-
-  /**
-   * Parse a value and return an array splitted by properties
-   * @param  {string} value
-   * @return {Array}
-   * @return
-   */
-  parseValue: function parseValue(value) {
-    var _this = this;
-
-    var properties = [];
-    var values = value.split(' ');
-    values.forEach(function (value, i) {
-      var property = _this.at(i);
-      properties.push(_extends({}, property.attributes, { value: value }));
-    });
-    return properties;
-  },
-  getFullValue: function getFullValue() {
-    var result = '';
-    this.each(function (model) {
-      return result += model.getFullValue() + ' ';
-    });
-    return result.trim();
   }
-});
+}, _defineProperty(_require$Collection$e, 'deepClone', function deepClone() {
+  var collection = this.clone();
+  collection.reset(collection.map(function (model) {
+    var cloned = model.clone();
+    cloned.typeView = model.typeView;
+    return cloned;
+  }));
+  return collection;
+}), _defineProperty(_require$Collection$e, 'parseValue', function parseValue(value) {
+  var _this = this;
+
+  var properties = [];
+  var values = value.split(' ');
+  values.forEach(function (value, i) {
+    var property = _this.at(i);
+    properties.push(_extends({}, property.attributes, { value: value }));
+  });
+  return properties;
+}), _defineProperty(_require$Collection$e, 'getFullValue', function getFullValue() {
+  var result = '';
+  this.each(function (model) {
+    return result += model.getFullValue() + ' ';
+  });
+  return result.trim();
+}), _require$Collection$e));
 
 /***/ }),
 /* 15 */
@@ -16647,6 +16755,7 @@ module.exports = Backbone.View.extend({
     this.onChange = o.onChange;
     this.onInputRender = o.onInputRender || {};
     this.customValue = o.customValue || {};
+    this.properties = [];
     var coll = this.collection;
     this.listenTo(coll, 'add', this.addTo);
     this.listenTo(coll, 'reset', this.render);
@@ -16672,6 +16781,7 @@ module.exports = Backbone.View.extend({
 
     view.render();
     var el = view.el;
+    this.properties.push(view);
 
     if (frag) {
       frag.appendChild(el);
@@ -16682,6 +16792,7 @@ module.exports = Backbone.View.extend({
   render: function render() {
     var _this = this;
 
+    this.properties = [];
     var fragment = document.createDocumentFragment();
     this.collection.each(function (model) {
       return _this.add(model, fragment);
@@ -16701,15 +16812,14 @@ module.exports = Backbone.View.extend({
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({
-
   tagName: 'img',
 
   events: {
-    'dblclick': 'openModal',
-    'click': 'initResize'
+    dblclick: 'openModal',
+    click: 'initResize'
   },
 
   initialize: function initialize(o) {
@@ -16721,6 +16831,28 @@ module.exports = ComponentView.extend({
     var config = this.config;
     config.modal && (this.modal = config.modal);
     config.am && (this.am = config.am);
+    this.fetchFile();
+  },
+
+
+  /**
+   * Fetch file if exists
+   */
+  fetchFile: function fetchFile() {
+    var model = this.model;
+    var file = model.get('file');
+
+    if (file) {
+      var fu = this.em.get('AssetManager').FileUploader();
+      fu.uploadFile({
+        dataTransfer: { files: [file] }
+      }, function (res) {
+        var obj = res && res.data && res.data[0];
+        var src = obj && obj.src;
+        src && model.set({ src: src });
+      });
+      model.set('file', '');
+    }
   },
 
 
@@ -16729,7 +16861,7 @@ module.exports = ComponentView.extend({
    * @private
    * */
   updateSrc: function updateSrc() {
-    var src = this.model.get("src");
+    var src = this.model.get('src');
     var el = this.$el;
     el.attr('src', src);
     el[src ? 'removeClass' : 'addClass'](this.classEmpty);
@@ -16944,14 +17076,13 @@ module.exports = Input.extend({
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
 var Input = __webpack_require__(35);
 var Backbone = __webpack_require__(0);
 var $ = Backbone.$;
 
 module.exports = Input.extend({
-
   events: {
     'change input': 'handleChange',
     'change select': 'handleUnitChange',
@@ -17039,7 +17170,7 @@ module.exports = Input.extend({
     var model = this.model;
     this.getInputEl().value = model.get('value');
     var unitEl = this.getUnitEl();
-    unitEl && (unitEl.value = model.get('unit'));
+    unitEl && (unitEl.value = model.get('unit') || '');
   },
 
 
@@ -17076,7 +17207,7 @@ module.exports = Input.extend({
   upArrowClick: function upArrowClick() {
     var model = this.model;
     var step = model.get('step');
-    var value = model.get('value');
+    var value = parseInt(model.get('value'), 10);
     value = this.normalizeValue(value + step);
     var valid = this.validateInputValue(value);
     model.set('value', valid.value);
@@ -17090,7 +17221,7 @@ module.exports = Input.extend({
   downArrowClick: function downArrowClick() {
     var model = this.model;
     var step = model.get('step');
-    var value = model.get('value');
+    var value = parseInt(model.get('value'), 10);
     var val = this.normalizeValue(value - step);
     var valid = this.validateInputValue(val);
     model.set('value', valid.value);
@@ -17179,7 +17310,8 @@ module.exports = Input.extend({
     var force = 0;
     var opt = opts || {};
     var model = this.model;
-    var val = value !== '' ? value : model.get('defaults');
+    var defValue = ''; //model.get('defaults');
+    var val = !(0, _underscore.isUndefined)(value) ? value : defValue;
     var units = model.get('units') || [];
     var unit = model.get('unit') || units.length && units[0] || '';
     var max = model.get('max');
@@ -17199,7 +17331,7 @@ module.exports = Input.extend({
           var valCopy = val + '';
           val += ''; // Make it suitable for replace
           val = parseFloat(val.replace(',', '.'));
-          val = !isNaN(val) ? val : model.get('defaults');
+          val = !isNaN(val) ? val : defValue;
           var uN = valCopy.replace(val, '');
           // Check if exists as unit
           if (_.indexOf(units, uN) >= 0) unit = uN;
@@ -17207,9 +17339,8 @@ module.exports = Input.extend({
       }
     }
 
-    if (typeof max !== 'undefined' && max !== '') val = val > max ? max : val;
-
-    if (typeof min !== 'undefined' && min !== '') val = val < min ? min : val;
+    if (!(0, _underscore.isUndefined)(max) && max !== '') val = val > max ? max : val;
+    if (!(0, _underscore.isUndefined)(min) && min !== '') val = val < min ? min : val;
 
     return {
       force: force,
@@ -17252,6 +17383,13 @@ module.exports = PropertyView.extend({
       PropertyView.prototype.inputValueChanged.apply(this, args);
     }
   },
+  clear: function clear(e) {
+    var props = this.properties;
+    props && props.forEach(function (propView) {
+      return propView.clear();
+    });
+    PropertyView.prototype.clear.apply(this, arguments);
+  },
 
 
   /**
@@ -17261,6 +17399,7 @@ module.exports = PropertyView.extend({
     var model = this.model;
     var props = model.get('properties') || [];
     var self = this;
+    this.properties = [];
 
     if (props.length) {
       if (!this.$input) {
@@ -17285,6 +17424,7 @@ module.exports = PropertyView.extend({
         var PropertiesView = __webpack_require__(15);
         var propsView = new PropertiesView(this.getPropsConfig());
         this.$props = propsView.render().$el;
+        this.properties = propsView.properties;
         this.$el.find('#' + this.pfx + 'input-holder').append(this.$props);
       }
     }
@@ -17367,7 +17507,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Component = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'tbody',
     tagName: 'tbody',
@@ -17432,7 +17571,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Component = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'image',
     tagName: 'img',
@@ -17442,7 +17580,10 @@ module.exports = Component.extend({
     editable: 1,
     highlightable: 0,
     resizable: 1,
-    traits: ['alt']
+    traits: ['alt'],
+
+    // File to load asynchronously once the model is rendered
+    file: ''
   }),
 
   initialize: function initialize(o, opt) {
@@ -17456,9 +17597,10 @@ module.exports = Component.extend({
     }
 
     Component.prototype.initToolbar.apply(this, args);
+    var em = this.em;
 
-    if (this.sm && this.sm.get) {
-      var cmd = this.sm.get('Commands');
+    if (em) {
+      var cmd = em.get('Commands');
       var cmdName = 'image-editor';
 
       // Add Image Editor button only if the default command exists
@@ -17519,7 +17661,6 @@ module.exports = Component.extend({
     };
   }
 }, {
-
   /**
    * Detect if the passed element is a valid component.
    * In case the element is valid an object abstracted
@@ -17550,10 +17691,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
-var ToolbarView = __webpack_require__(194);
-var Toolbar = __webpack_require__(196);
+var ToolbarView = __webpack_require__(195);
+var Toolbar = __webpack_require__(197);
 var key = __webpack_require__(24);
 var $ = __webpack_require__(0).$;
 var showOffsets = void 0;
@@ -17605,7 +17746,7 @@ module.exports = {
     methods[method](body, 'mouseover', this.onHover);
     methods[method](body, 'mouseout', this.onOut);
     methods[method](body, 'click', this.onClick);
-    methods[method](win, 'scroll', this.onFrameScroll);
+    methods[method](win, 'scroll resize', this.onFrameScroll);
     methods[method](win, 'keydown', this.onKeyPress);
     em[method]('change:selectedComponent', this.onSelect, this);
   },
@@ -17644,6 +17785,7 @@ module.exports = {
   onHover: function onHover(e) {
     e.stopPropagation();
     var trg = e.target;
+    var model = $(trg).data('model');
 
     // Adjust tools scroll top
     if (!this.adjScroll) {
@@ -17651,18 +17793,12 @@ module.exports = {
       this.onFrameScroll(e);
       this.updateAttached();
     }
-    var model = $(trg).data('model');
-    if (model != 'undefined') {
 
-      if (!model.get("selectable")) {
-        var comp = model && model.parent();
-
-        // recurse through the parent() chain until a selectable parent is found
-        while (comp && !comp.get("hoverable")) {
-          comp = comp.parent();
-        }
-        trg = comp.view.el;
-      }
+    if (model && !model.get('hoverable')) {
+      var comp = model && model.parent();
+      while (comp && !comp.get('hoverable')) {
+        comp = comp.parent();
+      }comp && (trg = comp.view.el);
     }
 
     var pos = this.getElementPos(trg);
@@ -17755,18 +17891,16 @@ module.exports = {
   onClick: function onClick(e) {
     e.stopPropagation();
     var model = $(e.target).data('model');
-    if (typeof model != 'undefined') {
-      if (model.get("selectable") && !$(e.target).hasClass('flex-start')) {
-        model && this.editor.select(model);
+    var editor = this.editor;
+
+    if (model) {
+      if (model.get('selectable')) {
+        editor.select(model);
       } else {
-        var comp = model && model.parent();
-
-        // recurse through the parent() chain until a selectable parent is found
-        while (comp && !comp.get("selectable")) {
-          comp = comp.parent();
-        }
-
-        comp && editor.select(comp);
+        var parent = model.parent();
+        while (parent && !parent.get('selectable')) {
+          parent = parent.parent();
+        }parent && editor.select(parent);
       }
     }
   },
@@ -17784,7 +17918,7 @@ module.exports = {
     var config = canvas.getConfig();
     var customeLabel = config.customBadgeLabel;
     this.cacheEl = el;
-    var model = $el.data("model");
+    var model = $el.data('model');
     if (!model || !model.get('badgable')) return;
     var badge = this.getBadge();
     var badgeLabel = model.getIcon() + model.getName();
@@ -17813,7 +17947,7 @@ module.exports = {
     var $el = $(el);
     var model = $el.data('model');
 
-    if (!model || !model.get("hoverable") || model.get('status') == 'selected') {
+    if (!model || !model.get('hoverable') || model.get('status') == 'selected') {
       return;
     }
 
@@ -17895,7 +18029,6 @@ module.exports = {
           var modelStyle = modelToStyle.getStyle();
           var currentWidth = modelStyle[keyWidth] || computedStyle[keyWidth];
           var currentHeight = modelStyle[keyHeight] || computedStyle[keyHeight];
-
           resizer.startDim.w = parseFloat(currentWidth);
           resizer.startDim.h = parseFloat(currentHeight);
           showOffsets = 0;
@@ -17938,18 +18071,10 @@ module.exports = {
           }
 
           if (!onlyWidth) {
-
-            if (editor.getSelected().allow_height) {
-              style[keyHeight] = rect.h + config.unitHeight;
-              window.toastr.success('Height modifed');
-            } else {
-              $(el).css('height', rect.h + config.unitHeight);
-              window.toastr.warning('Height not modifed');
-            }
+            style[keyHeight] = rect.h + config.unitHeight;
           }
 
           modelToStyle.setStyle(style, { avoidStore: 1 });
-
           var updateEvent = 'update:component:style';
           em && em.trigger(updateEvent + ':' + keyHeight + ' ' + updateEvent + ':' + keyWidth);
 
@@ -18024,6 +18149,7 @@ module.exports = {
     var unit = 'px';
     var toolbarEl = this.canvas.getToolbarEl();
     var toolbarStyle = toolbarEl.style;
+    var origDisp = toolbarStyle.display;
     toolbarStyle.display = 'block';
     var pos = this.canvas.getTargetToElementDim(toolbarEl, el, {
       elPos: elPos,
@@ -18031,8 +18157,8 @@ module.exports = {
     });
     var leftPos = pos.left + pos.elementWidth - pos.targetWidth;
     toolbarStyle.top = pos.top + unit;
-    toolbarStyle.left = leftPos + unit;
-    toolbarStyle.display = '';
+    toolbarStyle.left = (leftPos < 0 ? 0 : leftPos) + unit;
+    toolbarStyle.display = origDisp;
   },
 
 
@@ -18166,7 +18292,7 @@ module.exports = {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
-var SelectPosition = __webpack_require__(54);
+var SelectPosition = __webpack_require__(58);
 var $ = Backbone.$;
 
 module.exports = _.extend({}, SelectPosition, {
@@ -18279,7 +18405,7 @@ module.exports = _.extend({}, SelectPosition, {
     var trgCollection = $trg.data('collection');
     var droppable = trgModel ? trgModel.get('droppable') : 1;
     opt.at = index;
-    if (trgCollection && droppable) return trgCollection.add(component, opt);else console.warn("Invalid target position");
+    if (trgCollection && droppable) return trgCollection.add(component, opt);else console.warn('Invalid target position');
   },
 
 
@@ -18713,7 +18839,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _promisePolyfill = __webpack_require__(79);
+var _promisePolyfill = __webpack_require__(78);
 
 var _promisePolyfill2 = _interopRequireDefault(_promisePolyfill);
 
@@ -18760,13 +18886,11 @@ exports.default = typeof fetch == 'function' ? fetch.bind() : function (url, opt
 
 
 module.exports = function (config) {
-
   var TEXT_NODE = 'span';
   var c = config;
   var modelAttrStart = 'data-gjs-';
 
   return {
-
     compTypes: '',
 
     /**
@@ -19849,12 +19973,12 @@ var Backbone = __webpack_require__(0);
 var Buttons = __webpack_require__(29);
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     id: '',
     content: '',
     visible: true,
-    buttons: []
+    buttons: [],
+    attributes: {}
   },
 
   initialize: function initialize(options) {
@@ -19872,10 +19996,9 @@ module.exports = Backbone.Model.extend({
 
 
 var Backbone = __webpack_require__(0);
-var Button = __webpack_require__(113);
+var Button = __webpack_require__(112);
 
 module.exports = Backbone.Collection.extend({
-
   model: Button,
 
   /**
@@ -19953,6 +20076,8 @@ module.exports = Backbone.Collection.extend({
 "use strict";
 
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var Backbone = __webpack_require__(0);
 var ButtonsView = __webpack_require__(31);
 
@@ -19984,6 +20109,9 @@ module.exports = Backbone.View.extend({
   updateContent: function updateContent() {
     this.$el.html(this.model.get('content'));
   },
+  attributes: function attributes() {
+    return this.model.get('attributes');
+  },
   initResize: function initResize() {
     var em = this.config.em;
     var editor = em ? em.get('Editor') : '';
@@ -20010,7 +20138,7 @@ module.exports = Backbone.View.extend({
         cl = resz[3];
       }
 
-      var resizer = editor.Utils.Resizer.init({
+      var resizer = editor.Utils.Resizer.init(_extends({
         tc: tc,
         cr: cr,
         bc: bc,
@@ -20020,35 +20148,53 @@ module.exports = Backbone.View.extend({
         bl: 0,
         br: 0,
         appendTo: this.el,
+        silentFrames: 1,
+        avoidContainerUpdate: 1,
         prefix: editor.getConfig().stylePrefix,
-        posFetcher: function posFetcher(el) {
+        onEnd: function onEnd() {
+          em && em.trigger('change:canvasOffset');
+        },
+
+        posFetcher: function posFetcher(el, _ref) {
+          var target = _ref.target;
+
+          var style = el.style;
+          var config = resizer.getConfig();
+          var keyWidth = config.keyWidth;
+          var keyHeight = config.keyHeight;
           var rect = el.getBoundingClientRect();
+          var forContainer = target == 'container';
+          var styleWidth = style[keyWidth];
+          var styleHeight = style[keyHeight];
+          var width = styleWidth && !forContainer ? parseFloat(styleWidth) : rect.width;
+          var height = styleHeight && !forContainer ? parseFloat(styleHeight) : rect.height;
           return {
-            left: 0, top: 0,
-            width: rect.width,
-            height: rect.height
+            left: 0,
+            top: 0,
+            width: width,
+            height: height
           };
         }
-      });
+      }, resizable));
       resizer.blur = function () {};
       resizer.focus(this.el);
     }
   },
   render: function render() {
-    var el = this.$el;
-    var pfx = this.ppfx;
-    el.attr('class', this.className + ' ' + pfx + 'one-bg');
-    this.id && el.attr('id', this.id);
+    var $el = this.$el;
+    var ppfx = this.ppfx;
+    var cls = this.className + ' ' + this.id + ' ' + ppfx + 'one-bg ' + ppfx + 'two-color';
+    $el.addClass(cls);
 
     if (this.buttons.length) {
       var buttons = new ButtonsView({
         collection: this.buttons,
         config: this.config
       });
-      el.append(buttons.render().el);
+      $el.append(buttons.render().el);
     }
 
-    el.append(this.model.get('content'));
+    $el.append(this.model.get('content'));
     return this;
   }
 });
@@ -20061,7 +20207,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */(function(_) {
 
 var Backbone = __webpack_require__(0);
-var ButtonView = __webpack_require__(115);
+var ButtonView = __webpack_require__(114);
 
 module.exports = Backbone.View.extend({
   initialize: function initialize(o) {
@@ -20070,7 +20216,7 @@ module.exports = Backbone.View.extend({
     this.pfx = this.config.stylePrefix || '';
     this.parentM = this.opt.parentM || null;
     this.listenTo(this.collection, 'add', this.addTo);
-    this.listenTo(this.collection, 'reset', this.render);
+    this.listenTo(this.collection, 'reset remove', this.render);
     this.className = this.pfx + 'buttons';
   },
 
@@ -20134,59 +20280,60 @@ module.exports = Backbone.View.extend({
 "use strict";
 
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /**
+                                                                                                                                                                                                                                                                   * With Style Manager you basically build categories (called sectors) of CSS properties which could
+                                                                                                                                                                                                                                                                   * be used to custom components and classes.
+                                                                                                                                                                                                                                                                   * You can init the editor with all sectors and properties via configuration
+                                                                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                                                                   * ```js
+                                                                                                                                                                                                                                                                   * var editor = grapesjs.init({
+                                                                                                                                                                                                                                                                   *   ...
+                                                                                                                                                                                                                                                                   *  styleManager: {...} // Check below for the possible properties
+                                                                                                                                                                                                                                                                   *   ...
+                                                                                                                                                                                                                                                                   * });
+                                                                                                                                                                                                                                                                   * ```
+                                                                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                                                                   * Before using methods you should get first the module from the editor instance, in this way:
+                                                                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                                                                   * ```js
+                                                                                                                                                                                                                                                                   * var styleManager = editor.StyleManager;
+                                                                                                                                                                                                                                                                   * ```
+                                                                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                                                                   * @module StyleManager
+                                                                                                                                                                                                                                                                   * @param {Object} config Configurations
+                                                                                                                                                                                                                                                                   * @param {Array<Object>} [config.sectors=[]] Array of possible sectors
+                                                                                                                                                                                                                                                                   * @example
+                                                                                                                                                                                                                                                                   * ...
+                                                                                                                                                                                                                                                                   * styleManager: {
+                                                                                                                                                                                                                                                                   *    sectors: [{
+                                                                                                                                                                                                                                                                   *      id: 'dim',
+                                                                                                                                                                                                                                                                   *      name: 'Dimension',
+                                                                                                                                                                                                                                                                   *      properties: [{
+                                                                                                                                                                                                                                                                   *        name: 'Width',
+                                                                                                                                                                                                                                                                   *        property: 'width',
+                                                                                                                                                                                                                                                                   *        type: 'integer',
+                                                                                                                                                                                                                                                                   *        units: ['px', '%'],
+                                                                                                                                                                                                                                                                   *        defaults: 'auto',
+                                                                                                                                                                                                                                                                   *        min: 0,
+                                                                                                                                                                                                                                                                            }],
+                                                                                                                                                                                                                                                                   *     }],
+                                                                                                                                                                                                                                                                   * }
+                                                                                                                                                                                                                                                                   * ...
+                                                                                                                                                                                                                                                                   */
 
-/**
- * With Style Manager you basically build categories (called sectors) of CSS properties which could
- * be used to custom components and classes.
- * You can init the editor with all sectors and properties via configuration
- *
- * ```js
- * var editor = grapesjs.init({
- *   ...
- *  styleManager: {...} // Check below for the possible properties
- *   ...
- * });
- * ```
- *
- * Before using methods you should get first the module from the editor instance, in this way:
- *
- * ```js
- * var styleManager = editor.StyleManager;
- * ```
- *
- * @module StyleManager
- * @param {Object} config Configurations
- * @param {Array<Object>} [config.sectors=[]] Array of possible sectors
- * @example
- * ...
- * styleManager: {
- *    sectors: [{
- *      id: 'dim',
- *      name: 'Dimension',
- *      properties: [{
- *        name: 'Width',
- *        property: 'width',
- *        type: 'integer',
- *        units: ['px', '%'],
- *        defaults: 'auto',
- *        min: 0,
-          }],
- *     }],
- * }
- * ...
- */
+
+var _underscore = __webpack_require__(1);
+
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(120),
-      Sectors = __webpack_require__(121),
+      defaults = __webpack_require__(119),
+      Sectors = __webpack_require__(120),
       Properties = __webpack_require__(14),
-      SectorsView = __webpack_require__(134);
+      SectorsView = __webpack_require__(133);
   var properties = void 0;
   var sectors, SectView;
 
   return {
-
     /**
      * Name of the module
      * @type {String}
@@ -20225,6 +20372,14 @@ module.exports = function () {
         config: c
       });
       return this;
+    },
+    postRender: function postRender() {
+      var elTo = this.getConfig().appendTo;
+
+      if (elTo) {
+        var el = (0, _underscore.isElement)(elTo) ? elTo : document.querySelector(elTo);
+        el.appendChild(this.render());
+      }
     },
 
 
@@ -20400,20 +20555,35 @@ module.exports = function () {
 
       if (em) {
         var config = em.getConfig();
+        var um = em.get('UndoManager');
         var cssC = em.get('CssComposer');
         var state = !config.devicePreviewMode ? model.get('state') : '';
         var valid = classes.getStyleable();
         var hasClasses = valid.length;
         var opts = { state: state };
+        var rule = void 0;
 
         if (hasClasses) {
           var deviceW = em.getCurrentMedia();
-          var CssRule = cssC.get(valid, state, deviceW);
-          if (CssRule) return CssRule;
+          rule = cssC.get(valid, state, deviceW);
+
+          if (!rule) {
+            // I stop undo manager here as after adding the CSSRule (generally after
+            // selecting the component) and calling undo() it will remove the rule from
+            // the collection, therefore updating it in style manager will not affect it
+            // #268
+            um.stop();
+            rule = cssC.add(valid, state, deviceW);
+            rule.setStyle(model.getStyle());
+            model.setStyle({});
+            um.start();
+          }
         } else if (config.avoidInlineStyle) {
-          var rule = cssC.getIdRule(id, opts);
-          return rule ? rule : cssC.setIdRule(id, {}, opts);
+          rule = cssC.getIdRule(id, opts);
+          !rule && (rule = cssC.setIdRule(id, {}, opts));
         }
+
+        rule && (model = rule);
       }
 
       return model;
@@ -20679,2221 +20849,2212 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 // License: MIT
 
 (function (factory) {
-    factory(Backbone.$);
+  factory(Backbone.$);
 })(function ($, undefined) {
-    "use strict";
+  'use strict';
 
-    var defaultOpts = {
+  var defaultOpts = {
+    // Callbacks
+    beforeShow: noop,
+    move: noop,
+    change: noop,
+    show: noop,
+    hide: noop,
 
-        // Callbacks
-        beforeShow: noop,
-        move: noop,
-        change: noop,
-        show: noop,
-        hide: noop,
-
-        // Options
-        color: false,
-        flat: false,
-        showInput: false,
-        allowEmpty: false,
-        showButtons: true,
-        clickoutFiresChange: true,
-        showInitial: false,
-        showPalette: false,
-        showPaletteOnly: false,
-        hideAfterPaletteSelect: false,
-        togglePaletteOnly: false,
-        showSelectionPalette: true,
-        localStorageKey: false,
-        appendTo: "body",
-        maxSelectionSize: 7,
-        cancelText: "cancel",
-        chooseText: "choose",
-        togglePaletteMoreText: "more",
-        togglePaletteLessText: "less",
-        clearText: "Clear Color Selection",
-        noColorSelectedText: "No Color Selected",
-        preferredFormat: false,
-        className: "", // Deprecated - use containerClassName and replacerClassName instead.
-        containerClassName: "",
-        replacerClassName: "",
-        showAlpha: false,
-        theme: "sp-light",
-        palette: [["#ffffff", "#000000", "#ff0000", "#ff8000", "#ffff00", "#008000", "#0000ff", "#4b0082", "#9400d3"]],
-        selectionPalette: [],
-        disabled: false,
-        offset: null
-    },
-        spectrums = [],
-        IE = !!/msie/i.exec(window.navigator.userAgent),
-        rgbaSupport = function () {
-        function contains(str, substr) {
-            return !!~('' + str).indexOf(substr);
-        }
-
-        var elem = document.createElement('div');
-        var style = elem.style;
-        style.cssText = 'background-color:rgba(0,0,0,.5)';
-        return contains(style.backgroundColor, 'rgba') || contains(style.backgroundColor, 'hsla');
-    }(),
-        replaceInput = ["<div class='sp-replacer'>", "<div class='sp-preview'><div class='sp-preview-inner'></div></div>", "<div class='sp-dd'>&#9660;</div>", "</div>"].join(''),
-        markup = function () {
-
-        // IE does not support gradients with multiple stops, so we need to simulate
-        //  that for the rainbow slider with 8 divs that each have a single gradient
-        var gradientFix = "";
-        if (IE) {
-            for (var i = 1; i <= 6; i++) {
-                gradientFix += "<div class='sp-" + i + "'></div>";
-            }
-        }
-
-        return ["<div class='sp-container sp-hidden'>", "<div class='sp-palette-container'>", "<div class='sp-palette sp-thumb sp-cf'></div>", "<div class='sp-palette-button-container sp-cf'>", "<button type='button' class='sp-palette-toggle'></button>", "</div>", "</div>", "<div class='sp-picker-container'>", "<div class='sp-top sp-cf'>", "<div class='sp-fill'></div>", "<div class='sp-top-inner'>", "<div class='sp-color'>", "<div class='sp-sat'>", "<div class='sp-val'>", "<div class='sp-dragger'></div>", "</div>", "</div>", "</div>", "<div class='sp-clear sp-clear-display'>", "</div>", "<div class='sp-hue'>", "<div class='sp-slider'></div>", gradientFix, "</div>", "</div>", "<div class='sp-alpha'><div class='sp-alpha-inner'><div class='sp-alpha-handle'></div></div></div>", "</div>", "<div class='sp-input-container sp-cf'>", "<input class='sp-input' type='text' spellcheck='false'  />", "</div>", "<div class='sp-initial sp-thumb sp-cf'></div>", "<div class='sp-button-container sp-cf'>", "<a class='sp-cancel' href='#'></a>", "<button type='button' class='sp-choose'></button>", "</div>", "</div>", "</div>"].join("");
-    }();
-
-    function paletteTemplate(p, color, className, opts) {
-        var html = [];
-        for (var i = 0; i < p.length; i++) {
-            var current = p[i];
-            if (current) {
-                var tiny = tinycolor(current);
-                var c = tiny.toHsl().l < 0.5 ? "sp-thumb-el sp-thumb-dark" : "sp-thumb-el sp-thumb-light";
-                c += tinycolor.equals(color, current) ? " sp-thumb-active" : "";
-                var formattedString = tiny.toString(opts.preferredFormat || "rgb");
-                var swatchStyle = rgbaSupport ? "background-color:" + tiny.toRgbString() : "filter:" + tiny.toFilter();
-                html.push('<span title="' + formattedString + '" data-color="' + tiny.toRgbString() + '" class="' + c + '"><span class="sp-thumb-inner" style="' + swatchStyle + ';"></span></span>');
-            } else {
-                var cls = 'sp-clear-display';
-                html.push($('<div />').append($('<span data-color="" style="background-color:transparent;" class="' + cls + '"></span>').attr('title', opts.noColorSelectedText)).html());
-            }
-        }
-        return "<div class='sp-cf " + className + "'>" + html.join('') + "</div>";
+    // Options
+    color: false,
+    flat: false,
+    showInput: false,
+    allowEmpty: false,
+    showButtons: true,
+    clickoutFiresChange: true,
+    showInitial: false,
+    showPalette: false,
+    showPaletteOnly: false,
+    hideAfterPaletteSelect: false,
+    togglePaletteOnly: false,
+    showSelectionPalette: true,
+    localStorageKey: false,
+    appendTo: 'body',
+    maxSelectionSize: 7,
+    cancelText: 'cancel',
+    chooseText: 'choose',
+    togglePaletteMoreText: 'more',
+    togglePaletteLessText: 'less',
+    clearText: 'Clear Color Selection',
+    noColorSelectedText: 'No Color Selected',
+    preferredFormat: false,
+    className: '', // Deprecated - use containerClassName and replacerClassName instead.
+    containerClassName: '',
+    replacerClassName: '',
+    showAlpha: false,
+    theme: 'sp-light',
+    palette: [['#ffffff', '#000000', '#ff0000', '#ff8000', '#ffff00', '#008000', '#0000ff', '#4b0082', '#9400d3']],
+    selectionPalette: [],
+    disabled: false,
+    offset: null
+  },
+      spectrums = [],
+      IE = !!/msie/i.exec(window.navigator.userAgent),
+      rgbaSupport = function () {
+    function contains(str, substr) {
+      return !!~('' + str).indexOf(substr);
     }
 
-    function hideAll() {
-        for (var i = 0; i < spectrums.length; i++) {
-            if (spectrums[i]) {
-                spectrums[i].hide();
-            }
-        }
+    var elem = document.createElement('div');
+    var style = elem.style;
+    style.cssText = 'background-color:rgba(0,0,0,.5)';
+    return contains(style.backgroundColor, 'rgba') || contains(style.backgroundColor, 'hsla');
+  }(),
+      replaceInput = ["<div class='sp-replacer'>", "<div class='sp-preview'><div class='sp-preview-inner'></div></div>", "<div class='sp-dd'>&#9660;</div>", '</div>'].join(''),
+      markup = function () {
+    // IE does not support gradients with multiple stops, so we need to simulate
+    //  that for the rainbow slider with 8 divs that each have a single gradient
+    var gradientFix = '';
+    if (IE) {
+      for (var i = 1; i <= 6; i++) {
+        gradientFix += "<div class='sp-" + i + "'></div>";
+      }
     }
 
-    function instanceOptions(o, callbackContext) {
-        var opts = $.extend({}, defaultOpts, o);
-        opts.callbacks = {
-            'move': bind(opts.move, callbackContext),
-            'change': bind(opts.change, callbackContext),
-            'show': bind(opts.show, callbackContext),
-            'hide': bind(opts.hide, callbackContext),
-            'beforeShow': bind(opts.beforeShow, callbackContext)
-        };
-        return opts;
+    return ["<div class='sp-container sp-hidden'>", "<div class='sp-palette-container'>", "<div class='sp-palette sp-thumb sp-cf'></div>", "<div class='sp-palette-button-container sp-cf'>", "<button type='button' class='sp-palette-toggle'></button>", '</div>', '</div>', "<div class='sp-picker-container'>", "<div class='sp-top sp-cf'>", "<div class='sp-fill'></div>", "<div class='sp-top-inner'>", "<div class='sp-color'>", "<div class='sp-sat'>", "<div class='sp-val'>", "<div class='sp-dragger'></div>", '</div>', '</div>', '</div>', "<div class='sp-clear sp-clear-display'>", '</div>', "<div class='sp-hue'>", "<div class='sp-slider'></div>", gradientFix, '</div>', '</div>', "<div class='sp-alpha'><div class='sp-alpha-inner'><div class='sp-alpha-handle'></div></div></div>", '</div>', "<div class='sp-input-container sp-cf'>", "<input class='sp-input' type='text' spellcheck='false'  />", '</div>', "<div class='sp-initial sp-thumb sp-cf'></div>", "<div class='sp-button-container sp-cf'>", "<a class='sp-cancel' href='#'></a>", "<button type='button' class='sp-choose'></button>", '</div>', '</div>', '</div>'].join('');
+  }();
+
+  function paletteTemplate(p, color, className, opts) {
+    var html = [];
+    for (var i = 0; i < p.length; i++) {
+      var current = p[i];
+      if (current) {
+        var tiny = tinycolor(current);
+        var c = tiny.toHsl().l < 0.5 ? 'sp-thumb-el sp-thumb-dark' : 'sp-thumb-el sp-thumb-light';
+        c += tinycolor.equals(color, current) ? ' sp-thumb-active' : '';
+        var formattedString = tiny.toString(opts.preferredFormat || 'rgb');
+        var swatchStyle = rgbaSupport ? 'background-color:' + tiny.toRgbString() : 'filter:' + tiny.toFilter();
+        html.push('<span title="' + formattedString + '" data-color="' + tiny.toRgbString() + '" class="' + c + '"><span class="sp-thumb-inner" style="' + swatchStyle + ';"></span></span>');
+      } else {
+        var cls = 'sp-clear-display';
+        html.push($('<div />').append($('<span data-color="" style="background-color:transparent;" class="' + cls + '"></span>').attr('title', opts.noColorSelectedText)).html());
+      }
+    }
+    return "<div class='sp-cf " + className + "'>" + html.join('') + '</div>';
+  }
+
+  function hideAll() {
+    for (var i = 0; i < spectrums.length; i++) {
+      if (spectrums[i]) {
+        spectrums[i].hide();
+      }
+    }
+  }
+
+  function instanceOptions(o, callbackContext) {
+    var opts = $.extend({}, defaultOpts, o);
+    opts.callbacks = {
+      move: bind(opts.move, callbackContext),
+      change: bind(opts.change, callbackContext),
+      show: bind(opts.show, callbackContext),
+      hide: bind(opts.hide, callbackContext),
+      beforeShow: bind(opts.beforeShow, callbackContext)
+    };
+    return opts;
+  }
+
+  function spectrum(element, o) {
+    var opts = instanceOptions(o, element),
+        flat = opts.flat,
+        showSelectionPalette = opts.showSelectionPalette,
+        localStorageKey = opts.localStorageKey,
+        theme = opts.theme,
+        callbacks = opts.callbacks,
+        resize = throttle(reflow, 10),
+        visible = false,
+        isDragging = false,
+        dragWidth = 0,
+        dragHeight = 0,
+        dragHelperHeight = 0,
+        slideHeight = 0,
+        slideWidth = 0,
+        alphaWidth = 0,
+        alphaSlideHelperWidth = 0,
+        slideHelperHeight = 0,
+        currentHue = 0,
+        currentSaturation = 0,
+        currentValue = 0,
+        currentAlpha = 1,
+        palette = [],
+        paletteArray = [],
+        paletteLookup = {},
+        selectionPalette = opts.selectionPalette.slice(0),
+        maxSelectionSize = opts.maxSelectionSize,
+        draggingClass = 'sp-dragging',
+        shiftMovementDirection = null;
+
+    var doc = element.ownerDocument,
+        body = doc.body,
+        boundElement = $(element),
+        disabled = false,
+        container = $(markup, doc).addClass(theme),
+        pickerContainer = container.find('.sp-picker-container'),
+        dragger = container.find('.sp-color'),
+        dragHelper = container.find('.sp-dragger'),
+        slider = container.find('.sp-hue'),
+        slideHelper = container.find('.sp-slider'),
+        alphaSliderInner = container.find('.sp-alpha-inner'),
+        alphaSlider = container.find('.sp-alpha'),
+        alphaSlideHelper = container.find('.sp-alpha-handle'),
+        textInput = container.find('.sp-input'),
+        paletteContainer = container.find('.sp-palette'),
+        initialColorContainer = container.find('.sp-initial'),
+        cancelButton = container.find('.sp-cancel'),
+        clearButton = container.find('.sp-clear'),
+        chooseButton = container.find('.sp-choose'),
+        toggleButton = container.find('.sp-palette-toggle'),
+        isInput = boundElement.is('input'),
+        isInputTypeColor = isInput && boundElement.attr('type') === 'color' && inputTypeColorSupport(),
+        shouldReplace = isInput && !flat,
+        replacer = shouldReplace ? $(replaceInput).addClass(theme).addClass(opts.className).addClass(opts.replacerClassName) : $([]),
+        offsetElement = shouldReplace ? replacer : boundElement,
+        previewElement = replacer.find('.sp-preview-inner'),
+        initialColor = opts.color || isInput && boundElement.val(),
+        colorOnShow = false,
+        currentPreferredFormat = opts.preferredFormat,
+        clickoutFiresChange = !opts.showButtons || opts.clickoutFiresChange,
+        isEmpty = !initialColor,
+        allowEmpty = opts.allowEmpty && !isInputTypeColor;
+
+    function applyOptions() {
+      if (opts.showPaletteOnly) {
+        opts.showPalette = true;
+      }
+
+      toggleButton.text(opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText);
+
+      if (opts.palette) {
+        palette = opts.palette.slice(0);
+        paletteArray = $.isArray(palette[0]) ? palette : [palette];
+        paletteLookup = {};
+        for (var i = 0; i < paletteArray.length; i++) {
+          for (var j = 0; j < paletteArray[i].length; j++) {
+            var rgb = tinycolor(paletteArray[i][j]).toRgbString();
+            paletteLookup[rgb] = true;
+          }
+        }
+      }
+
+      container.toggleClass('sp-flat', flat);
+      container.toggleClass('sp-input-disabled', !opts.showInput);
+      container.toggleClass('sp-alpha-enabled', opts.showAlpha);
+      container.toggleClass('sp-clear-enabled', allowEmpty);
+      container.toggleClass('sp-buttons-disabled', !opts.showButtons);
+      container.toggleClass('sp-palette-buttons-disabled', !opts.togglePaletteOnly);
+      container.toggleClass('sp-palette-disabled', !opts.showPalette);
+      container.toggleClass('sp-palette-only', opts.showPaletteOnly);
+      container.toggleClass('sp-initial-disabled', !opts.showInitial);
+      container.addClass(opts.className).addClass(opts.containerClassName);
+
+      reflow();
     }
 
-    function spectrum(element, o) {
+    function initialize() {
+      if (IE) {
+        container.find('*:not(input)').attr('unselectable', 'on');
+      }
 
-        var opts = instanceOptions(o, element),
-            flat = opts.flat,
-            showSelectionPalette = opts.showSelectionPalette,
-            localStorageKey = opts.localStorageKey,
-            theme = opts.theme,
-            callbacks = opts.callbacks,
-            resize = throttle(reflow, 10),
-            visible = false,
-            isDragging = false,
-            dragWidth = 0,
-            dragHeight = 0,
-            dragHelperHeight = 0,
-            slideHeight = 0,
-            slideWidth = 0,
-            alphaWidth = 0,
-            alphaSlideHelperWidth = 0,
-            slideHelperHeight = 0,
-            currentHue = 0,
-            currentSaturation = 0,
-            currentValue = 0,
-            currentAlpha = 1,
-            palette = [],
-            paletteArray = [],
-            paletteLookup = {},
-            selectionPalette = opts.selectionPalette.slice(0),
-            maxSelectionSize = opts.maxSelectionSize,
-            draggingClass = "sp-dragging",
-            shiftMovementDirection = null;
+      applyOptions();
 
-        var doc = element.ownerDocument,
-            body = doc.body,
-            boundElement = $(element),
-            disabled = false,
-            container = $(markup, doc).addClass(theme),
-            pickerContainer = container.find(".sp-picker-container"),
-            dragger = container.find(".sp-color"),
-            dragHelper = container.find(".sp-dragger"),
-            slider = container.find(".sp-hue"),
-            slideHelper = container.find(".sp-slider"),
-            alphaSliderInner = container.find(".sp-alpha-inner"),
-            alphaSlider = container.find(".sp-alpha"),
-            alphaSlideHelper = container.find(".sp-alpha-handle"),
-            textInput = container.find(".sp-input"),
-            paletteContainer = container.find(".sp-palette"),
-            initialColorContainer = container.find(".sp-initial"),
-            cancelButton = container.find(".sp-cancel"),
-            clearButton = container.find(".sp-clear"),
-            chooseButton = container.find(".sp-choose"),
-            toggleButton = container.find(".sp-palette-toggle"),
-            isInput = boundElement.is("input"),
-            isInputTypeColor = isInput && boundElement.attr("type") === "color" && inputTypeColorSupport(),
-            shouldReplace = isInput && !flat,
-            replacer = shouldReplace ? $(replaceInput).addClass(theme).addClass(opts.className).addClass(opts.replacerClassName) : $([]),
-            offsetElement = shouldReplace ? replacer : boundElement,
-            previewElement = replacer.find(".sp-preview-inner"),
-            initialColor = opts.color || isInput && boundElement.val(),
-            colorOnShow = false,
-            currentPreferredFormat = opts.preferredFormat,
-            clickoutFiresChange = !opts.showButtons || opts.clickoutFiresChange,
-            isEmpty = !initialColor,
-            allowEmpty = opts.allowEmpty && !isInputTypeColor;
+      if (shouldReplace) {
+        boundElement.after(replacer).hide();
+      }
 
-        function applyOptions() {
+      if (!allowEmpty) {
+        clearButton.hide();
+      }
 
-            if (opts.showPaletteOnly) {
-                opts.showPalette = true;
-            }
-
-            toggleButton.text(opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText);
-
-            if (opts.palette) {
-                palette = opts.palette.slice(0);
-                paletteArray = $.isArray(palette[0]) ? palette : [palette];
-                paletteLookup = {};
-                for (var i = 0; i < paletteArray.length; i++) {
-                    for (var j = 0; j < paletteArray[i].length; j++) {
-                        var rgb = tinycolor(paletteArray[i][j]).toRgbString();
-                        paletteLookup[rgb] = true;
-                    }
-                }
-            }
-
-            container.toggleClass("sp-flat", flat);
-            container.toggleClass("sp-input-disabled", !opts.showInput);
-            container.toggleClass("sp-alpha-enabled", opts.showAlpha);
-            container.toggleClass("sp-clear-enabled", allowEmpty);
-            container.toggleClass("sp-buttons-disabled", !opts.showButtons);
-            container.toggleClass("sp-palette-buttons-disabled", !opts.togglePaletteOnly);
-            container.toggleClass("sp-palette-disabled", !opts.showPalette);
-            container.toggleClass("sp-palette-only", opts.showPaletteOnly);
-            container.toggleClass("sp-initial-disabled", !opts.showInitial);
-            container.addClass(opts.className).addClass(opts.containerClassName);
-
-            reflow();
+      if (flat) {
+        boundElement.after(container).hide();
+      } else {
+        var appendTo = opts.appendTo === 'parent' ? boundElement.parent() : $(opts.appendTo);
+        if (appendTo.length !== 1) {
+          appendTo = $('body');
         }
 
-        function initialize() {
+        appendTo.append(container);
+      }
 
-            if (IE) {
-                container.find("*:not(input)").attr("unselectable", "on");
-            }
+      updateSelectionPaletteFromStorage();
 
-            applyOptions();
-
-            if (shouldReplace) {
-                boundElement.after(replacer).hide();
-            }
-
-            if (!allowEmpty) {
-                clearButton.hide();
-            }
-
-            if (flat) {
-                boundElement.after(container).hide();
-            } else {
-
-                var appendTo = opts.appendTo === "parent" ? boundElement.parent() : $(opts.appendTo);
-                if (appendTo.length !== 1) {
-                    appendTo = $("body");
-                }
-
-                appendTo.append(container);
-            }
-
-            updateSelectionPaletteFromStorage();
-
-            offsetElement.bind("click.spectrum touchstart.spectrum", function (e) {
-
-                if (!disabled) {
-                    toggle();
-                }
-
-                e.stopPropagation();
-
-                if (!$(e.target).is("input")) {
-                    e.preventDefault();
-                }
-            });
-
-            if (boundElement.is(":disabled") || opts.disabled === true) {
-                disable();
-            }
-
-            // Prevent clicks from bubbling up to document.  This would cause it to be hidden.
-            container.click(stopPropagation);
-
-            // Handle user typed input
-            textInput.change(setFromTextInput);
-            textInput.bind("paste", function () {
-                setTimeout(setFromTextInput, 1);
-            });
-            textInput.keydown(function (e) {
-                if (e.keyCode == 13) {
-                    setFromTextInput();
-                }
-            });
-
-            cancelButton.text(opts.cancelText);
-            cancelButton.bind("click.spectrum", function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                revert();
-                hide();
-            });
-
-            clearButton.attr("title", opts.clearText);
-            clearButton.bind("click.spectrum", function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                isEmpty = true;
-                move();
-
-                if (flat) {
-                    //for the flat style, this is a change event
-                    updateOriginalInput(true);
-                }
-            });
-
-            chooseButton.text(opts.chooseText);
-            chooseButton.bind("click.spectrum", function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-
-                if (IE && textInput.is(":focus")) {
-                    textInput.trigger('change');
-                }
-
-                if (isValid()) {
-                    updateOriginalInput(true);
-                    hide();
-                }
-            });
-
-            toggleButton.text(opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText);
-            toggleButton.bind("click.spectrum", function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-
-                opts.showPaletteOnly = !opts.showPaletteOnly;
-
-                // To make sure the Picker area is drawn on the right, next to the
-                // Palette area (and not below the palette), first move the Palette
-                // to the left to make space for the picker, plus 5px extra.
-                // The 'applyOptions' function puts the whole container back into place
-                // and takes care of the button-text and the sp-palette-only CSS class.
-                if (!opts.showPaletteOnly && !flat) {
-                    container.css('left', '-=' + (pickerContainer.outerWidth(true) + 5));
-                }
-                applyOptions();
-            });
-
-            draggable(alphaSlider, function (dragX, dragY, e) {
-                currentAlpha = dragX / alphaWidth;
-                isEmpty = false;
-                if (e.shiftKey) {
-                    currentAlpha = Math.round(currentAlpha * 10) / 10;
-                }
-
-                move();
-            }, dragStart, dragStop);
-
-            draggable(slider, function (dragX, dragY) {
-                currentHue = parseFloat(dragY / slideHeight);
-                isEmpty = false;
-                if (!opts.showAlpha) {
-                    currentAlpha = 1;
-                }
-                move();
-            }, dragStart, dragStop);
-
-            draggable(dragger, function (dragX, dragY, e) {
-
-                // shift+drag should snap the movement to either the x or y axis.
-                if (!e.shiftKey) {
-                    shiftMovementDirection = null;
-                } else if (!shiftMovementDirection) {
-                    var oldDragX = currentSaturation * dragWidth;
-                    var oldDragY = dragHeight - currentValue * dragHeight;
-                    var furtherFromX = Math.abs(dragX - oldDragX) > Math.abs(dragY - oldDragY);
-
-                    shiftMovementDirection = furtherFromX ? "x" : "y";
-                }
-
-                var setSaturation = !shiftMovementDirection || shiftMovementDirection === "x";
-                var setValue = !shiftMovementDirection || shiftMovementDirection === "y";
-
-                if (setSaturation) {
-                    currentSaturation = parseFloat(dragX / dragWidth);
-                }
-                if (setValue) {
-                    currentValue = parseFloat((dragHeight - dragY) / dragHeight);
-                }
-
-                isEmpty = false;
-                if (!opts.showAlpha) {
-                    currentAlpha = 1;
-                }
-
-                move();
-            }, dragStart, dragStop);
-
-            if (!!initialColor) {
-                _set(initialColor);
-
-                // In case color was black - update the preview UI and set the format
-                // since the set function will not run (default color is black).
-                updateUI();
-                currentPreferredFormat = opts.preferredFormat || tinycolor(initialColor).format;
-
-                addColorToSelectionPalette(initialColor);
-            } else {
-                updateUI();
-            }
-
-            if (flat) {
-                show();
-            }
-
-            function paletteElementClick(e) {
-                if (e.data && e.data.ignore) {
-                    _set($(e.target).closest(".sp-thumb-el").data("color"));
-                    move();
-                } else {
-                    _set($(e.target).closest(".sp-thumb-el").data("color"));
-                    move();
-                    updateOriginalInput(true);
-                    if (opts.hideAfterPaletteSelect) {
-                        hide();
-                    }
-                }
-
-                return false;
-            }
-
-            var paletteEvent = IE ? "mousedown.spectrum" : "click.spectrum touchstart.spectrum";
-            paletteContainer.delegate(".sp-thumb-el", paletteEvent, paletteElementClick);
-            initialColorContainer.delegate(".sp-thumb-el:nth-child(1)", paletteEvent, { ignore: true }, paletteElementClick);
+      offsetElement.bind('click.spectrum touchstart.spectrum', function (e) {
+        if (!disabled) {
+          toggle();
         }
 
-        function updateSelectionPaletteFromStorage() {
-
-            if (localStorageKey && window.localStorage) {
-
-                // Migrate old palettes over to new format.  May want to remove this eventually.
-                try {
-                    var oldPalette = window.localStorage[localStorageKey].split(",#");
-                    if (oldPalette.length > 1) {
-                        delete window.localStorage[localStorageKey];
-                        $.each(oldPalette, function (i, c) {
-                            addColorToSelectionPalette(c);
-                        });
-                    }
-                } catch (e) {}
-
-                try {
-                    selectionPalette = window.localStorage[localStorageKey].split(";");
-                } catch (e) {}
-            }
-        }
-
-        function addColorToSelectionPalette(color) {
-            if (showSelectionPalette) {
-                var rgb = tinycolor(color).toRgbString();
-                if (!paletteLookup[rgb] && $.inArray(rgb, selectionPalette) === -1) {
-                    selectionPalette.push(rgb);
-                    while (selectionPalette.length > maxSelectionSize) {
-                        selectionPalette.shift();
-                    }
-                }
-
-                if (localStorageKey && window.localStorage) {
-                    try {
-                        window.localStorage[localStorageKey] = selectionPalette.join(";");
-                    } catch (e) {}
-                }
-            }
-        }
-
-        function getUniqueSelectionPalette() {
-            var unique = [];
-            if (opts.showPalette) {
-                for (var i = 0; i < selectionPalette.length; i++) {
-                    var rgb = tinycolor(selectionPalette[i]).toRgbString();
-
-                    if (!paletteLookup[rgb]) {
-                        unique.push(selectionPalette[i]);
-                    }
-                }
-            }
-
-            return unique.reverse().slice(0, opts.maxSelectionSize);
-        }
-
-        function drawPalette() {
-
-            var currentColor = get();
-
-            var html = $.map(paletteArray, function (palette, i) {
-                return paletteTemplate(palette, currentColor, "sp-palette-row sp-palette-row-" + i, opts);
-            });
-
-            updateSelectionPaletteFromStorage();
-
-            if (selectionPalette) {
-                html.push(paletteTemplate(getUniqueSelectionPalette(), currentColor, "sp-palette-row sp-palette-row-selection", opts));
-            }
-
-            paletteContainer.html(html.join(""));
-        }
-
-        function drawInitial() {
-            if (opts.showInitial) {
-                var initial = colorOnShow;
-                var current = get();
-                initialColorContainer.html(paletteTemplate([initial, current], current, "sp-palette-row-initial", opts));
-            }
-        }
-
-        function dragStart() {
-            if (dragHeight <= 0 || dragWidth <= 0 || slideHeight <= 0) {
-                reflow();
-            }
-            isDragging = true;
-            container.addClass(draggingClass);
-            shiftMovementDirection = null;
-            boundElement.trigger('dragstart.spectrum', [get()]);
-        }
-
-        function dragStop() {
-            isDragging = false;
-            container.removeClass(draggingClass);
-            boundElement.trigger('dragstop.spectrum', [get()]);
-        }
-
-        function setFromTextInput() {
-
-            var value = textInput.val();
-
-            if ((value === null || value === "") && allowEmpty) {
-                _set(null);
-                updateOriginalInput(true);
-            } else {
-                var tiny = tinycolor(value);
-                if (tiny.isValid()) {
-                    _set(tiny);
-                    updateOriginalInput(true);
-                } else {
-                    textInput.addClass("sp-validation-error");
-                }
-            }
-        }
-
-        function toggle() {
-            if (visible) {
-                hide();
-            } else {
-                show();
-            }
-        }
-
-        function show() {
-            var event = $.Event('beforeShow.spectrum');
-
-            if (visible) {
-                reflow();
-                return;
-            }
-
-            boundElement.trigger(event, [get()]);
-
-            if (callbacks.beforeShow(get()) === false || event.isDefaultPrevented()) {
-                return;
-            }
-
-            hideAll();
-            visible = true;
-
-            var $doc = $(doc);
-            $doc.bind("keydown.spectrum", onkeydown);
-            $doc.bind("click.spectrum", clickout);
-            $(window).bind("resize.spectrum", resize);
-            replacer.addClass("sp-active");
-            container.removeClass("sp-hidden");
-
-            reflow();
-            updateUI();
-
-            colorOnShow = get();
-
-            drawInitial();
-            callbacks.show(colorOnShow);
-            boundElement.trigger('show.spectrum', [colorOnShow]);
-        }
-
-        function onkeydown(e) {
-            // Close on ESC
-            if (e.keyCode === 27) {
-                hide();
-            }
-        }
-
-        function clickout(e) {
-            // Return on right click.
-            if (e.button == 2) {
-                return;
-            }
-
-            // If a drag event was happening during the mouseup, don't hide
-            // on click.
-            if (isDragging) {
-                return;
-            }
-
-            if (clickoutFiresChange) {
-                updateOriginalInput(true);
-            } else {
-                revert();
-            }
-            hide();
-        }
-
-        function hide() {
-            // Return if hiding is unnecessary
-            if (!visible || flat) {
-                return;
-            }
-            visible = false;
-
-            $(doc).unbind("keydown.spectrum", onkeydown);
-            $(doc).unbind("click.spectrum", clickout);
-            $(window).unbind("resize.spectrum", resize);
-
-            replacer.removeClass("sp-active");
-            container.addClass("sp-hidden");
-
-            callbacks.hide(get());
-            boundElement.trigger('hide.spectrum', [get()]);
-        }
-
-        function revert() {
-            _set(colorOnShow, true);
-        }
-
-        function _set(color, ignoreFormatChange) {
-            if (tinycolor.equals(color, get())) {
-                // Update UI just in case a validation error needs
-                // to be cleared.
-                updateUI();
-                return;
-            }
-
-            var newColor, newHsv;
-            if (!color && allowEmpty) {
-                isEmpty = true;
-            } else {
-                isEmpty = false;
-                newColor = tinycolor(color);
-                newHsv = newColor.toHsv();
-
-                currentHue = newHsv.h % 360 / 360;
-                currentSaturation = newHsv.s;
-                currentValue = newHsv.v;
-                currentAlpha = newHsv.a;
-            }
-            updateUI();
-
-            if (newColor && newColor.isValid() && !ignoreFormatChange) {
-                currentPreferredFormat = opts.preferredFormat || newColor.getFormat();
-            }
-        }
-
-        function get(opts) {
-            opts = opts || {};
-
-            if (allowEmpty && isEmpty) {
-                return null;
-            }
-
-            return tinycolor.fromRatio({
-                h: currentHue,
-                s: currentSaturation,
-                v: currentValue,
-                a: Math.round(currentAlpha * 100) / 100
-            }, { format: opts.format || currentPreferredFormat });
-        }
-
-        function isValid() {
-            return !textInput.hasClass("sp-validation-error");
-        }
-
-        function move() {
-            updateUI();
-
-            callbacks.move(get());
-            boundElement.trigger('move.spectrum', [get()]);
-        }
-
-        function updateUI() {
-
-            textInput.removeClass("sp-validation-error");
-
-            updateHelperLocations();
-
-            // Update dragger background color (gradients take care of saturation and value).
-            var flatColor = tinycolor.fromRatio({ h: currentHue, s: 1, v: 1 });
-            dragger.css("background-color", flatColor.toHexString());
-
-            // Get a format that alpha will be included in (hex and names ignore alpha)
-            var format = currentPreferredFormat;
-            if (currentAlpha < 1 && !(currentAlpha === 0 && format === "name")) {
-                if (format === "hex" || format === "hex3" || format === "hex6" || format === "name") {
-                    format = "rgb";
-                }
-            }
-
-            var realColor = get({ format: format }),
-                displayColor = '';
-
-            //reset background info for preview element
-            previewElement.removeClass("sp-clear-display");
-            previewElement.css('background-color', 'transparent');
-
-            if (!realColor && allowEmpty) {
-                // Update the replaced elements background with icon indicating no color selection
-                previewElement.addClass("sp-clear-display");
-            } else {
-                var realHex = realColor.toHexString(),
-                    realRgb = realColor.toRgbString();
-
-                // Update the replaced elements background color (with actual selected color)
-                if (rgbaSupport || realColor.alpha === 1) {
-                    previewElement.css("background-color", realRgb);
-                } else {
-                    previewElement.css("background-color", "transparent");
-                    previewElement.css("filter", realColor.toFilter());
-                }
-
-                if (opts.showAlpha) {
-                    var rgb = realColor.toRgb();
-                    rgb.a = 0;
-                    var realAlpha = tinycolor(rgb).toRgbString();
-                    var gradient = "linear-gradient(left, " + realAlpha + ", " + realHex + ")";
-
-                    if (IE) {
-                        alphaSliderInner.css("filter", tinycolor(realAlpha).toFilter({ gradientType: 1 }, realHex));
-                    } else {
-                        alphaSliderInner.css("background", "-webkit-" + gradient);
-                        alphaSliderInner.css("background", "-moz-" + gradient);
-                        alphaSliderInner.css("background", "-ms-" + gradient);
-                        // Use current syntax gradient on unprefixed property.
-                        alphaSliderInner.css("background", "linear-gradient(to right, " + realAlpha + ", " + realHex + ")");
-                    }
-                }
-
-                displayColor = realColor.toString(format);
-            }
-
-            // Update the text entry input as it changes happen
-            if (opts.showInput) {
-                textInput.val(displayColor);
-            }
-
-            if (opts.showPalette) {
-                drawPalette();
-            }
-
-            drawInitial();
-        }
-
-        function updateHelperLocations() {
-            var s = currentSaturation;
-            var v = currentValue;
-
-            if (allowEmpty && isEmpty) {
-                //if selected color is empty, hide the helpers
-                alphaSlideHelper.hide();
-                slideHelper.hide();
-                dragHelper.hide();
-            } else {
-                //make sure helpers are visible
-                alphaSlideHelper.show();
-                slideHelper.show();
-                dragHelper.show();
-
-                // Where to show the little circle in that displays your current selected color
-                var dragX = s * dragWidth;
-                var dragY = dragHeight - v * dragHeight;
-                dragX = Math.max(-dragHelperHeight, Math.min(dragWidth - dragHelperHeight, dragX - dragHelperHeight));
-                dragY = Math.max(-dragHelperHeight, Math.min(dragHeight - dragHelperHeight, dragY - dragHelperHeight));
-                dragHelper.css({
-                    "top": dragY + "px",
-                    "left": dragX + "px"
-                });
-
-                var alphaX = currentAlpha * alphaWidth;
-                alphaSlideHelper.css({
-                    "left": alphaX - alphaSlideHelperWidth / 2 + "px"
-                });
-
-                // Where to show the bar that displays your current selected hue
-                var slideY = currentHue * slideHeight;
-                slideHelper.css({
-                    "top": slideY - slideHelperHeight + "px"
-                });
-            }
-        }
-
-        function updateOriginalInput(fireCallback) {
-            var color = get(),
-                displayColor = '',
-                hasChanged = !tinycolor.equals(color, colorOnShow);
-
-            if (color) {
-                displayColor = color.toString(currentPreferredFormat);
-                // Update the selection palette with the current color
-                addColorToSelectionPalette(color);
-            }
-
-            if (isInput) {
-                boundElement.val(displayColor);
-            }
-
-            if (fireCallback && hasChanged) {
-                callbacks.change(color);
-                boundElement.trigger('change', [color]);
-            }
-        }
-
-        function reflow() {
-            if (!visible) {
-                return; // Calculations would be useless and wouldn't be reliable anyways
-            }
-            dragWidth = dragger.width();
-            dragHeight = dragger.height();
-            dragHelperHeight = dragHelper.height();
-            slideWidth = slider.width();
-            slideHeight = slider.height();
-            slideHelperHeight = slideHelper.height();
-            alphaWidth = alphaSlider.width();
-            alphaSlideHelperWidth = alphaSlideHelper.width();
-
-            if (!flat) {
-                container.css("position", "absolute");
-                if (opts.offset) {
-                    container.offset(opts.offset);
-                } else {
-                    container.offset(getOffset(container, offsetElement));
-                }
-            }
-
-            updateHelperLocations();
-
-            if (opts.showPalette) {
-                drawPalette();
-            }
-
-            boundElement.trigger('reflow.spectrum');
-        }
-
-        function destroy() {
-            boundElement.show();
-            offsetElement.unbind("click.spectrum touchstart.spectrum");
-            container.remove();
-            replacer.remove();
-            spectrums[spect.id] = null;
-        }
-
-        function option(optionName, optionValue) {
-            if (optionName === undefined) {
-                return $.extend({}, opts);
-            }
-            if (optionValue === undefined) {
-                return opts[optionName];
-            }
-
-            opts[optionName] = optionValue;
-
-            if (optionName === "preferredFormat") {
-                currentPreferredFormat = opts.preferredFormat;
-            }
-            applyOptions();
-        }
-
-        function enable() {
-            disabled = false;
-            boundElement.attr("disabled", false);
-            offsetElement.removeClass("sp-disabled");
-        }
-
-        function disable() {
-            hide();
-            disabled = true;
-            boundElement.attr("disabled", true);
-            offsetElement.addClass("sp-disabled");
-        }
-
-        function setOffset(coord) {
-            opts.offset = coord;
-            reflow();
-        }
-
-        initialize();
-
-        var spect = {
-            show: show,
-            hide: hide,
-            toggle: toggle,
-            reflow: reflow,
-            option: option,
-            enable: enable,
-            disable: disable,
-            offset: setOffset,
-            set: function set(c) {
-                _set(c);
-                updateOriginalInput();
-            },
-            get: get,
-            destroy: destroy,
-            container: container
-        };
-
-        spect.id = spectrums.push(spect) - 1;
-
-        return spect;
-    }
-
-    /**
-    * checkOffset - get the offset below/above and left/right element depending on screen position
-    * Thanks https://github.com/jquery/jquery-ui/blob/master/ui/jquery.ui.datepicker.js
-    */
-    function getOffset(picker, input) {
-        var extraY = 0;
-        var dpWidth = picker.outerWidth();
-        var dpHeight = picker.outerHeight();
-        var inputHeight = input.outerHeight();
-        var doc = picker[0].ownerDocument;
-        var docElem = doc.documentElement;
-        var cW = docElem.clientWidth;
-        var cH = docElem.clientHeight;
-        var scL = $(doc).scrollLeft();
-        var scT = $(doc).scrollTop();
-        var viewWidth = cW + scL;
-        var viewHeight = cH + scT;
-        var offset = input.offset();
-
-        offset.top += inputHeight;
-
-        offset.left -= Math.min(offset.left, offset.left + dpWidth > viewWidth && viewWidth > dpWidth ? Math.abs(offset.left + dpWidth - viewWidth) : 0);
-
-        offset.top -= Math.min(offset.top, offset.top + dpHeight > viewHeight && viewHeight > dpHeight ? Math.abs(dpHeight + inputHeight - extraY) : extraY);
-
-        return offset;
-    }
-
-    /**
-    * noop - do nothing
-    */
-    function noop() {}
-
-    /**
-    * stopPropagation - makes the code only doing this a little easier to read in line
-    */
-    function stopPropagation(e) {
         e.stopPropagation();
-    }
 
-    /**
-    * Create a function bound to a given object
-    * Thanks to underscore.js
-    */
-    function bind(func, obj) {
-        var slice = Array.prototype.slice;
-        var args = slice.call(arguments, 2);
-        return function () {
-            return func.apply(obj, args.concat(slice.call(arguments)));
-        };
-    }
+        if (!$(e.target).is('input')) {
+          e.preventDefault();
+        }
+      });
 
-    /**
-    * Lightweight drag helper.  Handles containment within the element, so that
-    * when dragging, the x is within [0,element.width] and y is within [0,element.height]
-    */
-    function draggable(element, onmove, onstart, onstop) {
-        onmove = onmove || function () {};
-        onstart = onstart || function () {};
-        onstop = onstop || function () {};
-        var doc = document;
-        var dragging = false;
-        var offset = {};
-        var maxHeight = 0;
-        var maxWidth = 0;
-        var hasTouch = 'ontouchstart' in window;
+      if (boundElement.is(':disabled') || opts.disabled === true) {
+        disable();
+      }
 
-        var duringDragEvents = {};
-        duringDragEvents["selectstart"] = prevent;
-        duringDragEvents["dragstart"] = prevent;
-        duringDragEvents["touchmove mousemove"] = move;
-        duringDragEvents["touchend mouseup"] = stop;
+      // Prevent clicks from bubbling up to document.  This would cause it to be hidden.
+      container.click(stopPropagation);
 
-        function prevent(e) {
-            if (e.stopPropagation) {
-                e.stopPropagation();
-            }
-            if (e.preventDefault) {
-                e.preventDefault();
-            }
-            e.returnValue = false;
+      // Handle user typed input
+      textInput.change(setFromTextInput);
+      textInput.bind('paste', function () {
+        setTimeout(setFromTextInput, 1);
+      });
+      textInput.keydown(function (e) {
+        if (e.keyCode == 13) {
+          setFromTextInput();
+        }
+      });
+
+      cancelButton.text(opts.cancelText);
+      cancelButton.bind('click.spectrum', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        revert();
+        hide();
+      });
+
+      clearButton.attr('title', opts.clearText);
+      clearButton.bind('click.spectrum', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        isEmpty = true;
+        move();
+
+        if (flat) {
+          //for the flat style, this is a change event
+          updateOriginalInput(true);
+        }
+      });
+
+      chooseButton.text(opts.chooseText);
+      chooseButton.bind('click.spectrum', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (IE && textInput.is(':focus')) {
+          textInput.trigger('change');
         }
 
-        function move(e) {
-            if (dragging) {
-                // Mouseup happened outside of window
-                if (IE && doc.documentMode < 9 && !e.button) {
-                    return stop();
-                }
+        if (isValid()) {
+          updateOriginalInput(true);
+          hide();
+        }
+      });
 
-                var t0 = e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0];
-                var pageX = t0 && t0.pageX || e.pageX;
-                var pageY = t0 && t0.pageY || e.pageY;
+      toggleButton.text(opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText);
+      toggleButton.bind('click.spectrum', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
 
-                var dragX = Math.max(0, Math.min(pageX - offset.left, maxWidth));
-                var dragY = Math.max(0, Math.min(pageY - offset.top, maxHeight));
+        opts.showPaletteOnly = !opts.showPaletteOnly;
 
-                if (hasTouch) {
-                    // Stop scrolling in iOS
-                    prevent(e);
-                }
+        // To make sure the Picker area is drawn on the right, next to the
+        // Palette area (and not below the palette), first move the Palette
+        // to the left to make space for the picker, plus 5px extra.
+        // The 'applyOptions' function puts the whole container back into place
+        // and takes care of the button-text and the sp-palette-only CSS class.
+        if (!opts.showPaletteOnly && !flat) {
+          container.css('left', '-=' + (pickerContainer.outerWidth(true) + 5));
+        }
+        applyOptions();
+      });
 
-                onmove.apply(element, [dragX, dragY, e]);
-            }
+      draggable(alphaSlider, function (dragX, dragY, e) {
+        currentAlpha = dragX / alphaWidth;
+        isEmpty = false;
+        if (e.shiftKey) {
+          currentAlpha = Math.round(currentAlpha * 10) / 10;
         }
 
-        function start(e) {
-            var rightclick = e.which ? e.which == 3 : e.button == 2;
+        move();
+      }, dragStart, dragStop);
 
-            if (!rightclick && !dragging) {
-                if (onstart.apply(element, arguments) !== false) {
-                    dragging = true;
-                    maxHeight = $(element).height();
-                    maxWidth = $(element).width();
-                    offset = $(element).offset();
+      draggable(slider, function (dragX, dragY) {
+        currentHue = parseFloat(dragY / slideHeight);
+        isEmpty = false;
+        if (!opts.showAlpha) {
+          currentAlpha = 1;
+        }
+        move();
+      }, dragStart, dragStop);
 
-                    $(doc).bind(duringDragEvents);
-                    $(doc.body).addClass("sp-dragging");
+      draggable(dragger, function (dragX, dragY, e) {
+        // shift+drag should snap the movement to either the x or y axis.
+        if (!e.shiftKey) {
+          shiftMovementDirection = null;
+        } else if (!shiftMovementDirection) {
+          var oldDragX = currentSaturation * dragWidth;
+          var oldDragY = dragHeight - currentValue * dragHeight;
+          var furtherFromX = Math.abs(dragX - oldDragX) > Math.abs(dragY - oldDragY);
 
-                    move(e);
-
-                    prevent(e);
-                }
-            }
+          shiftMovementDirection = furtherFromX ? 'x' : 'y';
         }
 
-        function stop() {
-            if (dragging) {
-                $(doc).unbind(duringDragEvents);
-                $(doc.body).removeClass("sp-dragging");
+        var setSaturation = !shiftMovementDirection || shiftMovementDirection === 'x';
+        var setValue = !shiftMovementDirection || shiftMovementDirection === 'y';
 
-                // Wait a tick before notifying observers to allow the click event
-                // to fire in Chrome.
-                setTimeout(function () {
-                    onstop.apply(element, arguments);
-                }, 0);
-            }
-            dragging = false;
+        if (setSaturation) {
+          currentSaturation = parseFloat(dragX / dragWidth);
+        }
+        if (setValue) {
+          currentValue = parseFloat((dragHeight - dragY) / dragHeight);
         }
 
-        $(element).bind("touchstart mousedown", start);
-    }
-
-    function throttle(func, wait, debounce) {
-        var timeout;
-        return function () {
-            var context = this,
-                args = arguments;
-            var throttler = function throttler() {
-                timeout = null;
-                func.apply(context, args);
-            };
-            if (debounce) clearTimeout(timeout);
-            if (debounce || !timeout) timeout = setTimeout(throttler, wait);
-        };
-    }
-
-    function inputTypeColorSupport() {
-        return $.fn.spectrum.inputTypeColorSupport();
-    }
-
-    /**
-    * Define a jQuery plugin
-    */
-    var dataID = "spectrum.id";
-    $.fn.spectrum = function (opts, extra) {
-
-        if (typeof opts == "string") {
-
-            var returnValue = this;
-            var args = Array.prototype.slice.call(arguments, 1);
-
-            this.each(function () {
-                var spect = spectrums[$(this).data(dataID)];
-                if (spect) {
-                    var method = spect[opts];
-                    if (!method) {
-                        throw new Error("Spectrum: no such method: '" + opts + "'");
-                    }
-
-                    if (opts == "get") {
-                        returnValue = spect.get();
-                    } else if (opts == "container") {
-                        returnValue = spect.container;
-                    } else if (opts == "option") {
-                        returnValue = spect.option.apply(spect, args);
-                    } else if (opts == "destroy") {
-                        spect.destroy();
-                        $(this).removeData(dataID);
-                    } else {
-                        method.apply(spect, args);
-                    }
-                }
-            });
-
-            return returnValue;
+        isEmpty = false;
+        if (!opts.showAlpha) {
+          currentAlpha = 1;
         }
 
-        // Initializing a new instance of spectrum
-        return this.spectrum("destroy").each(function () {
-            var options = $.extend({}, opts, $(this).data());
-            var spect = spectrum(this, options);
-            $(this).data(dataID, spect.id);
-        });
-    };
+        move();
+      }, dragStart, dragStop);
 
-    $.fn.spectrum.load = true;
-    $.fn.spectrum.loadOpts = {};
-    $.fn.spectrum.draggable = draggable;
-    $.fn.spectrum.defaults = defaultOpts;
-    $.fn.spectrum.inputTypeColorSupport = function inputTypeColorSupport() {
-        if (typeof inputTypeColorSupport._cachedResult === "undefined") {
-            var colorInput = $("<input type='color'/>")[0]; // if color element is supported, value will default to not null
-            inputTypeColorSupport._cachedResult = colorInput.type === "color" && colorInput.value !== "";
-        }
-        return inputTypeColorSupport._cachedResult;
-    };
+      if (!!initialColor) {
+        _set(initialColor);
 
-    $.spectrum = {};
-    $.spectrum.localization = {};
-    $.spectrum.palettes = {};
+        // In case color was black - update the preview UI and set the format
+        // since the set function will not run (default color is black).
+        updateUI();
+        currentPreferredFormat = opts.preferredFormat || tinycolor(initialColor).format;
 
-    $.fn.spectrum.processNativeColorInputs = function () {
-        var colorInputs = $("input[type=color]");
-        if (colorInputs.length && !inputTypeColorSupport()) {
-            colorInputs.spectrum({
-                preferredFormat: "hex6"
-            });
-        }
-    };
+        addColorToSelectionPalette(initialColor);
+      } else {
+        updateUI();
+      }
 
-    // TinyColor v1.1.2
-    // https://github.com/bgrins/TinyColor
-    // Brian Grinstead, MIT License
+      if (flat) {
+        show();
+      }
 
-    //(function() {
-
-    var trimLeft = /^[\s,#]+/,
-        trimRight = /\s+$/,
-        tinyCounter = 0,
-        math = Math,
-        mathRound = math.round,
-        mathMin = math.min,
-        mathMax = math.max,
-        mathRandom = math.random;
-
-    var tinycolor = function tinycolor(color, opts) {
-
-        color = color ? color : '';
-        opts = opts || {};
-
-        // If input is already a tinycolor, return itself
-        if (color instanceof tinycolor) {
-            return color;
-        }
-        // If we are called as a function, call using new instead
-        if (!(this instanceof tinycolor)) {
-            return new tinycolor(color, opts);
-        }
-
-        var rgb = inputToRGB(color);
-        this._originalInput = color, this._r = rgb.r, this._g = rgb.g, this._b = rgb.b, this._a = rgb.a, this._roundA = mathRound(100 * this._a) / 100, this._format = opts.format || rgb.format;
-        this._gradientType = opts.gradientType;
-
-        // Don't let the range of [0,255] come back in [0,1].
-        // Potentially lose a little bit of precision here, but will fix issues where
-        // .5 gets interpreted as half of the total, instead of half of 1
-        // If it was supposed to be 128, this was already taken care of by `inputToRgb`
-        if (this._r < 1) {
-            this._r = mathRound(this._r);
-        }
-        if (this._g < 1) {
-            this._g = mathRound(this._g);
-        }
-        if (this._b < 1) {
-            this._b = mathRound(this._b);
-        }
-
-        this._ok = rgb.ok;
-        this._tc_id = tinyCounter++;
-    };
-
-    tinycolor.prototype = {
-        isDark: function isDark() {
-            return this.getBrightness() < 128;
-        },
-        isLight: function isLight() {
-            return !this.isDark();
-        },
-        isValid: function isValid() {
-            return this._ok;
-        },
-        getOriginalInput: function getOriginalInput() {
-            return this._originalInput;
-        },
-        getFormat: function getFormat() {
-            return this._format;
-        },
-        getAlpha: function getAlpha() {
-            return this._a;
-        },
-        getBrightness: function getBrightness() {
-            var rgb = this.toRgb();
-            return (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-        },
-        setAlpha: function setAlpha(value) {
-            this._a = boundAlpha(value);
-            this._roundA = mathRound(100 * this._a) / 100;
-            return this;
-        },
-        toHsv: function toHsv() {
-            var hsv = rgbToHsv(this._r, this._g, this._b);
-            return { h: hsv.h * 360, s: hsv.s, v: hsv.v, a: this._a };
-        },
-        toHsvString: function toHsvString() {
-            var hsv = rgbToHsv(this._r, this._g, this._b);
-            var h = mathRound(hsv.h * 360),
-                s = mathRound(hsv.s * 100),
-                v = mathRound(hsv.v * 100);
-            return this._a == 1 ? "hsv(" + h + ", " + s + "%, " + v + "%)" : "hsva(" + h + ", " + s + "%, " + v + "%, " + this._roundA + ")";
-        },
-        toHsl: function toHsl() {
-            var hsl = rgbToHsl(this._r, this._g, this._b);
-            return { h: hsl.h * 360, s: hsl.s, l: hsl.l, a: this._a };
-        },
-        toHslString: function toHslString() {
-            var hsl = rgbToHsl(this._r, this._g, this._b);
-            var h = mathRound(hsl.h * 360),
-                s = mathRound(hsl.s * 100),
-                l = mathRound(hsl.l * 100);
-            return this._a == 1 ? "hsl(" + h + ", " + s + "%, " + l + "%)" : "hsla(" + h + ", " + s + "%, " + l + "%, " + this._roundA + ")";
-        },
-        toHex: function toHex(allow3Char) {
-            return rgbToHex(this._r, this._g, this._b, allow3Char);
-        },
-        toHexString: function toHexString(allow3Char) {
-            return '#' + this.toHex(allow3Char);
-        },
-        toHex8: function toHex8() {
-            return rgbaToHex(this._r, this._g, this._b, this._a);
-        },
-        toHex8String: function toHex8String() {
-            return '#' + this.toHex8();
-        },
-        toRgb: function toRgb() {
-            return { r: mathRound(this._r), g: mathRound(this._g), b: mathRound(this._b), a: this._a };
-        },
-        toRgbString: function toRgbString() {
-            return this._a == 1 ? "rgb(" + mathRound(this._r) + ", " + mathRound(this._g) + ", " + mathRound(this._b) + ")" : "rgba(" + mathRound(this._r) + ", " + mathRound(this._g) + ", " + mathRound(this._b) + ", " + this._roundA + ")";
-        },
-        toPercentageRgb: function toPercentageRgb() {
-            return { r: mathRound(bound01(this._r, 255) * 100) + "%", g: mathRound(bound01(this._g, 255) * 100) + "%", b: mathRound(bound01(this._b, 255) * 100) + "%", a: this._a };
-        },
-        toPercentageRgbString: function toPercentageRgbString() {
-            return this._a == 1 ? "rgb(" + mathRound(bound01(this._r, 255) * 100) + "%, " + mathRound(bound01(this._g, 255) * 100) + "%, " + mathRound(bound01(this._b, 255) * 100) + "%)" : "rgba(" + mathRound(bound01(this._r, 255) * 100) + "%, " + mathRound(bound01(this._g, 255) * 100) + "%, " + mathRound(bound01(this._b, 255) * 100) + "%, " + this._roundA + ")";
-        },
-        toName: function toName() {
-            if (this._a === 0) {
-                return "transparent";
-            }
-
-            if (this._a < 1) {
-                return false;
-            }
-
-            return hexNames[rgbToHex(this._r, this._g, this._b, true)] || false;
-        },
-        toFilter: function toFilter(secondColor) {
-            var hex8String = '#' + rgbaToHex(this._r, this._g, this._b, this._a);
-            var secondHex8String = hex8String;
-            var gradientType = this._gradientType ? "GradientType = 1, " : "";
-
-            if (secondColor) {
-                var s = tinycolor(secondColor);
-                secondHex8String = s.toHex8String();
-            }
-
-            return "progid:DXImageTransform.Microsoft.gradient(" + gradientType + "startColorstr=" + hex8String + ",endColorstr=" + secondHex8String + ")";
-        },
-        toString: function toString(format) {
-            var formatSet = !!format;
-            format = format || this._format;
-
-            var formattedString = false;
-            var hasAlpha = this._a < 1 && this._a >= 0;
-            var needsAlphaFormat = !formatSet && hasAlpha && (format === "hex" || format === "hex6" || format === "hex3" || format === "name");
-
-            if (needsAlphaFormat) {
-                // Special case for "transparent", all other non-alpha formats
-                // will return rgba when there is transparency.
-                if (format === "name" && this._a === 0) {
-                    return this.toName();
-                }
-                return this.toRgbString();
-            }
-            if (format === "rgb") {
-                formattedString = this.toRgbString();
-            }
-            if (format === "prgb") {
-                formattedString = this.toPercentageRgbString();
-            }
-            if (format === "hex" || format === "hex6") {
-                formattedString = this.toHexString();
-            }
-            if (format === "hex3") {
-                formattedString = this.toHexString(true);
-            }
-            if (format === "hex8") {
-                formattedString = this.toHex8String();
-            }
-            if (format === "name") {
-                formattedString = this.toName();
-            }
-            if (format === "hsl") {
-                formattedString = this.toHslString();
-            }
-            if (format === "hsv") {
-                formattedString = this.toHsvString();
-            }
-
-            return formattedString || this.toHexString();
-        },
-
-        _applyModification: function _applyModification(fn, args) {
-            var color = fn.apply(null, [this].concat([].slice.call(args)));
-            this._r = color._r;
-            this._g = color._g;
-            this._b = color._b;
-            this.setAlpha(color._a);
-            return this;
-        },
-        lighten: function lighten() {
-            return this._applyModification(_lighten, arguments);
-        },
-        brighten: function brighten() {
-            return this._applyModification(_brighten, arguments);
-        },
-        darken: function darken() {
-            return this._applyModification(_darken, arguments);
-        },
-        desaturate: function desaturate() {
-            return this._applyModification(_desaturate, arguments);
-        },
-        saturate: function saturate() {
-            return this._applyModification(_saturate, arguments);
-        },
-        greyscale: function greyscale() {
-            return this._applyModification(_greyscale, arguments);
-        },
-        spin: function spin() {
-            return this._applyModification(_spin, arguments);
-        },
-
-        _applyCombination: function _applyCombination(fn, args) {
-            return fn.apply(null, [this].concat([].slice.call(args)));
-        },
-        analogous: function analogous() {
-            return this._applyCombination(_analogous, arguments);
-        },
-        complement: function complement() {
-            return this._applyCombination(_complement, arguments);
-        },
-        monochromatic: function monochromatic() {
-            return this._applyCombination(_monochromatic, arguments);
-        },
-        splitcomplement: function splitcomplement() {
-            return this._applyCombination(_splitcomplement, arguments);
-        },
-        triad: function triad() {
-            return this._applyCombination(_triad, arguments);
-        },
-        tetrad: function tetrad() {
-            return this._applyCombination(_tetrad, arguments);
-        }
-    };
-
-    // If input is an object, force 1 into "1.0" to handle ratios properly
-    // String input requires "1.0" as input, so 1 will be treated as 1
-    tinycolor.fromRatio = function (color, opts) {
-        if ((typeof color === "undefined" ? "undefined" : _typeof(color)) == "object") {
-            var newColor = {};
-            for (var i in color) {
-                if (color.hasOwnProperty(i)) {
-                    if (i === "a") {
-                        newColor[i] = color[i];
-                    } else {
-                        newColor[i] = convertToPercentage(color[i]);
-                    }
-                }
-            }
-            color = newColor;
-        }
-
-        return tinycolor(color, opts);
-    };
-
-    // Given a string or object, convert that input to RGB
-    // Possible string inputs:
-    //
-    //     "red"
-    //     "#f00" or "f00"
-    //     "#ff0000" or "ff0000"
-    //     "#ff000000" or "ff000000"
-    //     "rgb 255 0 0" or "rgb (255, 0, 0)"
-    //     "rgb 1.0 0 0" or "rgb (1, 0, 0)"
-    //     "rgba (255, 0, 0, 1)" or "rgba 255, 0, 0, 1"
-    //     "rgba (1.0, 0, 0, 1)" or "rgba 1.0, 0, 0, 1"
-    //     "hsl(0, 100%, 50%)" or "hsl 0 100% 50%"
-    //     "hsla(0, 100%, 50%, 1)" or "hsla 0 100% 50%, 1"
-    //     "hsv(0, 100%, 100%)" or "hsv 0 100% 100%"
-    //
-    function inputToRGB(color) {
-
-        var rgb = { r: 0, g: 0, b: 0 };
-        var a = 1;
-        var ok = false;
-        var format = false;
-
-        if (typeof color == "string") {
-            color = stringInputToObject(color);
-        }
-
-        if ((typeof color === "undefined" ? "undefined" : _typeof(color)) == "object") {
-            if (color.hasOwnProperty("r") && color.hasOwnProperty("g") && color.hasOwnProperty("b")) {
-                rgb = rgbToRgb(color.r, color.g, color.b);
-                ok = true;
-                format = String(color.r).substr(-1) === "%" ? "prgb" : "rgb";
-            } else if (color.hasOwnProperty("h") && color.hasOwnProperty("s") && color.hasOwnProperty("v")) {
-                color.s = convertToPercentage(color.s);
-                color.v = convertToPercentage(color.v);
-                rgb = hsvToRgb(color.h, color.s, color.v);
-                ok = true;
-                format = "hsv";
-            } else if (color.hasOwnProperty("h") && color.hasOwnProperty("s") && color.hasOwnProperty("l")) {
-                color.s = convertToPercentage(color.s);
-                color.l = convertToPercentage(color.l);
-                rgb = hslToRgb(color.h, color.s, color.l);
-                ok = true;
-                format = "hsl";
-            }
-
-            if (color.hasOwnProperty("a")) {
-                a = color.a;
-            }
-        }
-
-        a = boundAlpha(a);
-
-        return {
-            ok: ok,
-            format: color.format || format,
-            r: mathMin(255, mathMax(rgb.r, 0)),
-            g: mathMin(255, mathMax(rgb.g, 0)),
-            b: mathMin(255, mathMax(rgb.b, 0)),
-            a: a
-        };
-    }
-
-    // Conversion Functions
-    // --------------------
-
-    // `rgbToHsl`, `rgbToHsv`, `hslToRgb`, `hsvToRgb` modified from:
-    // <http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript>
-
-    // `rgbToRgb`
-    // Handle bounds / percentage checking to conform to CSS color spec
-    // <http://www.w3.org/TR/css3-color/>
-    // *Assumes:* r, g, b in [0, 255] or [0, 1]
-    // *Returns:* { r, g, b } in [0, 255]
-    function rgbToRgb(r, g, b) {
-        return {
-            r: bound01(r, 255) * 255,
-            g: bound01(g, 255) * 255,
-            b: bound01(b, 255) * 255
-        };
-    }
-
-    // `rgbToHsl`
-    // Converts an RGB color value to HSL.
-    // *Assumes:* r, g, and b are contained in [0, 255] or [0, 1]
-    // *Returns:* { h, s, l } in [0,1]
-    function rgbToHsl(r, g, b) {
-
-        r = bound01(r, 255);
-        g = bound01(g, 255);
-        b = bound01(b, 255);
-
-        var max = mathMax(r, g, b),
-            min = mathMin(r, g, b);
-        var h,
-            s,
-            l = (max + min) / 2;
-
-        if (max == min) {
-            h = s = 0; // achromatic
+      function paletteElementClick(e) {
+        if (e.data && e.data.ignore) {
+          _set($(e.target).closest('.sp-thumb-el').data('color'));
+          move();
         } else {
-            var d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch (max) {
-                case r:
-                    h = (g - b) / d + (g < b ? 6 : 0);break;
-                case g:
-                    h = (b - r) / d + 2;break;
-                case b:
-                    h = (r - g) / d + 4;break;
-            }
-
-            h /= 6;
-        }
-
-        return { h: h, s: s, l: l };
-    }
-
-    // `hslToRgb`
-    // Converts an HSL color value to RGB.
-    // *Assumes:* h is contained in [0, 1] or [0, 360] and s and l are contained [0, 1] or [0, 100]
-    // *Returns:* { r, g, b } in the set [0, 255]
-    function hslToRgb(h, s, l) {
-        var r, g, b;
-
-        h = bound01(h, 360);
-        s = bound01(s, 100);
-        l = bound01(l, 100);
-
-        function hue2rgb(p, q, t) {
-            if (t < 0) t += 1;
-            if (t > 1) t -= 1;
-            if (t < 1 / 6) return p + (q - p) * 6 * t;
-            if (t < 1 / 2) return q;
-            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-            return p;
-        }
-
-        if (s === 0) {
-            r = g = b = l; // achromatic
-        } else {
-            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            var p = 2 * l - q;
-            r = hue2rgb(p, q, h + 1 / 3);
-            g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1 / 3);
-        }
-
-        return { r: r * 255, g: g * 255, b: b * 255 };
-    }
-
-    // `rgbToHsv`
-    // Converts an RGB color value to HSV
-    // *Assumes:* r, g, and b are contained in the set [0, 255] or [0, 1]
-    // *Returns:* { h, s, v } in [0,1]
-    function rgbToHsv(r, g, b) {
-
-        r = bound01(r, 255);
-        g = bound01(g, 255);
-        b = bound01(b, 255);
-
-        var max = mathMax(r, g, b),
-            min = mathMin(r, g, b);
-        var h,
-            s,
-            v = max;
-
-        var d = max - min;
-        s = max === 0 ? 0 : d / max;
-
-        if (max == min) {
-            h = 0; // achromatic
-        } else {
-            switch (max) {
-                case r:
-                    h = (g - b) / d + (g < b ? 6 : 0);break;
-                case g:
-                    h = (b - r) / d + 2;break;
-                case b:
-                    h = (r - g) / d + 4;break;
-            }
-            h /= 6;
-        }
-        return { h: h, s: s, v: v };
-    }
-
-    // `hsvToRgb`
-    // Converts an HSV color value to RGB.
-    // *Assumes:* h is contained in [0, 1] or [0, 360] and s and v are contained in [0, 1] or [0, 100]
-    // *Returns:* { r, g, b } in the set [0, 255]
-    function hsvToRgb(h, s, v) {
-
-        h = bound01(h, 360) * 6;
-        s = bound01(s, 100);
-        v = bound01(v, 100);
-
-        var i = math.floor(h),
-            f = h - i,
-            p = v * (1 - s),
-            q = v * (1 - f * s),
-            t = v * (1 - (1 - f) * s),
-            mod = i % 6,
-            r = [v, q, p, p, t, v][mod],
-            g = [t, v, v, q, p, p][mod],
-            b = [p, p, t, v, v, q][mod];
-
-        return { r: r * 255, g: g * 255, b: b * 255 };
-    }
-
-    // `rgbToHex`
-    // Converts an RGB color to hex
-    // Assumes r, g, and b are contained in the set [0, 255]
-    // Returns a 3 or 6 character hex
-    function rgbToHex(r, g, b, allow3Char) {
-
-        var hex = [pad2(mathRound(r).toString(16)), pad2(mathRound(g).toString(16)), pad2(mathRound(b).toString(16))];
-
-        // Return a 3 character hex if possible
-        if (allow3Char && hex[0].charAt(0) == hex[0].charAt(1) && hex[1].charAt(0) == hex[1].charAt(1) && hex[2].charAt(0) == hex[2].charAt(1)) {
-            return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0);
-        }
-
-        return hex.join("");
-    }
-    // `rgbaToHex`
-    // Converts an RGBA color plus alpha transparency to hex
-    // Assumes r, g, b and a are contained in the set [0, 255]
-    // Returns an 8 character hex
-    function rgbaToHex(r, g, b, a) {
-
-        var hex = [pad2(convertDecimalToHex(a)), pad2(mathRound(r).toString(16)), pad2(mathRound(g).toString(16)), pad2(mathRound(b).toString(16))];
-
-        return hex.join("");
-    }
-
-    // `equals`
-    // Can be called with any tinycolor input
-    tinycolor.equals = function (color1, color2) {
-        if (!color1 || !color2) {
-            return false;
-        }
-        return tinycolor(color1).toRgbString() == tinycolor(color2).toRgbString();
-    };
-    tinycolor.random = function () {
-        return tinycolor.fromRatio({
-            r: mathRandom(),
-            g: mathRandom(),
-            b: mathRandom()
-        });
-    };
-
-    // Modification Functions
-    // ----------------------
-    // Thanks to less.js for some of the basics here
-    // <https://github.com/cloudhead/less.js/blob/master/lib/less/functions.js>
-
-    function _desaturate(color, amount) {
-        amount = amount === 0 ? 0 : amount || 10;
-        var hsl = tinycolor(color).toHsl();
-        hsl.s -= amount / 100;
-        hsl.s = clamp01(hsl.s);
-        return tinycolor(hsl);
-    }
-
-    function _saturate(color, amount) {
-        amount = amount === 0 ? 0 : amount || 10;
-        var hsl = tinycolor(color).toHsl();
-        hsl.s += amount / 100;
-        hsl.s = clamp01(hsl.s);
-        return tinycolor(hsl);
-    }
-
-    function _greyscale(color) {
-        return tinycolor(color).desaturate(100);
-    }
-
-    function _lighten(color, amount) {
-        amount = amount === 0 ? 0 : amount || 10;
-        var hsl = tinycolor(color).toHsl();
-        hsl.l += amount / 100;
-        hsl.l = clamp01(hsl.l);
-        return tinycolor(hsl);
-    }
-
-    function _brighten(color, amount) {
-        amount = amount === 0 ? 0 : amount || 10;
-        var rgb = tinycolor(color).toRgb();
-        rgb.r = mathMax(0, mathMin(255, rgb.r - mathRound(255 * -(amount / 100))));
-        rgb.g = mathMax(0, mathMin(255, rgb.g - mathRound(255 * -(amount / 100))));
-        rgb.b = mathMax(0, mathMin(255, rgb.b - mathRound(255 * -(amount / 100))));
-        return tinycolor(rgb);
-    }
-
-    function _darken(color, amount) {
-        amount = amount === 0 ? 0 : amount || 10;
-        var hsl = tinycolor(color).toHsl();
-        hsl.l -= amount / 100;
-        hsl.l = clamp01(hsl.l);
-        return tinycolor(hsl);
-    }
-
-    // Spin takes a positive or negative amount within [-360, 360] indicating the change of hue.
-    // Values outside of this range will be wrapped into this range.
-    function _spin(color, amount) {
-        var hsl = tinycolor(color).toHsl();
-        var hue = (mathRound(hsl.h) + amount) % 360;
-        hsl.h = hue < 0 ? 360 + hue : hue;
-        return tinycolor(hsl);
-    }
-
-    // Combination Functions
-    // ---------------------
-    // Thanks to jQuery xColor for some of the ideas behind these
-    // <https://github.com/infusion/jQuery-xcolor/blob/master/jquery.xcolor.js>
-
-    function _complement(color) {
-        var hsl = tinycolor(color).toHsl();
-        hsl.h = (hsl.h + 180) % 360;
-        return tinycolor(hsl);
-    }
-
-    function _triad(color) {
-        var hsl = tinycolor(color).toHsl();
-        var h = hsl.h;
-        return [tinycolor(color), tinycolor({ h: (h + 120) % 360, s: hsl.s, l: hsl.l }), tinycolor({ h: (h + 240) % 360, s: hsl.s, l: hsl.l })];
-    }
-
-    function _tetrad(color) {
-        var hsl = tinycolor(color).toHsl();
-        var h = hsl.h;
-        return [tinycolor(color), tinycolor({ h: (h + 90) % 360, s: hsl.s, l: hsl.l }), tinycolor({ h: (h + 180) % 360, s: hsl.s, l: hsl.l }), tinycolor({ h: (h + 270) % 360, s: hsl.s, l: hsl.l })];
-    }
-
-    function _splitcomplement(color) {
-        var hsl = tinycolor(color).toHsl();
-        var h = hsl.h;
-        return [tinycolor(color), tinycolor({ h: (h + 72) % 360, s: hsl.s, l: hsl.l }), tinycolor({ h: (h + 216) % 360, s: hsl.s, l: hsl.l })];
-    }
-
-    function _analogous(color, results, slices) {
-        results = results || 6;
-        slices = slices || 30;
-
-        var hsl = tinycolor(color).toHsl();
-        var part = 360 / slices;
-        var ret = [tinycolor(color)];
-
-        for (hsl.h = (hsl.h - (part * results >> 1) + 720) % 360; --results;) {
-            hsl.h = (hsl.h + part) % 360;
-            ret.push(tinycolor(hsl));
-        }
-        return ret;
-    }
-
-    function _monochromatic(color, results) {
-        results = results || 6;
-        var hsv = tinycolor(color).toHsv();
-        var h = hsv.h,
-            s = hsv.s,
-            v = hsv.v;
-        var ret = [];
-        var modification = 1 / results;
-
-        while (results--) {
-            ret.push(tinycolor({ h: h, s: s, v: v }));
-            v = (v + modification) % 1;
-        }
-
-        return ret;
-    }
-
-    // Utility Functions
-    // ---------------------
-
-    tinycolor.mix = function (color1, color2, amount) {
-        amount = amount === 0 ? 0 : amount || 50;
-
-        var rgb1 = tinycolor(color1).toRgb();
-        var rgb2 = tinycolor(color2).toRgb();
-
-        var p = amount / 100;
-        var w = p * 2 - 1;
-        var a = rgb2.a - rgb1.a;
-
-        var w1;
-
-        if (w * a == -1) {
-            w1 = w;
-        } else {
-            w1 = (w + a) / (1 + w * a);
-        }
-
-        w1 = (w1 + 1) / 2;
-
-        var w2 = 1 - w1;
-
-        var rgba = {
-            r: rgb2.r * w1 + rgb1.r * w2,
-            g: rgb2.g * w1 + rgb1.g * w2,
-            b: rgb2.b * w1 + rgb1.b * w2,
-            a: rgb2.a * p + rgb1.a * (1 - p)
-        };
-
-        return tinycolor(rgba);
-    };
-
-    // Readability Functions
-    // ---------------------
-    // <http://www.w3.org/TR/AERT#color-contrast>
-
-    // `readability`
-    // Analyze the 2 colors and returns an object with the following properties:
-    //    `brightness`: difference in brightness between the two colors
-    //    `color`: difference in color/hue between the two colors
-    tinycolor.readability = function (color1, color2) {
-        var c1 = tinycolor(color1);
-        var c2 = tinycolor(color2);
-        var rgb1 = c1.toRgb();
-        var rgb2 = c2.toRgb();
-        var brightnessA = c1.getBrightness();
-        var brightnessB = c2.getBrightness();
-        var colorDiff = Math.max(rgb1.r, rgb2.r) - Math.min(rgb1.r, rgb2.r) + Math.max(rgb1.g, rgb2.g) - Math.min(rgb1.g, rgb2.g) + Math.max(rgb1.b, rgb2.b) - Math.min(rgb1.b, rgb2.b);
-
-        return {
-            brightness: Math.abs(brightnessA - brightnessB),
-            color: colorDiff
-        };
-    };
-
-    // `readable`
-    // http://www.w3.org/TR/AERT#color-contrast
-    // Ensure that foreground and background color combinations provide sufficient contrast.
-    // *Example*
-    //    tinycolor.isReadable("#000", "#111") => false
-    tinycolor.isReadable = function (color1, color2) {
-        var readability = tinycolor.readability(color1, color2);
-        return readability.brightness > 125 && readability.color > 500;
-    };
-
-    // `mostReadable`
-    // Given a base color and a list of possible foreground or background
-    // colors for that base, returns the most readable color.
-    // *Example*
-    //    tinycolor.mostReadable("#123", ["#fff", "#000"]) => "#000"
-    tinycolor.mostReadable = function (baseColor, colorList) {
-        var bestColor = null;
-        var bestScore = 0;
-        var bestIsReadable = false;
-        for (var i = 0; i < colorList.length; i++) {
-
-            // We normalize both around the "acceptable" breaking point,
-            // but rank brightness constrast higher than hue.
-
-            var readability = tinycolor.readability(baseColor, colorList[i]);
-            var readable = readability.brightness > 125 && readability.color > 500;
-            var score = 3 * (readability.brightness / 125) + readability.color / 500;
-
-            if (readable && !bestIsReadable || readable && bestIsReadable && score > bestScore || !readable && !bestIsReadable && score > bestScore) {
-                bestIsReadable = readable;
-                bestScore = score;
-                bestColor = tinycolor(colorList[i]);
-            }
-        }
-        return bestColor;
-    };
-
-    // Big List of Colors
-    // ------------------
-    // <http://www.w3.org/TR/css3-color/#svg-color>
-    var names = tinycolor.names = {
-        aliceblue: "f0f8ff",
-        antiquewhite: "faebd7",
-        aqua: "0ff",
-        aquamarine: "7fffd4",
-        azure: "f0ffff",
-        beige: "f5f5dc",
-        bisque: "ffe4c4",
-        black: "000",
-        blanchedalmond: "ffebcd",
-        blue: "00f",
-        blueviolet: "8a2be2",
-        brown: "a52a2a",
-        burlywood: "deb887",
-        burntsienna: "ea7e5d",
-        cadetblue: "5f9ea0",
-        chartreuse: "7fff00",
-        chocolate: "d2691e",
-        coral: "ff7f50",
-        cornflowerblue: "6495ed",
-        cornsilk: "fff8dc",
-        crimson: "dc143c",
-        cyan: "0ff",
-        darkblue: "00008b",
-        darkcyan: "008b8b",
-        darkgoldenrod: "b8860b",
-        darkgray: "a9a9a9",
-        darkgreen: "006400",
-        darkgrey: "a9a9a9",
-        darkkhaki: "bdb76b",
-        darkmagenta: "8b008b",
-        darkolivegreen: "556b2f",
-        darkorange: "ff8c00",
-        darkorchid: "9932cc",
-        darkred: "8b0000",
-        darksalmon: "e9967a",
-        darkseagreen: "8fbc8f",
-        darkslateblue: "483d8b",
-        darkslategray: "2f4f4f",
-        darkslategrey: "2f4f4f",
-        darkturquoise: "00ced1",
-        darkviolet: "9400d3",
-        deeppink: "ff1493",
-        deepskyblue: "00bfff",
-        dimgray: "696969",
-        dimgrey: "696969",
-        dodgerblue: "1e90ff",
-        firebrick: "b22222",
-        floralwhite: "fffaf0",
-        forestgreen: "228b22",
-        fuchsia: "f0f",
-        gainsboro: "dcdcdc",
-        ghostwhite: "f8f8ff",
-        gold: "ffd700",
-        goldenrod: "daa520",
-        gray: "808080",
-        green: "008000",
-        greenyellow: "adff2f",
-        grey: "808080",
-        honeydew: "f0fff0",
-        hotpink: "ff69b4",
-        indianred: "cd5c5c",
-        indigo: "4b0082",
-        ivory: "fffff0",
-        khaki: "f0e68c",
-        lavender: "e6e6fa",
-        lavenderblush: "fff0f5",
-        lawngreen: "7cfc00",
-        lemonchiffon: "fffacd",
-        lightblue: "add8e6",
-        lightcoral: "f08080",
-        lightcyan: "e0ffff",
-        lightgoldenrodyellow: "fafad2",
-        lightgray: "d3d3d3",
-        lightgreen: "90ee90",
-        lightgrey: "d3d3d3",
-        lightpink: "ffb6c1",
-        lightsalmon: "ffa07a",
-        lightseagreen: "20b2aa",
-        lightskyblue: "87cefa",
-        lightslategray: "789",
-        lightslategrey: "789",
-        lightsteelblue: "b0c4de",
-        lightyellow: "ffffe0",
-        lime: "0f0",
-        limegreen: "32cd32",
-        linen: "faf0e6",
-        magenta: "f0f",
-        maroon: "800000",
-        mediumaquamarine: "66cdaa",
-        mediumblue: "0000cd",
-        mediumorchid: "ba55d3",
-        mediumpurple: "9370db",
-        mediumseagreen: "3cb371",
-        mediumslateblue: "7b68ee",
-        mediumspringgreen: "00fa9a",
-        mediumturquoise: "48d1cc",
-        mediumvioletred: "c71585",
-        midnightblue: "191970",
-        mintcream: "f5fffa",
-        mistyrose: "ffe4e1",
-        moccasin: "ffe4b5",
-        navajowhite: "ffdead",
-        navy: "000080",
-        oldlace: "fdf5e6",
-        olive: "808000",
-        olivedrab: "6b8e23",
-        orange: "ffa500",
-        orangered: "ff4500",
-        orchid: "da70d6",
-        palegoldenrod: "eee8aa",
-        palegreen: "98fb98",
-        paleturquoise: "afeeee",
-        palevioletred: "db7093",
-        papayawhip: "ffefd5",
-        peachpuff: "ffdab9",
-        peru: "cd853f",
-        pink: "ffc0cb",
-        plum: "dda0dd",
-        powderblue: "b0e0e6",
-        purple: "800080",
-        rebeccapurple: "663399",
-        red: "f00",
-        rosybrown: "bc8f8f",
-        royalblue: "4169e1",
-        saddlebrown: "8b4513",
-        salmon: "fa8072",
-        sandybrown: "f4a460",
-        seagreen: "2e8b57",
-        seashell: "fff5ee",
-        sienna: "a0522d",
-        silver: "c0c0c0",
-        skyblue: "87ceeb",
-        slateblue: "6a5acd",
-        slategray: "708090",
-        slategrey: "708090",
-        snow: "fffafa",
-        springgreen: "00ff7f",
-        steelblue: "4682b4",
-        tan: "d2b48c",
-        teal: "008080",
-        thistle: "d8bfd8",
-        tomato: "ff6347",
-        turquoise: "40e0d0",
-        violet: "ee82ee",
-        wheat: "f5deb3",
-        white: "fff",
-        whitesmoke: "f5f5f5",
-        yellow: "ff0",
-        yellowgreen: "9acd32"
-    };
-
-    // Make it easy to access colors via `hexNames[hex]`
-    var hexNames = tinycolor.hexNames = flip(names);
-
-    // Utilities
-    // ---------
-
-    // `{ 'name1': 'val1' }` becomes `{ 'val1': 'name1' }`
-    function flip(o) {
-        var flipped = {};
-        for (var i in o) {
-            if (o.hasOwnProperty(i)) {
-                flipped[o[i]] = i;
-            }
-        }
-        return flipped;
-    }
-
-    // Return a valid alpha value [0,1] with all invalid values being set to 1
-    function boundAlpha(a) {
-        a = parseFloat(a);
-
-        if (isNaN(a) || a < 0 || a > 1) {
-            a = 1;
-        }
-
-        return a;
-    }
-
-    // Take input from [0, n] and return it as [0, 1]
-    function bound01(n, max) {
-        if (isOnePointZero(n)) {
-            n = "100%";
-        }
-
-        var processPercent = isPercentage(n);
-        n = mathMin(max, mathMax(0, parseFloat(n)));
-
-        // Automatically convert percentage into number
-        if (processPercent) {
-            n = parseInt(n * max, 10) / 100;
-        }
-
-        // Handle floating point rounding errors
-        if (math.abs(n - max) < 0.000001) {
-            return 1;
-        }
-
-        // Convert into [0, 1] range if it isn't already
-        return n % max / parseFloat(max);
-    }
-
-    // Force a number between 0 and 1
-    function clamp01(val) {
-        return mathMin(1, mathMax(0, val));
-    }
-
-    // Parse a base-16 hex value into a base-10 integer
-    function parseIntFromHex(val) {
-        return parseInt(val, 16);
-    }
-
-    // Need to handle 1.0 as 100%, since once it is a number, there is no difference between it and 1
-    // <http://stackoverflow.com/questions/7422072/javascript-how-to-detect-number-as-a-decimal-including-1-0>
-    function isOnePointZero(n) {
-        return typeof n == "string" && n.indexOf('.') != -1 && parseFloat(n) === 1;
-    }
-
-    // Check to see if string passed in is a percentage
-    function isPercentage(n) {
-        return typeof n === "string" && n.indexOf('%') != -1;
-    }
-
-    // Force a hex value to have 2 characters
-    function pad2(c) {
-        return c.length == 1 ? '0' + c : '' + c;
-    }
-
-    // Replace a decimal with it's percentage value
-    function convertToPercentage(n) {
-        if (n <= 1) {
-            n = n * 100 + "%";
-        }
-
-        return n;
-    }
-
-    // Converts a decimal to a hex value
-    function convertDecimalToHex(d) {
-        return Math.round(parseFloat(d) * 255).toString(16);
-    }
-    // Converts a hex value to a decimal
-    function convertHexToDecimal(h) {
-        return parseIntFromHex(h) / 255;
-    }
-
-    var matchers = function () {
-
-        // <http://www.w3.org/TR/css3-values/#integers>
-        var CSS_INTEGER = "[-\\+]?\\d+%?";
-
-        // <http://www.w3.org/TR/css3-values/#number-value>
-        var CSS_NUMBER = "[-\\+]?\\d*\\.\\d+%?";
-
-        // Allow positive/negative integer/number.  Don't capture the either/or, just the entire outcome.
-        var CSS_UNIT = "(?:" + CSS_NUMBER + ")|(?:" + CSS_INTEGER + ")";
-
-        // Actual matching.
-        // Parentheses and commas are optional, but not required.
-        // Whitespace can take the place of commas or opening paren
-        var PERMISSIVE_MATCH3 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
-        var PERMISSIVE_MATCH4 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
-
-        return {
-            rgb: new RegExp("rgb" + PERMISSIVE_MATCH3),
-            rgba: new RegExp("rgba" + PERMISSIVE_MATCH4),
-            hsl: new RegExp("hsl" + PERMISSIVE_MATCH3),
-            hsla: new RegExp("hsla" + PERMISSIVE_MATCH4),
-            hsv: new RegExp("hsv" + PERMISSIVE_MATCH3),
-            hsva: new RegExp("hsva" + PERMISSIVE_MATCH4),
-            hex3: /^([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
-            hex6: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/,
-            hex8: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
-        };
-    }();
-
-    // `stringInputToObject`
-    // Permissive string parsing.  Take in a number of formats, and output an object
-    // based on detected format.  Returns `{ r, g, b }` or `{ h, s, l }` or `{ h, s, v}`
-    function stringInputToObject(color) {
-
-        color = color.replace(trimLeft, '').replace(trimRight, '').toLowerCase();
-        var named = false;
-        if (names[color]) {
-            color = names[color];
-            named = true;
-        } else if (color == 'transparent') {
-            return { r: 0, g: 0, b: 0, a: 0, format: "name" };
-        }
-
-        // Try to match string input using regular expressions.
-        // Keep most of the number bounding out of this function - don't worry about [0,1] or [0,100] or [0,360]
-        // Just return an object and let the conversion functions handle that.
-        // This way the result will be the same whether the tinycolor is initialized with string or object.
-        var match;
-        if (match = matchers.rgb.exec(color)) {
-            return { r: match[1], g: match[2], b: match[3] };
-        }
-        if (match = matchers.rgba.exec(color)) {
-            return { r: match[1], g: match[2], b: match[3], a: match[4] };
-        }
-        if (match = matchers.hsl.exec(color)) {
-            return { h: match[1], s: match[2], l: match[3] };
-        }
-        if (match = matchers.hsla.exec(color)) {
-            return { h: match[1], s: match[2], l: match[3], a: match[4] };
-        }
-        if (match = matchers.hsv.exec(color)) {
-            return { h: match[1], s: match[2], v: match[3] };
-        }
-        if (match = matchers.hsva.exec(color)) {
-            return { h: match[1], s: match[2], v: match[3], a: match[4] };
-        }
-        if (match = matchers.hex8.exec(color)) {
-            return {
-                a: convertHexToDecimal(match[1]),
-                r: parseIntFromHex(match[2]),
-                g: parseIntFromHex(match[3]),
-                b: parseIntFromHex(match[4]),
-                format: named ? "name" : "hex8"
-            };
-        }
-        if (match = matchers.hex6.exec(color)) {
-            return {
-                r: parseIntFromHex(match[1]),
-                g: parseIntFromHex(match[2]),
-                b: parseIntFromHex(match[3]),
-                format: named ? "name" : "hex"
-            };
-        }
-        if (match = matchers.hex3.exec(color)) {
-            return {
-                r: parseIntFromHex(match[1] + '' + match[1]),
-                g: parseIntFromHex(match[2] + '' + match[2]),
-                b: parseIntFromHex(match[3] + '' + match[3]),
-                format: named ? "name" : "hex"
-            };
+          _set($(e.target).closest('.sp-thumb-el').data('color'));
+          move();
+          updateOriginalInput(true);
+          if (opts.hideAfterPaletteSelect) {
+            hide();
+          }
         }
 
         return false;
+      }
+
+      var paletteEvent = IE ? 'mousedown.spectrum' : 'click.spectrum touchstart.spectrum';
+      paletteContainer.delegate('.sp-thumb-el', paletteEvent, paletteElementClick);
+      initialColorContainer.delegate('.sp-thumb-el:nth-child(1)', paletteEvent, { ignore: true }, paletteElementClick);
     }
 
-    window.tinycolor = tinycolor;
-    //})();
+    function updateSelectionPaletteFromStorage() {
+      if (localStorageKey && window.localStorage) {
+        // Migrate old palettes over to new format.  May want to remove this eventually.
+        try {
+          var oldPalette = window.localStorage[localStorageKey].split(',#');
+          if (oldPalette.length > 1) {
+            delete window.localStorage[localStorageKey];
+            $.each(oldPalette, function (i, c) {
+              addColorToSelectionPalette(c);
+            });
+          }
+        } catch (e) {}
 
-    $(function () {
-        if ($.fn.spectrum.load) {
-            $.fn.spectrum.processNativeColorInputs();
+        try {
+          selectionPalette = window.localStorage[localStorageKey].split(';');
+        } catch (e) {}
+      }
+    }
+
+    function addColorToSelectionPalette(color) {
+      if (showSelectionPalette) {
+        var rgb = tinycolor(color).toRgbString();
+        if (!paletteLookup[rgb] && $.inArray(rgb, selectionPalette) === -1) {
+          selectionPalette.push(rgb);
+          while (selectionPalette.length > maxSelectionSize) {
+            selectionPalette.shift();
+          }
         }
+
+        if (localStorageKey && window.localStorage) {
+          try {
+            window.localStorage[localStorageKey] = selectionPalette.join(';');
+          } catch (e) {}
+        }
+      }
+    }
+
+    function getUniqueSelectionPalette() {
+      var unique = [];
+      if (opts.showPalette) {
+        for (var i = 0; i < selectionPalette.length; i++) {
+          var rgb = tinycolor(selectionPalette[i]).toRgbString();
+
+          if (!paletteLookup[rgb]) {
+            unique.push(selectionPalette[i]);
+          }
+        }
+      }
+
+      return unique.reverse().slice(0, opts.maxSelectionSize);
+    }
+
+    function drawPalette() {
+      var currentColor = get();
+
+      var html = $.map(paletteArray, function (palette, i) {
+        return paletteTemplate(palette, currentColor, 'sp-palette-row sp-palette-row-' + i, opts);
+      });
+
+      updateSelectionPaletteFromStorage();
+
+      if (selectionPalette) {
+        html.push(paletteTemplate(getUniqueSelectionPalette(), currentColor, 'sp-palette-row sp-palette-row-selection', opts));
+      }
+
+      paletteContainer.html(html.join(''));
+    }
+
+    function drawInitial() {
+      if (opts.showInitial) {
+        var initial = colorOnShow;
+        var current = get();
+        initialColorContainer.html(paletteTemplate([initial, current], current, 'sp-palette-row-initial', opts));
+      }
+    }
+
+    function dragStart() {
+      if (dragHeight <= 0 || dragWidth <= 0 || slideHeight <= 0) {
+        reflow();
+      }
+      isDragging = true;
+      container.addClass(draggingClass);
+      shiftMovementDirection = null;
+      boundElement.trigger('dragstart.spectrum', [get()]);
+    }
+
+    function dragStop() {
+      isDragging = false;
+      container.removeClass(draggingClass);
+      boundElement.trigger('dragstop.spectrum', [get()]);
+    }
+
+    function setFromTextInput() {
+      var value = textInput.val();
+
+      if ((value === null || value === '') && allowEmpty) {
+        _set(null);
+        updateOriginalInput(true);
+      } else {
+        var tiny = tinycolor(value);
+        if (tiny.isValid()) {
+          _set(tiny);
+          updateOriginalInput(true);
+        } else {
+          textInput.addClass('sp-validation-error');
+        }
+      }
+    }
+
+    function toggle() {
+      if (visible) {
+        hide();
+      } else {
+        show();
+      }
+    }
+
+    function show() {
+      var event = $.Event('beforeShow.spectrum');
+
+      if (visible) {
+        reflow();
+        return;
+      }
+
+      boundElement.trigger(event, [get()]);
+
+      if (callbacks.beforeShow(get()) === false || event.isDefaultPrevented()) {
+        return;
+      }
+
+      hideAll();
+      visible = true;
+
+      var $doc = $(doc);
+      $doc.bind('keydown.spectrum', onkeydown);
+      $doc.bind('click.spectrum', clickout);
+      $(window).bind('resize.spectrum', resize);
+      replacer.addClass('sp-active');
+      container.removeClass('sp-hidden');
+
+      reflow();
+      updateUI();
+
+      colorOnShow = get();
+
+      drawInitial();
+      callbacks.show(colorOnShow);
+      boundElement.trigger('show.spectrum', [colorOnShow]);
+    }
+
+    function onkeydown(e) {
+      // Close on ESC
+      if (e.keyCode === 27) {
+        hide();
+      }
+    }
+
+    function clickout(e) {
+      // Return on right click.
+      if (e.button == 2) {
+        return;
+      }
+
+      // If a drag event was happening during the mouseup, don't hide
+      // on click.
+      if (isDragging) {
+        return;
+      }
+
+      if (clickoutFiresChange) {
+        updateOriginalInput(true);
+      } else {
+        revert();
+      }
+      hide();
+    }
+
+    function hide() {
+      // Return if hiding is unnecessary
+      if (!visible || flat) {
+        return;
+      }
+      visible = false;
+
+      $(doc).unbind('keydown.spectrum', onkeydown);
+      $(doc).unbind('click.spectrum', clickout);
+      $(window).unbind('resize.spectrum', resize);
+
+      replacer.removeClass('sp-active');
+      container.addClass('sp-hidden');
+
+      callbacks.hide(get());
+      boundElement.trigger('hide.spectrum', [get()]);
+    }
+
+    function revert() {
+      _set(colorOnShow, true);
+    }
+
+    function _set(color, ignoreFormatChange) {
+      if (tinycolor.equals(color, get())) {
+        // Update UI just in case a validation error needs
+        // to be cleared.
+        updateUI();
+        return;
+      }
+
+      var newColor, newHsv;
+      if (!color && allowEmpty) {
+        isEmpty = true;
+      } else {
+        isEmpty = false;
+        newColor = tinycolor(color);
+        newHsv = newColor.toHsv();
+
+        currentHue = newHsv.h % 360 / 360;
+        currentSaturation = newHsv.s;
+        currentValue = newHsv.v;
+        currentAlpha = newHsv.a;
+      }
+      updateUI();
+
+      if (newColor && newColor.isValid() && !ignoreFormatChange) {
+        currentPreferredFormat = opts.preferredFormat || newColor.getFormat();
+      }
+    }
+
+    function get(opts) {
+      opts = opts || {};
+
+      if (allowEmpty && isEmpty) {
+        return null;
+      }
+
+      return tinycolor.fromRatio({
+        h: currentHue,
+        s: currentSaturation,
+        v: currentValue,
+        a: Math.round(currentAlpha * 100) / 100
+      }, { format: opts.format || currentPreferredFormat });
+    }
+
+    function isValid() {
+      return !textInput.hasClass('sp-validation-error');
+    }
+
+    function move() {
+      updateUI();
+
+      callbacks.move(get());
+      boundElement.trigger('move.spectrum', [get()]);
+    }
+
+    function updateUI() {
+      textInput.removeClass('sp-validation-error');
+
+      updateHelperLocations();
+
+      // Update dragger background color (gradients take care of saturation and value).
+      var flatColor = tinycolor.fromRatio({ h: currentHue, s: 1, v: 1 });
+      dragger.css('background-color', flatColor.toHexString());
+
+      // Get a format that alpha will be included in (hex and names ignore alpha)
+      var format = currentPreferredFormat;
+      if (currentAlpha < 1 && !(currentAlpha === 0 && format === 'name')) {
+        if (format === 'hex' || format === 'hex3' || format === 'hex6' || format === 'name') {
+          format = 'rgb';
+        }
+      }
+
+      var realColor = get({ format: format }),
+          displayColor = '';
+
+      //reset background info for preview element
+      previewElement.removeClass('sp-clear-display');
+      previewElement.css('background-color', 'transparent');
+
+      if (!realColor && allowEmpty) {
+        // Update the replaced elements background with icon indicating no color selection
+        previewElement.addClass('sp-clear-display');
+      } else {
+        var realHex = realColor.toHexString(),
+            realRgb = realColor.toRgbString();
+
+        // Update the replaced elements background color (with actual selected color)
+        if (rgbaSupport || realColor.alpha === 1) {
+          previewElement.css('background-color', realRgb);
+        } else {
+          previewElement.css('background-color', 'transparent');
+          previewElement.css('filter', realColor.toFilter());
+        }
+
+        if (opts.showAlpha) {
+          var rgb = realColor.toRgb();
+          rgb.a = 0;
+          var realAlpha = tinycolor(rgb).toRgbString();
+          var gradient = 'linear-gradient(left, ' + realAlpha + ', ' + realHex + ')';
+
+          if (IE) {
+            alphaSliderInner.css('filter', tinycolor(realAlpha).toFilter({ gradientType: 1 }, realHex));
+          } else {
+            alphaSliderInner.css('background', '-webkit-' + gradient);
+            alphaSliderInner.css('background', '-moz-' + gradient);
+            alphaSliderInner.css('background', '-ms-' + gradient);
+            // Use current syntax gradient on unprefixed property.
+            alphaSliderInner.css('background', 'linear-gradient(to right, ' + realAlpha + ', ' + realHex + ')');
+          }
+        }
+
+        displayColor = realColor.toString(format);
+      }
+
+      // Update the text entry input as it changes happen
+      if (opts.showInput) {
+        textInput.val(displayColor);
+      }
+
+      if (opts.showPalette) {
+        drawPalette();
+      }
+
+      drawInitial();
+    }
+
+    function updateHelperLocations() {
+      var s = currentSaturation;
+      var v = currentValue;
+
+      if (allowEmpty && isEmpty) {
+        //if selected color is empty, hide the helpers
+        alphaSlideHelper.hide();
+        slideHelper.hide();
+        dragHelper.hide();
+      } else {
+        //make sure helpers are visible
+        alphaSlideHelper.show();
+        slideHelper.show();
+        dragHelper.show();
+
+        // Where to show the little circle in that displays your current selected color
+        var dragX = s * dragWidth;
+        var dragY = dragHeight - v * dragHeight;
+        dragX = Math.max(-dragHelperHeight, Math.min(dragWidth - dragHelperHeight, dragX - dragHelperHeight));
+        dragY = Math.max(-dragHelperHeight, Math.min(dragHeight - dragHelperHeight, dragY - dragHelperHeight));
+        dragHelper.css({
+          top: dragY + 'px',
+          left: dragX + 'px'
+        });
+
+        var alphaX = currentAlpha * alphaWidth;
+        alphaSlideHelper.css({
+          left: alphaX - alphaSlideHelperWidth / 2 + 'px'
+        });
+
+        // Where to show the bar that displays your current selected hue
+        var slideY = currentHue * slideHeight;
+        slideHelper.css({
+          top: slideY - slideHelperHeight + 'px'
+        });
+      }
+    }
+
+    function updateOriginalInput(fireCallback) {
+      var color = get(),
+          displayColor = '',
+          hasChanged = !tinycolor.equals(color, colorOnShow);
+
+      if (color) {
+        displayColor = color.toString(currentPreferredFormat);
+        // Update the selection palette with the current color
+        addColorToSelectionPalette(color);
+      }
+
+      if (isInput) {
+        boundElement.val(displayColor);
+      }
+
+      if (fireCallback && hasChanged) {
+        callbacks.change(color);
+        boundElement.trigger('change', [color]);
+      }
+    }
+
+    function reflow() {
+      if (!visible) {
+        return; // Calculations would be useless and wouldn't be reliable anyways
+      }
+      dragWidth = dragger.width();
+      dragHeight = dragger.height();
+      dragHelperHeight = dragHelper.height();
+      slideWidth = slider.width();
+      slideHeight = slider.height();
+      slideHelperHeight = slideHelper.height();
+      alphaWidth = alphaSlider.width();
+      alphaSlideHelperWidth = alphaSlideHelper.width();
+
+      if (!flat) {
+        container.css('position', 'absolute');
+        if (opts.offset) {
+          container.offset(opts.offset);
+        } else {
+          container.offset(getOffset(container, offsetElement));
+        }
+      }
+
+      updateHelperLocations();
+
+      if (opts.showPalette) {
+        drawPalette();
+      }
+
+      boundElement.trigger('reflow.spectrum');
+    }
+
+    function destroy() {
+      boundElement.show();
+      offsetElement.unbind('click.spectrum touchstart.spectrum');
+      container.remove();
+      replacer.remove();
+      spectrums[spect.id] = null;
+    }
+
+    function option(optionName, optionValue) {
+      if (optionName === undefined) {
+        return $.extend({}, opts);
+      }
+      if (optionValue === undefined) {
+        return opts[optionName];
+      }
+
+      opts[optionName] = optionValue;
+
+      if (optionName === 'preferredFormat') {
+        currentPreferredFormat = opts.preferredFormat;
+      }
+      applyOptions();
+    }
+
+    function enable() {
+      disabled = false;
+      boundElement.attr('disabled', false);
+      offsetElement.removeClass('sp-disabled');
+    }
+
+    function disable() {
+      hide();
+      disabled = true;
+      boundElement.attr('disabled', true);
+      offsetElement.addClass('sp-disabled');
+    }
+
+    function setOffset(coord) {
+      opts.offset = coord;
+      reflow();
+    }
+
+    initialize();
+
+    var spect = {
+      show: show,
+      hide: hide,
+      toggle: toggle,
+      reflow: reflow,
+      option: option,
+      enable: enable,
+      disable: disable,
+      offset: setOffset,
+      set: function set(c) {
+        _set(c);
+        updateOriginalInput();
+      },
+      get: get,
+      destroy: destroy,
+      container: container
+    };
+
+    spect.id = spectrums.push(spect) - 1;
+
+    return spect;
+  }
+
+  /**
+   * checkOffset - get the offset below/above and left/right element depending on screen position
+   * Thanks https://github.com/jquery/jquery-ui/blob/master/ui/jquery.ui.datepicker.js
+   */
+  function getOffset(picker, input) {
+    var extraY = 0;
+    var dpWidth = picker.outerWidth();
+    var dpHeight = picker.outerHeight();
+    var inputHeight = input.outerHeight();
+    var doc = picker[0].ownerDocument;
+    var docElem = doc.documentElement;
+    var cW = docElem.clientWidth;
+    var cH = docElem.clientHeight;
+    var scL = $(doc).scrollLeft();
+    var scT = $(doc).scrollTop();
+    var viewWidth = cW + scL;
+    var viewHeight = cH + scT;
+    var offset = input.offset();
+
+    offset.top += inputHeight;
+
+    offset.left -= Math.min(offset.left, offset.left + dpWidth > viewWidth && viewWidth > dpWidth ? Math.abs(offset.left + dpWidth - viewWidth) : 0);
+
+    offset.top -= Math.min(offset.top, offset.top + dpHeight > viewHeight && viewHeight > dpHeight ? Math.abs(dpHeight + inputHeight - extraY) : extraY);
+
+    return offset;
+  }
+
+  /**
+   * noop - do nothing
+   */
+  function noop() {}
+
+  /**
+   * stopPropagation - makes the code only doing this a little easier to read in line
+   */
+  function stopPropagation(e) {
+    e.stopPropagation();
+  }
+
+  /**
+   * Create a function bound to a given object
+   * Thanks to underscore.js
+   */
+  function bind(func, obj) {
+    var slice = Array.prototype.slice;
+    var args = slice.call(arguments, 2);
+    return function () {
+      return func.apply(obj, args.concat(slice.call(arguments)));
+    };
+  }
+
+  /**
+   * Lightweight drag helper.  Handles containment within the element, so that
+   * when dragging, the x is within [0,element.width] and y is within [0,element.height]
+   */
+  function draggable(element, onmove, onstart, onstop) {
+    onmove = onmove || function () {};
+    onstart = onstart || function () {};
+    onstop = onstop || function () {};
+    var doc = document;
+    var dragging = false;
+    var offset = {};
+    var maxHeight = 0;
+    var maxWidth = 0;
+    var hasTouch = 'ontouchstart' in window;
+
+    var duringDragEvents = {};
+    duringDragEvents['selectstart'] = prevent;
+    duringDragEvents['dragstart'] = prevent;
+    duringDragEvents['touchmove mousemove'] = move;
+    duringDragEvents['touchend mouseup'] = stop;
+
+    function prevent(e) {
+      if (e.stopPropagation) {
+        e.stopPropagation();
+      }
+      if (e.preventDefault) {
+        e.preventDefault();
+      }
+      e.returnValue = false;
+    }
+
+    function move(e) {
+      if (dragging) {
+        // Mouseup happened outside of window
+        if (IE && doc.documentMode < 9 && !e.button) {
+          return stop();
+        }
+
+        var t0 = e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0];
+        var pageX = t0 && t0.pageX || e.pageX;
+        var pageY = t0 && t0.pageY || e.pageY;
+
+        var dragX = Math.max(0, Math.min(pageX - offset.left, maxWidth));
+        var dragY = Math.max(0, Math.min(pageY - offset.top, maxHeight));
+
+        if (hasTouch) {
+          // Stop scrolling in iOS
+          prevent(e);
+        }
+
+        onmove.apply(element, [dragX, dragY, e]);
+      }
+    }
+
+    function start(e) {
+      var rightclick = e.which ? e.which == 3 : e.button == 2;
+
+      if (!rightclick && !dragging) {
+        if (onstart.apply(element, arguments) !== false) {
+          dragging = true;
+          maxHeight = $(element).height();
+          maxWidth = $(element).width();
+          offset = $(element).offset();
+
+          $(doc).bind(duringDragEvents);
+          $(doc.body).addClass('sp-dragging');
+
+          move(e);
+
+          prevent(e);
+        }
+      }
+    }
+
+    function stop() {
+      if (dragging) {
+        $(doc).unbind(duringDragEvents);
+        $(doc.body).removeClass('sp-dragging');
+
+        // Wait a tick before notifying observers to allow the click event
+        // to fire in Chrome.
+        setTimeout(function () {
+          onstop.apply(element, arguments);
+        }, 0);
+      }
+      dragging = false;
+    }
+
+    $(element).bind('touchstart mousedown', start);
+  }
+
+  function throttle(func, wait, debounce) {
+    var timeout;
+    return function () {
+      var context = this,
+          args = arguments;
+      var throttler = function throttler() {
+        timeout = null;
+        func.apply(context, args);
+      };
+      if (debounce) clearTimeout(timeout);
+      if (debounce || !timeout) timeout = setTimeout(throttler, wait);
+    };
+  }
+
+  function inputTypeColorSupport() {
+    return $.fn.spectrum.inputTypeColorSupport();
+  }
+
+  /**
+   * Define a jQuery plugin
+   */
+  var dataID = 'spectrum.id';
+  $.fn.spectrum = function (opts, extra) {
+    if (typeof opts == 'string') {
+      var returnValue = this;
+      var args = Array.prototype.slice.call(arguments, 1);
+
+      this.each(function () {
+        var spect = spectrums[$(this).data(dataID)];
+        if (spect) {
+          var method = spect[opts];
+          if (!method) {
+            throw new Error("Spectrum: no such method: '" + opts + "'");
+          }
+
+          if (opts == 'get') {
+            returnValue = spect.get();
+          } else if (opts == 'container') {
+            returnValue = spect.container;
+          } else if (opts == 'option') {
+            returnValue = spect.option.apply(spect, args);
+          } else if (opts == 'destroy') {
+            spect.destroy();
+            $(this).removeData(dataID);
+          } else {
+            method.apply(spect, args);
+          }
+        }
+      });
+
+      return returnValue;
+    }
+
+    // Initializing a new instance of spectrum
+    return this.spectrum('destroy').each(function () {
+      var options = $.extend({}, opts, $(this).data());
+      var spect = spectrum(this, options);
+      $(this).data(dataID, spect.id);
     });
+  };
+
+  $.fn.spectrum.load = true;
+  $.fn.spectrum.loadOpts = {};
+  $.fn.spectrum.draggable = draggable;
+  $.fn.spectrum.defaults = defaultOpts;
+  $.fn.spectrum.inputTypeColorSupport = function inputTypeColorSupport() {
+    if (typeof inputTypeColorSupport._cachedResult === 'undefined') {
+      var colorInput = $("<input type='color'/>")[0]; // if color element is supported, value will default to not null
+      inputTypeColorSupport._cachedResult = colorInput.type === 'color' && colorInput.value !== '';
+    }
+    return inputTypeColorSupport._cachedResult;
+  };
+
+  $.spectrum = {};
+  $.spectrum.localization = {};
+  $.spectrum.palettes = {};
+
+  $.fn.spectrum.processNativeColorInputs = function () {
+    var colorInputs = $('input[type=color]');
+    if (colorInputs.length && !inputTypeColorSupport()) {
+      colorInputs.spectrum({
+        preferredFormat: 'hex6'
+      });
+    }
+  };
+
+  // TinyColor v1.1.2
+  // https://github.com/bgrins/TinyColor
+  // Brian Grinstead, MIT License
+
+  //(function() {
+
+  var trimLeft = /^[\s,#]+/,
+      trimRight = /\s+$/,
+      tinyCounter = 0,
+      math = Math,
+      mathRound = math.round,
+      mathMin = math.min,
+      mathMax = math.max,
+      mathRandom = math.random;
+
+  var tinycolor = function tinycolor(color, opts) {
+    color = color ? color : '';
+    opts = opts || {};
+
+    // If input is already a tinycolor, return itself
+    if (color instanceof tinycolor) {
+      return color;
+    }
+    // If we are called as a function, call using new instead
+    if (!(this instanceof tinycolor)) {
+      return new tinycolor(color, opts);
+    }
+
+    var rgb = inputToRGB(color);
+    this._originalInput = color, this._r = rgb.r, this._g = rgb.g, this._b = rgb.b, this._a = rgb.a, this._roundA = mathRound(100 * this._a) / 100, this._format = opts.format || rgb.format;
+    this._gradientType = opts.gradientType;
+
+    // Don't let the range of [0,255] come back in [0,1].
+    // Potentially lose a little bit of precision here, but will fix issues where
+    // .5 gets interpreted as half of the total, instead of half of 1
+    // If it was supposed to be 128, this was already taken care of by `inputToRgb`
+    if (this._r < 1) {
+      this._r = mathRound(this._r);
+    }
+    if (this._g < 1) {
+      this._g = mathRound(this._g);
+    }
+    if (this._b < 1) {
+      this._b = mathRound(this._b);
+    }
+
+    this._ok = rgb.ok;
+    this._tc_id = tinyCounter++;
+  };
+
+  tinycolor.prototype = {
+    isDark: function isDark() {
+      return this.getBrightness() < 128;
+    },
+    isLight: function isLight() {
+      return !this.isDark();
+    },
+    isValid: function isValid() {
+      return this._ok;
+    },
+    getOriginalInput: function getOriginalInput() {
+      return this._originalInput;
+    },
+    getFormat: function getFormat() {
+      return this._format;
+    },
+    getAlpha: function getAlpha() {
+      return this._a;
+    },
+    getBrightness: function getBrightness() {
+      var rgb = this.toRgb();
+      return (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+    },
+    setAlpha: function setAlpha(value) {
+      this._a = boundAlpha(value);
+      this._roundA = mathRound(100 * this._a) / 100;
+      return this;
+    },
+    toHsv: function toHsv() {
+      var hsv = rgbToHsv(this._r, this._g, this._b);
+      return { h: hsv.h * 360, s: hsv.s, v: hsv.v, a: this._a };
+    },
+    toHsvString: function toHsvString() {
+      var hsv = rgbToHsv(this._r, this._g, this._b);
+      var h = mathRound(hsv.h * 360),
+          s = mathRound(hsv.s * 100),
+          v = mathRound(hsv.v * 100);
+      return this._a == 1 ? 'hsv(' + h + ', ' + s + '%, ' + v + '%)' : 'hsva(' + h + ', ' + s + '%, ' + v + '%, ' + this._roundA + ')';
+    },
+    toHsl: function toHsl() {
+      var hsl = rgbToHsl(this._r, this._g, this._b);
+      return { h: hsl.h * 360, s: hsl.s, l: hsl.l, a: this._a };
+    },
+    toHslString: function toHslString() {
+      var hsl = rgbToHsl(this._r, this._g, this._b);
+      var h = mathRound(hsl.h * 360),
+          s = mathRound(hsl.s * 100),
+          l = mathRound(hsl.l * 100);
+      return this._a == 1 ? 'hsl(' + h + ', ' + s + '%, ' + l + '%)' : 'hsla(' + h + ', ' + s + '%, ' + l + '%, ' + this._roundA + ')';
+    },
+    toHex: function toHex(allow3Char) {
+      return rgbToHex(this._r, this._g, this._b, allow3Char);
+    },
+    toHexString: function toHexString(allow3Char) {
+      return '#' + this.toHex(allow3Char);
+    },
+    toHex8: function toHex8() {
+      return rgbaToHex(this._r, this._g, this._b, this._a);
+    },
+    toHex8String: function toHex8String() {
+      return '#' + this.toHex8();
+    },
+    toRgb: function toRgb() {
+      return {
+        r: mathRound(this._r),
+        g: mathRound(this._g),
+        b: mathRound(this._b),
+        a: this._a
+      };
+    },
+    toRgbString: function toRgbString() {
+      return this._a == 1 ? 'rgb(' + mathRound(this._r) + ', ' + mathRound(this._g) + ', ' + mathRound(this._b) + ')' : 'rgba(' + mathRound(this._r) + ', ' + mathRound(this._g) + ', ' + mathRound(this._b) + ', ' + this._roundA + ')';
+    },
+    toPercentageRgb: function toPercentageRgb() {
+      return {
+        r: mathRound(bound01(this._r, 255) * 100) + '%',
+        g: mathRound(bound01(this._g, 255) * 100) + '%',
+        b: mathRound(bound01(this._b, 255) * 100) + '%',
+        a: this._a
+      };
+    },
+    toPercentageRgbString: function toPercentageRgbString() {
+      return this._a == 1 ? 'rgb(' + mathRound(bound01(this._r, 255) * 100) + '%, ' + mathRound(bound01(this._g, 255) * 100) + '%, ' + mathRound(bound01(this._b, 255) * 100) + '%)' : 'rgba(' + mathRound(bound01(this._r, 255) * 100) + '%, ' + mathRound(bound01(this._g, 255) * 100) + '%, ' + mathRound(bound01(this._b, 255) * 100) + '%, ' + this._roundA + ')';
+    },
+    toName: function toName() {
+      if (this._a === 0) {
+        return 'transparent';
+      }
+
+      if (this._a < 1) {
+        return false;
+      }
+
+      return hexNames[rgbToHex(this._r, this._g, this._b, true)] || false;
+    },
+    toFilter: function toFilter(secondColor) {
+      var hex8String = '#' + rgbaToHex(this._r, this._g, this._b, this._a);
+      var secondHex8String = hex8String;
+      var gradientType = this._gradientType ? 'GradientType = 1, ' : '';
+
+      if (secondColor) {
+        var s = tinycolor(secondColor);
+        secondHex8String = s.toHex8String();
+      }
+
+      return 'progid:DXImageTransform.Microsoft.gradient(' + gradientType + 'startColorstr=' + hex8String + ',endColorstr=' + secondHex8String + ')';
+    },
+    toString: function toString(format) {
+      var formatSet = !!format;
+      format = format || this._format;
+
+      var formattedString = false;
+      var hasAlpha = this._a < 1 && this._a >= 0;
+      var needsAlphaFormat = !formatSet && hasAlpha && (format === 'hex' || format === 'hex6' || format === 'hex3' || format === 'name');
+
+      if (needsAlphaFormat) {
+        // Special case for "transparent", all other non-alpha formats
+        // will return rgba when there is transparency.
+        if (format === 'name' && this._a === 0) {
+          return this.toName();
+        }
+        return this.toRgbString();
+      }
+      if (format === 'rgb') {
+        formattedString = this.toRgbString();
+      }
+      if (format === 'prgb') {
+        formattedString = this.toPercentageRgbString();
+      }
+      if (format === 'hex' || format === 'hex6') {
+        formattedString = this.toHexString();
+      }
+      if (format === 'hex3') {
+        formattedString = this.toHexString(true);
+      }
+      if (format === 'hex8') {
+        formattedString = this.toHex8String();
+      }
+      if (format === 'name') {
+        formattedString = this.toName();
+      }
+      if (format === 'hsl') {
+        formattedString = this.toHslString();
+      }
+      if (format === 'hsv') {
+        formattedString = this.toHsvString();
+      }
+
+      return formattedString || this.toHexString();
+    },
+
+    _applyModification: function _applyModification(fn, args) {
+      var color = fn.apply(null, [this].concat([].slice.call(args)));
+      this._r = color._r;
+      this._g = color._g;
+      this._b = color._b;
+      this.setAlpha(color._a);
+      return this;
+    },
+    lighten: function lighten() {
+      return this._applyModification(_lighten, arguments);
+    },
+    brighten: function brighten() {
+      return this._applyModification(_brighten, arguments);
+    },
+    darken: function darken() {
+      return this._applyModification(_darken, arguments);
+    },
+    desaturate: function desaturate() {
+      return this._applyModification(_desaturate, arguments);
+    },
+    saturate: function saturate() {
+      return this._applyModification(_saturate, arguments);
+    },
+    greyscale: function greyscale() {
+      return this._applyModification(_greyscale, arguments);
+    },
+    spin: function spin() {
+      return this._applyModification(_spin, arguments);
+    },
+
+    _applyCombination: function _applyCombination(fn, args) {
+      return fn.apply(null, [this].concat([].slice.call(args)));
+    },
+    analogous: function analogous() {
+      return this._applyCombination(_analogous, arguments);
+    },
+    complement: function complement() {
+      return this._applyCombination(_complement, arguments);
+    },
+    monochromatic: function monochromatic() {
+      return this._applyCombination(_monochromatic, arguments);
+    },
+    splitcomplement: function splitcomplement() {
+      return this._applyCombination(_splitcomplement, arguments);
+    },
+    triad: function triad() {
+      return this._applyCombination(_triad, arguments);
+    },
+    tetrad: function tetrad() {
+      return this._applyCombination(_tetrad, arguments);
+    }
+  };
+
+  // If input is an object, force 1 into "1.0" to handle ratios properly
+  // String input requires "1.0" as input, so 1 will be treated as 1
+  tinycolor.fromRatio = function (color, opts) {
+    if ((typeof color === 'undefined' ? 'undefined' : _typeof(color)) == 'object') {
+      var newColor = {};
+      for (var i in color) {
+        if (color.hasOwnProperty(i)) {
+          if (i === 'a') {
+            newColor[i] = color[i];
+          } else {
+            newColor[i] = convertToPercentage(color[i]);
+          }
+        }
+      }
+      color = newColor;
+    }
+
+    return tinycolor(color, opts);
+  };
+
+  // Given a string or object, convert that input to RGB
+  // Possible string inputs:
+  //
+  //     "red"
+  //     "#f00" or "f00"
+  //     "#ff0000" or "ff0000"
+  //     "#ff000000" or "ff000000"
+  //     "rgb 255 0 0" or "rgb (255, 0, 0)"
+  //     "rgb 1.0 0 0" or "rgb (1, 0, 0)"
+  //     "rgba (255, 0, 0, 1)" or "rgba 255, 0, 0, 1"
+  //     "rgba (1.0, 0, 0, 1)" or "rgba 1.0, 0, 0, 1"
+  //     "hsl(0, 100%, 50%)" or "hsl 0 100% 50%"
+  //     "hsla(0, 100%, 50%, 1)" or "hsla 0 100% 50%, 1"
+  //     "hsv(0, 100%, 100%)" or "hsv 0 100% 100%"
+  //
+  function inputToRGB(color) {
+    var rgb = { r: 0, g: 0, b: 0 };
+    var a = 1;
+    var ok = false;
+    var format = false;
+
+    if (typeof color == 'string') {
+      color = stringInputToObject(color);
+    }
+
+    if ((typeof color === 'undefined' ? 'undefined' : _typeof(color)) == 'object') {
+      if (color.hasOwnProperty('r') && color.hasOwnProperty('g') && color.hasOwnProperty('b')) {
+        rgb = rgbToRgb(color.r, color.g, color.b);
+        ok = true;
+        format = String(color.r).substr(-1) === '%' ? 'prgb' : 'rgb';
+      } else if (color.hasOwnProperty('h') && color.hasOwnProperty('s') && color.hasOwnProperty('v')) {
+        color.s = convertToPercentage(color.s);
+        color.v = convertToPercentage(color.v);
+        rgb = hsvToRgb(color.h, color.s, color.v);
+        ok = true;
+        format = 'hsv';
+      } else if (color.hasOwnProperty('h') && color.hasOwnProperty('s') && color.hasOwnProperty('l')) {
+        color.s = convertToPercentage(color.s);
+        color.l = convertToPercentage(color.l);
+        rgb = hslToRgb(color.h, color.s, color.l);
+        ok = true;
+        format = 'hsl';
+      }
+
+      if (color.hasOwnProperty('a')) {
+        a = color.a;
+      }
+    }
+
+    a = boundAlpha(a);
+
+    return {
+      ok: ok,
+      format: color.format || format,
+      r: mathMin(255, mathMax(rgb.r, 0)),
+      g: mathMin(255, mathMax(rgb.g, 0)),
+      b: mathMin(255, mathMax(rgb.b, 0)),
+      a: a
+    };
+  }
+
+  // Conversion Functions
+  // --------------------
+
+  // `rgbToHsl`, `rgbToHsv`, `hslToRgb`, `hsvToRgb` modified from:
+  // <http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript>
+
+  // `rgbToRgb`
+  // Handle bounds / percentage checking to conform to CSS color spec
+  // <http://www.w3.org/TR/css3-color/>
+  // *Assumes:* r, g, b in [0, 255] or [0, 1]
+  // *Returns:* { r, g, b } in [0, 255]
+  function rgbToRgb(r, g, b) {
+    return {
+      r: bound01(r, 255) * 255,
+      g: bound01(g, 255) * 255,
+      b: bound01(b, 255) * 255
+    };
+  }
+
+  // `rgbToHsl`
+  // Converts an RGB color value to HSL.
+  // *Assumes:* r, g, and b are contained in [0, 255] or [0, 1]
+  // *Returns:* { h, s, l } in [0,1]
+  function rgbToHsl(r, g, b) {
+    r = bound01(r, 255);
+    g = bound01(g, 255);
+    b = bound01(b, 255);
+
+    var max = mathMax(r, g, b),
+        min = mathMin(r, g, b);
+    var h,
+        s,
+        l = (max + min) / 2;
+
+    if (max == min) {
+      h = s = 0; // achromatic
+    } else {
+      var d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+
+      h /= 6;
+    }
+
+    return { h: h, s: s, l: l };
+  }
+
+  // `hslToRgb`
+  // Converts an HSL color value to RGB.
+  // *Assumes:* h is contained in [0, 1] or [0, 360] and s and l are contained [0, 1] or [0, 100]
+  // *Returns:* { r, g, b } in the set [0, 255]
+  function hslToRgb(h, s, l) {
+    var r, g, b;
+
+    h = bound01(h, 360);
+    s = bound01(s, 100);
+    l = bound01(l, 100);
+
+    function hue2rgb(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    }
+
+    if (s === 0) {
+      r = g = b = l; // achromatic
+    } else {
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    return { r: r * 255, g: g * 255, b: b * 255 };
+  }
+
+  // `rgbToHsv`
+  // Converts an RGB color value to HSV
+  // *Assumes:* r, g, and b are contained in the set [0, 255] or [0, 1]
+  // *Returns:* { h, s, v } in [0,1]
+  function rgbToHsv(r, g, b) {
+    r = bound01(r, 255);
+    g = bound01(g, 255);
+    b = bound01(b, 255);
+
+    var max = mathMax(r, g, b),
+        min = mathMin(r, g, b);
+    var h,
+        s,
+        v = max;
+
+    var d = max - min;
+    s = max === 0 ? 0 : d / max;
+
+    if (max == min) {
+      h = 0; // achromatic
+    } else {
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+      h /= 6;
+    }
+    return { h: h, s: s, v: v };
+  }
+
+  // `hsvToRgb`
+  // Converts an HSV color value to RGB.
+  // *Assumes:* h is contained in [0, 1] or [0, 360] and s and v are contained in [0, 1] or [0, 100]
+  // *Returns:* { r, g, b } in the set [0, 255]
+  function hsvToRgb(h, s, v) {
+    h = bound01(h, 360) * 6;
+    s = bound01(s, 100);
+    v = bound01(v, 100);
+
+    var i = math.floor(h),
+        f = h - i,
+        p = v * (1 - s),
+        q = v * (1 - f * s),
+        t = v * (1 - (1 - f) * s),
+        mod = i % 6,
+        r = [v, q, p, p, t, v][mod],
+        g = [t, v, v, q, p, p][mod],
+        b = [p, p, t, v, v, q][mod];
+
+    return { r: r * 255, g: g * 255, b: b * 255 };
+  }
+
+  // `rgbToHex`
+  // Converts an RGB color to hex
+  // Assumes r, g, and b are contained in the set [0, 255]
+  // Returns a 3 or 6 character hex
+  function rgbToHex(r, g, b, allow3Char) {
+    var hex = [pad2(mathRound(r).toString(16)), pad2(mathRound(g).toString(16)), pad2(mathRound(b).toString(16))];
+
+    // Return a 3 character hex if possible
+    if (allow3Char && hex[0].charAt(0) == hex[0].charAt(1) && hex[1].charAt(0) == hex[1].charAt(1) && hex[2].charAt(0) == hex[2].charAt(1)) {
+      return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0);
+    }
+
+    return hex.join('');
+  }
+  // `rgbaToHex`
+  // Converts an RGBA color plus alpha transparency to hex
+  // Assumes r, g, b and a are contained in the set [0, 255]
+  // Returns an 8 character hex
+  function rgbaToHex(r, g, b, a) {
+    var hex = [pad2(convertDecimalToHex(a)), pad2(mathRound(r).toString(16)), pad2(mathRound(g).toString(16)), pad2(mathRound(b).toString(16))];
+
+    return hex.join('');
+  }
+
+  // `equals`
+  // Can be called with any tinycolor input
+  tinycolor.equals = function (color1, color2) {
+    if (!color1 || !color2) {
+      return false;
+    }
+    return tinycolor(color1).toRgbString() == tinycolor(color2).toRgbString();
+  };
+  tinycolor.random = function () {
+    return tinycolor.fromRatio({
+      r: mathRandom(),
+      g: mathRandom(),
+      b: mathRandom()
+    });
+  };
+
+  // Modification Functions
+  // ----------------------
+  // Thanks to less.js for some of the basics here
+  // <https://github.com/cloudhead/less.js/blob/master/lib/less/functions.js>
+
+  function _desaturate(color, amount) {
+    amount = amount === 0 ? 0 : amount || 10;
+    var hsl = tinycolor(color).toHsl();
+    hsl.s -= amount / 100;
+    hsl.s = clamp01(hsl.s);
+    return tinycolor(hsl);
+  }
+
+  function _saturate(color, amount) {
+    amount = amount === 0 ? 0 : amount || 10;
+    var hsl = tinycolor(color).toHsl();
+    hsl.s += amount / 100;
+    hsl.s = clamp01(hsl.s);
+    return tinycolor(hsl);
+  }
+
+  function _greyscale(color) {
+    return tinycolor(color).desaturate(100);
+  }
+
+  function _lighten(color, amount) {
+    amount = amount === 0 ? 0 : amount || 10;
+    var hsl = tinycolor(color).toHsl();
+    hsl.l += amount / 100;
+    hsl.l = clamp01(hsl.l);
+    return tinycolor(hsl);
+  }
+
+  function _brighten(color, amount) {
+    amount = amount === 0 ? 0 : amount || 10;
+    var rgb = tinycolor(color).toRgb();
+    rgb.r = mathMax(0, mathMin(255, rgb.r - mathRound(255 * -(amount / 100))));
+    rgb.g = mathMax(0, mathMin(255, rgb.g - mathRound(255 * -(amount / 100))));
+    rgb.b = mathMax(0, mathMin(255, rgb.b - mathRound(255 * -(amount / 100))));
+    return tinycolor(rgb);
+  }
+
+  function _darken(color, amount) {
+    amount = amount === 0 ? 0 : amount || 10;
+    var hsl = tinycolor(color).toHsl();
+    hsl.l -= amount / 100;
+    hsl.l = clamp01(hsl.l);
+    return tinycolor(hsl);
+  }
+
+  // Spin takes a positive or negative amount within [-360, 360] indicating the change of hue.
+  // Values outside of this range will be wrapped into this range.
+  function _spin(color, amount) {
+    var hsl = tinycolor(color).toHsl();
+    var hue = (mathRound(hsl.h) + amount) % 360;
+    hsl.h = hue < 0 ? 360 + hue : hue;
+    return tinycolor(hsl);
+  }
+
+  // Combination Functions
+  // ---------------------
+  // Thanks to jQuery xColor for some of the ideas behind these
+  // <https://github.com/infusion/jQuery-xcolor/blob/master/jquery.xcolor.js>
+
+  function _complement(color) {
+    var hsl = tinycolor(color).toHsl();
+    hsl.h = (hsl.h + 180) % 360;
+    return tinycolor(hsl);
+  }
+
+  function _triad(color) {
+    var hsl = tinycolor(color).toHsl();
+    var h = hsl.h;
+    return [tinycolor(color), tinycolor({ h: (h + 120) % 360, s: hsl.s, l: hsl.l }), tinycolor({ h: (h + 240) % 360, s: hsl.s, l: hsl.l })];
+  }
+
+  function _tetrad(color) {
+    var hsl = tinycolor(color).toHsl();
+    var h = hsl.h;
+    return [tinycolor(color), tinycolor({ h: (h + 90) % 360, s: hsl.s, l: hsl.l }), tinycolor({ h: (h + 180) % 360, s: hsl.s, l: hsl.l }), tinycolor({ h: (h + 270) % 360, s: hsl.s, l: hsl.l })];
+  }
+
+  function _splitcomplement(color) {
+    var hsl = tinycolor(color).toHsl();
+    var h = hsl.h;
+    return [tinycolor(color), tinycolor({ h: (h + 72) % 360, s: hsl.s, l: hsl.l }), tinycolor({ h: (h + 216) % 360, s: hsl.s, l: hsl.l })];
+  }
+
+  function _analogous(color, results, slices) {
+    results = results || 6;
+    slices = slices || 30;
+
+    var hsl = tinycolor(color).toHsl();
+    var part = 360 / slices;
+    var ret = [tinycolor(color)];
+
+    for (hsl.h = (hsl.h - (part * results >> 1) + 720) % 360; --results;) {
+      hsl.h = (hsl.h + part) % 360;
+      ret.push(tinycolor(hsl));
+    }
+    return ret;
+  }
+
+  function _monochromatic(color, results) {
+    results = results || 6;
+    var hsv = tinycolor(color).toHsv();
+    var h = hsv.h,
+        s = hsv.s,
+        v = hsv.v;
+    var ret = [];
+    var modification = 1 / results;
+
+    while (results--) {
+      ret.push(tinycolor({ h: h, s: s, v: v }));
+      v = (v + modification) % 1;
+    }
+
+    return ret;
+  }
+
+  // Utility Functions
+  // ---------------------
+
+  tinycolor.mix = function (color1, color2, amount) {
+    amount = amount === 0 ? 0 : amount || 50;
+
+    var rgb1 = tinycolor(color1).toRgb();
+    var rgb2 = tinycolor(color2).toRgb();
+
+    var p = amount / 100;
+    var w = p * 2 - 1;
+    var a = rgb2.a - rgb1.a;
+
+    var w1;
+
+    if (w * a == -1) {
+      w1 = w;
+    } else {
+      w1 = (w + a) / (1 + w * a);
+    }
+
+    w1 = (w1 + 1) / 2;
+
+    var w2 = 1 - w1;
+
+    var rgba = {
+      r: rgb2.r * w1 + rgb1.r * w2,
+      g: rgb2.g * w1 + rgb1.g * w2,
+      b: rgb2.b * w1 + rgb1.b * w2,
+      a: rgb2.a * p + rgb1.a * (1 - p)
+    };
+
+    return tinycolor(rgba);
+  };
+
+  // Readability Functions
+  // ---------------------
+  // <http://www.w3.org/TR/AERT#color-contrast>
+
+  // `readability`
+  // Analyze the 2 colors and returns an object with the following properties:
+  //    `brightness`: difference in brightness between the two colors
+  //    `color`: difference in color/hue between the two colors
+  tinycolor.readability = function (color1, color2) {
+    var c1 = tinycolor(color1);
+    var c2 = tinycolor(color2);
+    var rgb1 = c1.toRgb();
+    var rgb2 = c2.toRgb();
+    var brightnessA = c1.getBrightness();
+    var brightnessB = c2.getBrightness();
+    var colorDiff = Math.max(rgb1.r, rgb2.r) - Math.min(rgb1.r, rgb2.r) + Math.max(rgb1.g, rgb2.g) - Math.min(rgb1.g, rgb2.g) + Math.max(rgb1.b, rgb2.b) - Math.min(rgb1.b, rgb2.b);
+
+    return {
+      brightness: Math.abs(brightnessA - brightnessB),
+      color: colorDiff
+    };
+  };
+
+  // `readable`
+  // http://www.w3.org/TR/AERT#color-contrast
+  // Ensure that foreground and background color combinations provide sufficient contrast.
+  // *Example*
+  //    tinycolor.isReadable("#000", "#111") => false
+  tinycolor.isReadable = function (color1, color2) {
+    var readability = tinycolor.readability(color1, color2);
+    return readability.brightness > 125 && readability.color > 500;
+  };
+
+  // `mostReadable`
+  // Given a base color and a list of possible foreground or background
+  // colors for that base, returns the most readable color.
+  // *Example*
+  //    tinycolor.mostReadable("#123", ["#fff", "#000"]) => "#000"
+  tinycolor.mostReadable = function (baseColor, colorList) {
+    var bestColor = null;
+    var bestScore = 0;
+    var bestIsReadable = false;
+    for (var i = 0; i < colorList.length; i++) {
+      // We normalize both around the "acceptable" breaking point,
+      // but rank brightness constrast higher than hue.
+
+      var readability = tinycolor.readability(baseColor, colorList[i]);
+      var readable = readability.brightness > 125 && readability.color > 500;
+      var score = 3 * (readability.brightness / 125) + readability.color / 500;
+
+      if (readable && !bestIsReadable || readable && bestIsReadable && score > bestScore || !readable && !bestIsReadable && score > bestScore) {
+        bestIsReadable = readable;
+        bestScore = score;
+        bestColor = tinycolor(colorList[i]);
+      }
+    }
+    return bestColor;
+  };
+
+  // Big List of Colors
+  // ------------------
+  // <http://www.w3.org/TR/css3-color/#svg-color>
+  var names = tinycolor.names = {
+    aliceblue: 'f0f8ff',
+    antiquewhite: 'faebd7',
+    aqua: '0ff',
+    aquamarine: '7fffd4',
+    azure: 'f0ffff',
+    beige: 'f5f5dc',
+    bisque: 'ffe4c4',
+    black: '000',
+    blanchedalmond: 'ffebcd',
+    blue: '00f',
+    blueviolet: '8a2be2',
+    brown: 'a52a2a',
+    burlywood: 'deb887',
+    burntsienna: 'ea7e5d',
+    cadetblue: '5f9ea0',
+    chartreuse: '7fff00',
+    chocolate: 'd2691e',
+    coral: 'ff7f50',
+    cornflowerblue: '6495ed',
+    cornsilk: 'fff8dc',
+    crimson: 'dc143c',
+    cyan: '0ff',
+    darkblue: '00008b',
+    darkcyan: '008b8b',
+    darkgoldenrod: 'b8860b',
+    darkgray: 'a9a9a9',
+    darkgreen: '006400',
+    darkgrey: 'a9a9a9',
+    darkkhaki: 'bdb76b',
+    darkmagenta: '8b008b',
+    darkolivegreen: '556b2f',
+    darkorange: 'ff8c00',
+    darkorchid: '9932cc',
+    darkred: '8b0000',
+    darksalmon: 'e9967a',
+    darkseagreen: '8fbc8f',
+    darkslateblue: '483d8b',
+    darkslategray: '2f4f4f',
+    darkslategrey: '2f4f4f',
+    darkturquoise: '00ced1',
+    darkviolet: '9400d3',
+    deeppink: 'ff1493',
+    deepskyblue: '00bfff',
+    dimgray: '696969',
+    dimgrey: '696969',
+    dodgerblue: '1e90ff',
+    firebrick: 'b22222',
+    floralwhite: 'fffaf0',
+    forestgreen: '228b22',
+    fuchsia: 'f0f',
+    gainsboro: 'dcdcdc',
+    ghostwhite: 'f8f8ff',
+    gold: 'ffd700',
+    goldenrod: 'daa520',
+    gray: '808080',
+    green: '008000',
+    greenyellow: 'adff2f',
+    grey: '808080',
+    honeydew: 'f0fff0',
+    hotpink: 'ff69b4',
+    indianred: 'cd5c5c',
+    indigo: '4b0082',
+    ivory: 'fffff0',
+    khaki: 'f0e68c',
+    lavender: 'e6e6fa',
+    lavenderblush: 'fff0f5',
+    lawngreen: '7cfc00',
+    lemonchiffon: 'fffacd',
+    lightblue: 'add8e6',
+    lightcoral: 'f08080',
+    lightcyan: 'e0ffff',
+    lightgoldenrodyellow: 'fafad2',
+    lightgray: 'd3d3d3',
+    lightgreen: '90ee90',
+    lightgrey: 'd3d3d3',
+    lightpink: 'ffb6c1',
+    lightsalmon: 'ffa07a',
+    lightseagreen: '20b2aa',
+    lightskyblue: '87cefa',
+    lightslategray: '789',
+    lightslategrey: '789',
+    lightsteelblue: 'b0c4de',
+    lightyellow: 'ffffe0',
+    lime: '0f0',
+    limegreen: '32cd32',
+    linen: 'faf0e6',
+    magenta: 'f0f',
+    maroon: '800000',
+    mediumaquamarine: '66cdaa',
+    mediumblue: '0000cd',
+    mediumorchid: 'ba55d3',
+    mediumpurple: '9370db',
+    mediumseagreen: '3cb371',
+    mediumslateblue: '7b68ee',
+    mediumspringgreen: '00fa9a',
+    mediumturquoise: '48d1cc',
+    mediumvioletred: 'c71585',
+    midnightblue: '191970',
+    mintcream: 'f5fffa',
+    mistyrose: 'ffe4e1',
+    moccasin: 'ffe4b5',
+    navajowhite: 'ffdead',
+    navy: '000080',
+    oldlace: 'fdf5e6',
+    olive: '808000',
+    olivedrab: '6b8e23',
+    orange: 'ffa500',
+    orangered: 'ff4500',
+    orchid: 'da70d6',
+    palegoldenrod: 'eee8aa',
+    palegreen: '98fb98',
+    paleturquoise: 'afeeee',
+    palevioletred: 'db7093',
+    papayawhip: 'ffefd5',
+    peachpuff: 'ffdab9',
+    peru: 'cd853f',
+    pink: 'ffc0cb',
+    plum: 'dda0dd',
+    powderblue: 'b0e0e6',
+    purple: '800080',
+    rebeccapurple: '663399',
+    red: 'f00',
+    rosybrown: 'bc8f8f',
+    royalblue: '4169e1',
+    saddlebrown: '8b4513',
+    salmon: 'fa8072',
+    sandybrown: 'f4a460',
+    seagreen: '2e8b57',
+    seashell: 'fff5ee',
+    sienna: 'a0522d',
+    silver: 'c0c0c0',
+    skyblue: '87ceeb',
+    slateblue: '6a5acd',
+    slategray: '708090',
+    slategrey: '708090',
+    snow: 'fffafa',
+    springgreen: '00ff7f',
+    steelblue: '4682b4',
+    tan: 'd2b48c',
+    teal: '008080',
+    thistle: 'd8bfd8',
+    tomato: 'ff6347',
+    turquoise: '40e0d0',
+    violet: 'ee82ee',
+    wheat: 'f5deb3',
+    white: 'fff',
+    whitesmoke: 'f5f5f5',
+    yellow: 'ff0',
+    yellowgreen: '9acd32'
+  };
+
+  // Make it easy to access colors via `hexNames[hex]`
+  var hexNames = tinycolor.hexNames = flip(names);
+
+  // Utilities
+  // ---------
+
+  // `{ 'name1': 'val1' }` becomes `{ 'val1': 'name1' }`
+  function flip(o) {
+    var flipped = {};
+    for (var i in o) {
+      if (o.hasOwnProperty(i)) {
+        flipped[o[i]] = i;
+      }
+    }
+    return flipped;
+  }
+
+  // Return a valid alpha value [0,1] with all invalid values being set to 1
+  function boundAlpha(a) {
+    a = parseFloat(a);
+
+    if (isNaN(a) || a < 0 || a > 1) {
+      a = 1;
+    }
+
+    return a;
+  }
+
+  // Take input from [0, n] and return it as [0, 1]
+  function bound01(n, max) {
+    if (isOnePointZero(n)) {
+      n = '100%';
+    }
+
+    var processPercent = isPercentage(n);
+    n = mathMin(max, mathMax(0, parseFloat(n)));
+
+    // Automatically convert percentage into number
+    if (processPercent) {
+      n = parseInt(n * max, 10) / 100;
+    }
+
+    // Handle floating point rounding errors
+    if (math.abs(n - max) < 0.000001) {
+      return 1;
+    }
+
+    // Convert into [0, 1] range if it isn't already
+    return n % max / parseFloat(max);
+  }
+
+  // Force a number between 0 and 1
+  function clamp01(val) {
+    return mathMin(1, mathMax(0, val));
+  }
+
+  // Parse a base-16 hex value into a base-10 integer
+  function parseIntFromHex(val) {
+    return parseInt(val, 16);
+  }
+
+  // Need to handle 1.0 as 100%, since once it is a number, there is no difference between it and 1
+  // <http://stackoverflow.com/questions/7422072/javascript-how-to-detect-number-as-a-decimal-including-1-0>
+  function isOnePointZero(n) {
+    return typeof n == 'string' && n.indexOf('.') != -1 && parseFloat(n) === 1;
+  }
+
+  // Check to see if string passed in is a percentage
+  function isPercentage(n) {
+    return typeof n === 'string' && n.indexOf('%') != -1;
+  }
+
+  // Force a hex value to have 2 characters
+  function pad2(c) {
+    return c.length == 1 ? '0' + c : '' + c;
+  }
+
+  // Replace a decimal with it's percentage value
+  function convertToPercentage(n) {
+    if (n <= 1) {
+      n = n * 100 + '%';
+    }
+
+    return n;
+  }
+
+  // Converts a decimal to a hex value
+  function convertDecimalToHex(d) {
+    return Math.round(parseFloat(d) * 255).toString(16);
+  }
+  // Converts a hex value to a decimal
+  function convertHexToDecimal(h) {
+    return parseIntFromHex(h) / 255;
+  }
+
+  var matchers = function () {
+    // <http://www.w3.org/TR/css3-values/#integers>
+    var CSS_INTEGER = '[-\\+]?\\d+%?';
+
+    // <http://www.w3.org/TR/css3-values/#number-value>
+    var CSS_NUMBER = '[-\\+]?\\d*\\.\\d+%?';
+
+    // Allow positive/negative integer/number.  Don't capture the either/or, just the entire outcome.
+    var CSS_UNIT = '(?:' + CSS_NUMBER + ')|(?:' + CSS_INTEGER + ')';
+
+    // Actual matching.
+    // Parentheses and commas are optional, but not required.
+    // Whitespace can take the place of commas or opening paren
+    var PERMISSIVE_MATCH3 = '[\\s|\\(]+(' + CSS_UNIT + ')[,|\\s]+(' + CSS_UNIT + ')[,|\\s]+(' + CSS_UNIT + ')\\s*\\)?';
+    var PERMISSIVE_MATCH4 = '[\\s|\\(]+(' + CSS_UNIT + ')[,|\\s]+(' + CSS_UNIT + ')[,|\\s]+(' + CSS_UNIT + ')[,|\\s]+(' + CSS_UNIT + ')\\s*\\)?';
+
+    return {
+      rgb: new RegExp('rgb' + PERMISSIVE_MATCH3),
+      rgba: new RegExp('rgba' + PERMISSIVE_MATCH4),
+      hsl: new RegExp('hsl' + PERMISSIVE_MATCH3),
+      hsla: new RegExp('hsla' + PERMISSIVE_MATCH4),
+      hsv: new RegExp('hsv' + PERMISSIVE_MATCH3),
+      hsva: new RegExp('hsva' + PERMISSIVE_MATCH4),
+      hex3: /^([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
+      hex6: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/,
+      hex8: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
+    };
+  }();
+
+  // `stringInputToObject`
+  // Permissive string parsing.  Take in a number of formats, and output an object
+  // based on detected format.  Returns `{ r, g, b }` or `{ h, s, l }` or `{ h, s, v}`
+  function stringInputToObject(color) {
+    color = color.replace(trimLeft, '').replace(trimRight, '').toLowerCase();
+    var named = false;
+    if (names[color]) {
+      color = names[color];
+      named = true;
+    } else if (color == 'transparent') {
+      return { r: 0, g: 0, b: 0, a: 0, format: 'name' };
+    }
+
+    // Try to match string input using regular expressions.
+    // Keep most of the number bounding out of this function - don't worry about [0,1] or [0,100] or [0,360]
+    // Just return an object and let the conversion functions handle that.
+    // This way the result will be the same whether the tinycolor is initialized with string or object.
+    var match;
+    if (match = matchers.rgb.exec(color)) {
+      return { r: match[1], g: match[2], b: match[3] };
+    }
+    if (match = matchers.rgba.exec(color)) {
+      return { r: match[1], g: match[2], b: match[3], a: match[4] };
+    }
+    if (match = matchers.hsl.exec(color)) {
+      return { h: match[1], s: match[2], l: match[3] };
+    }
+    if (match = matchers.hsla.exec(color)) {
+      return { h: match[1], s: match[2], l: match[3], a: match[4] };
+    }
+    if (match = matchers.hsv.exec(color)) {
+      return { h: match[1], s: match[2], v: match[3] };
+    }
+    if (match = matchers.hsva.exec(color)) {
+      return { h: match[1], s: match[2], v: match[3], a: match[4] };
+    }
+    if (match = matchers.hex8.exec(color)) {
+      return {
+        a: convertHexToDecimal(match[1]),
+        r: parseIntFromHex(match[2]),
+        g: parseIntFromHex(match[3]),
+        b: parseIntFromHex(match[4]),
+        format: named ? 'name' : 'hex8'
+      };
+    }
+    if (match = matchers.hex6.exec(color)) {
+      return {
+        r: parseIntFromHex(match[1]),
+        g: parseIntFromHex(match[2]),
+        b: parseIntFromHex(match[3]),
+        format: named ? 'name' : 'hex'
+      };
+    }
+    if (match = matchers.hex3.exec(color)) {
+      return {
+        r: parseIntFromHex(match[1] + '' + match[1]),
+        g: parseIntFromHex(match[2] + '' + match[2]),
+        b: parseIntFromHex(match[3] + '' + match[3]),
+        format: named ? 'name' : 'hex'
+      };
+    }
+
+    return false;
+  }
+
+  window.tinycolor = tinycolor;
+  //})();
+
+  $(function () {
+    if ($.fn.spectrum.load) {
+      $.fn.spectrum.processNativeColorInputs();
+    }
+  });
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
@@ -22907,9 +23068,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var $ = Backbone.$;
 
 module.exports = Backbone.View.extend({
-
   events: {
-    'change': 'handleChange'
+    change: 'handleChange'
   },
 
   template: function template() {
@@ -23004,7 +23164,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Property = __webpack_require__(8);
 
 module.exports = Property.extend({
-
   defaults: _extends({}, Property.prototype.defaults, {
     // 'background' is a good example where to make a difference
     // between detached and not
@@ -23033,10 +23192,24 @@ module.exports = Property.extend({
 
 
   /**
+   * Clear the value
+   * @return {this}
+   */
+  clearValue: function clearValue() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    this.get('properties').each(function (property) {
+      return property.clearValue();
+    });
+    return Property.prototype.clearValue.apply(this, arguments);
+  },
+
+
+  /**
    * Update property values
    */
   updateValues: function updateValues() {
-    var values = this.get('value').split(this.get('separator'));
+    var values = this.getFullValue().split(this.get('separator'));
     this.get('properties').each(function (property, i) {
       var len = values.length;
       // Try to get value from a shorthand:
@@ -23085,7 +23258,7 @@ module.exports = Property.extend({
 
 
 var PropertyCompositeView = __webpack_require__(19);
-var LayersView = __webpack_require__(127);
+var LayersView = __webpack_require__(126);
 
 module.exports = PropertyCompositeView.extend({
   templateInput: function templateInput() {
@@ -23101,6 +23274,12 @@ module.exports = PropertyCompositeView.extend({
     this.listenTo(model, 'change:stackIndex', this.indexChanged);
     this.listenTo(model, 'updateValue', this.inputValueChanged);
     this.delegateEvents();
+  },
+  clear: function clear(e) {
+    e && e.stopPropagation();
+    this.model.get('layers').reset();
+    this.model.clearValue();
+    this.targetUpdated();
   },
 
 
@@ -23547,12 +23726,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Property = __webpack_require__(8);
 
 module.exports = Property.extend({
-
   defaults: _extends({}, Property.prototype.defaults, {
     // Array of options, eg. [{name: 'Label ', value: '100'}]
     options: []
   })
-
 });
 
 /***/ }),
@@ -23564,11 +23741,12 @@ module.exports = Property.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var _underscore = __webpack_require__(1);
+
 var Property = __webpack_require__(8);
 var InputNumber = __webpack_require__(18);
 
 module.exports = Property.extend({
-
   defaults: _extends({}, Property.prototype.defaults, {
     // Array of units, eg. ['px', '%']
     units: [],
@@ -23595,10 +23773,18 @@ module.exports = Property.extend({
       this.set('unit', units[0]);
     }
   },
+  clearValue: function clearValue() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    this.set({ value: undefined, unit: undefined }, opts);
+    return this;
+  },
   parseValue: function parseValue(val) {
     var parsed = Property.prototype.parseValue.apply(this, arguments);
 
-    var _input$validateInputV = this.input.validateInputValue(parsed.value, { deepCheck: 1 }),
+    var _input$validateInputV = this.input.validateInputValue(parsed.value, {
+      deepCheck: 1
+    }),
         value = _input$validateInputV.value,
         unit = _input$validateInputV.unit;
 
@@ -23607,7 +23793,11 @@ module.exports = Property.extend({
     return parsed;
   },
   getFullValue: function getFullValue() {
-    var value = this.get('value') + this.get('unit');
+    var value = this.get('value');
+    var unit = this.get('unit');
+    value = !(0, _underscore.isUndefined)(value) ? value : '';
+    unit = !(0, _underscore.isUndefined)(unit) && value ? unit : '';
+    value = '' + value + unit;
     return Property.prototype.getFullValue.apply(this, [value]);
   }
 });
@@ -23620,7 +23810,6 @@ module.exports = Property.extend({
 
 
 module.exports = __webpack_require__(45).extend({
-
   events: {
     'click [data-toggle=asset-remove]': 'onRemove',
     click: 'onClick',
@@ -23630,7 +23819,7 @@ module.exports = __webpack_require__(45).extend({
   getPreview: function getPreview() {
     var pfx = this.pfx;
     var src = this.model.get('src');
-    return '\n      <div class="' + pfx + 'preview" style="background-image: url(' + src + ');"></div>\n      <div class="' + pfx + 'preview-bg ' + this.ppfx + 'checker-bg"></div>\n    ';
+    return '\n      <div class="' + pfx + 'preview" style="background-image: url(\'' + src + '\');"></div>\n      <div class="' + pfx + 'preview-bg ' + this.ppfx + 'checker-bg"></div>\n    ';
   },
   getInfo: function getInfo() {
     var pfx = this.pfx;
@@ -23770,7 +23959,6 @@ var _fetch2 = _interopRequireDefault(_fetch);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 module.exports = Backbone.View.extend({
-
   template: _.template('\n  <form>\n    <div id="<%= pfx %>title"><%= title %></div>\n    <input type="file" id="<%= uploadId %>" name="file" accept="image/*" <%= disabled ? \'disabled\' : \'\' %> multiple/>\n    <div style="clear:both;"></div>\n  </form>\n  '),
 
   events: {},
@@ -23838,7 +24026,7 @@ module.exports = Backbone.View.extend({
    * @param  {string} text Response text
    * @private
    */
-  onUploadResponse: function onUploadResponse(text) {
+  onUploadResponse: function onUploadResponse(text, clb) {
     var em = this.config.em;
     var config = this.config;
     var target = this.target;
@@ -23850,6 +24038,7 @@ module.exports = Backbone.View.extend({
     }
 
     this.onUploadEnd(text);
+    clb && clb(json);
   },
 
 
@@ -23859,7 +24048,7 @@ module.exports = Backbone.View.extend({
    * @return {Promise}
    * @private
    * */
-  uploadFile: function uploadFile(e) {
+  uploadFile: function uploadFile(e, clb) {
     var _this = this;
 
     var files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
@@ -23896,7 +24085,7 @@ module.exports = Backbone.View.extend({
           return Promise.reject(text);
         });
       }).then(function (text) {
-        return _this.onUploadResponse(text);
+        return _this.onUploadResponse(text, clb);
       }).catch(function (err) {
         return _this.onUploadError(err);
       });
@@ -24002,7 +24191,7 @@ module.exports = Backbone.View.extend({
     return this;
   }
 }, {
-  embedAsBase64: function embedAsBase64(e) {
+  embedAsBase64: function embedAsBase64(e, clb) {
     var _this3 = this;
 
     // List files dropped
@@ -24034,6 +24223,42 @@ module.exports = Backbone.View.extend({
           } else {
             type = file.type;
           }
+
+          /*
+          // Show local video files, http://jsfiddle.net/dsbonev/cCCZ2/embedded/result,js,html,css/
+          var URL = window.URL || window.webkitURL
+          var file = this.files[0]
+          var type = file.type
+          var videoNode = document.createElement('video');
+          var canPlay = videoNode.canPlayType(type) // can use also for 'audio' types
+          if (canPlay === '') canPlay = 'no'
+          var message = 'Can play type "' + type + '": ' + canPlay
+          var isError = canPlay === 'no'
+          displayMessage(message, isError)
+          if (isError) {
+          return
+          }
+          var fileURL = URL.createObjectURL(file)
+          videoNode.src = fileURL
+          */
+
+          /*
+          // Show local video files, http://jsfiddle.net/dsbonev/cCCZ2/embedded/result,js,html,css/
+          var URL = window.URL || window.webkitURL
+          var file = this.files[0]
+           var type = file.type
+           var videoNode = document.createElement('video');
+           var canPlay = videoNode.canPlayType(type) // can use also for 'audio' types
+           if (canPlay === '') canPlay = 'no'
+           var message = 'Can play type "' + type + '": ' + canPlay
+           var isError = canPlay === 'no'
+           displayMessage(message, isError)
+            if (isError) {
+             return
+           }
+            var fileURL = URL.createObjectURL(file)
+           videoNode.src = fileURL
+          */
 
           // If it's an image, try to find its size
           if (type === 'image') {
@@ -24107,7 +24332,7 @@ module.exports = Backbone.View.extend({
 
     Promise.all(promises).then(function (data) {
       response.data = data;
-      _this3.onUploadResponse(response);
+      _this3.onUploadResponse(response, clb);
     }, function (error) {
       _this3.onUploadError(error);
     });
@@ -24132,7 +24357,6 @@ var Backbone = __webpack_require__(0);
 var Selectors = __webpack_require__(13);
 
 module.exports = Backbone.Model.extend(_Styleable2.default).extend({
-
   defaults: {
     // Css selectors
     selectors: {},
@@ -24151,6 +24375,13 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
     // Indicates if the rule is stylable
     stylable: true,
+
+    // Type of at-rule, eg. 'media', 'font-face', etc.
+    atRuleType: '',
+
+    // This particolar property is used only on at-rules, like 'page' or
+    // 'font-face', where the block containes only style declarations
+    singleAtRule: 0,
 
     // If true, sets '!important' on all properties
     // You can use an array to specify properties to set important
@@ -24180,6 +24411,20 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
 
   /**
+   * Returns an at-rule statement if possible, eg. '@media (...)', '@keyframes'
+   * @return {string}
+   */
+  getAtRule: function getAtRule() {
+    var type = this.get('atRuleType');
+    var condition = this.get('mediaText');
+    // Avoid breaks with the last condition
+    var typeStr = type ? '@' + type : condition ? '@media' : '';
+
+    return typeStr + (condition && typeStr ? ' ' + condition : '');
+  },
+
+
+  /**
    * Return selectors fo the rule as a string
    * @return {string}
    */
@@ -24198,6 +24443,27 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
 
 
   /**
+   * Get declaration block
+   * @param {Object} [opts={}] Options
+   * @return {string}
+   */
+  getDeclaration: function getDeclaration() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    var result = '';
+    var selectors = this.selectorsToString();
+    var style = this.styleToString(opts);
+    var singleAtRule = this.get('singleAtRule');
+
+    if ((selectors || singleAtRule) && style) {
+      result = singleAtRule ? style : selectors + '{' + style + '}';
+    }
+
+    return result;
+  },
+
+
+  /**
    * Returns CSS string of the rule
    * @param {Object} [opts={}] Options
    * @return {string}
@@ -24206,16 +24472,12 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
     var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
     var result = '';
-    var media = this.get('mediaText');
-    var style = this.styleToString(opts);
-    var selectors = this.selectorsToString();
+    var atRule = this.getAtRule();
+    var block = this.getDeclaration(opts);
+    block && (result = block);
 
-    if (selectors && style) {
-      result = selectors + '{' + style + '}';
-    }
-
-    if (media && result) {
-      result = '@media ' + media + '{' + result + '}';
+    if (atRule && result) {
+      result = atRule + '{' + result + '}';
     }
 
     return result;
@@ -24231,11 +24493,13 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
    * @return  {Boolean}
    * @private
    */
-  compare: function compare(selectors, state, width, ruleProps) {
-    var otherRule = ruleProps || {};
+  compare: function compare(selectors, state, width) {
+    var ruleProps = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
     var st = state || '';
     var wd = width || '';
-    var selectorsAdd = otherRule.selectorsAdd || '';
+    var selectorsAdd = ruleProps.selectorsAdd || '';
+    var atRuleType = ruleProps.atRuleType || '';
     var cId = 'cid';
     //var a1 = _.pluck(selectors.models || selectors, cId);
     //var a2 = _.pluck(this.get('selectors').models, cId);
@@ -24258,11 +24522,9 @@ module.exports = Backbone.Model.extend(_Styleable2.default).extend({
       if (re === 0) return f;
     }
 
-    if (this.get('state') !== st) return f;
-
-    if (this.get('mediaText') !== wd) return f;
-
-    if (this.get('selectorsAdd') !== selectorsAdd) return f;
+    if (this.get('state') !== st || this.get('mediaText') !== wd || this.get('selectorsAdd') !== selectorsAdd || this.get('atRuleType') !== atRuleType) {
+      return f;
+    }
 
     return true;
   }
@@ -24284,7 +24546,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
 var _ParserHtml = __webpack_require__(26);
 
@@ -24294,7 +24556,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var parseStyle = (0, _ParserHtml2.default)().parseStyle;
 exports.default = {
-
   parseStyle: parseStyle,
 
   /**
@@ -24338,7 +24599,12 @@ exports.default = {
     this.set('style', propNew, opts);
     var diff = (0, _mixins.shallowDiff)(propOrig, propNew);
     (0, _underscore.keys)(diff).forEach(function (pr) {
-      return _this.trigger('change:style:' + pr);
+      var em = _this.em;
+      _this.trigger('change:style:' + pr);
+      if (em) {
+        em.trigger('styleable:change');
+        em.trigger('styleable:change:' + pr);
+      }
     });
 
     return propNew;
@@ -24410,10 +24676,37 @@ exports.default = {
 "use strict";
 
 
+module.exports = __webpack_require__(0).View.extend({
+  tagName: 'style',
+
+  initialize: function initialize() {
+    var o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    this.config = o.config || {};
+    var model = this.model;
+    var toTrack = 'change:style change:state change:mediaText';
+    this.listenTo(model, toTrack, this.render);
+    this.listenTo(model, 'destroy remove', this.remove);
+    this.listenTo(model.get('selectors'), 'change', this.render);
+  },
+  render: function render() {
+    var model = this.model;
+    var important = model.get('important');
+    this.el.innerHTML = this.model.toCSS({ important: important });
+    return this;
+  }
+});
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.View.extend({
-
   // Default view
   itemView: '',
 
@@ -24472,7 +24765,7 @@ module.exports = Backbone.View.extend({
 });
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24483,27 +24776,19 @@ var _underscore = __webpack_require__(1);
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.Collection.extend({
-  initialize: function initialize(models, opt) {
+  initialize: function initialize(models) {
+    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    this.on('add', this.onAdd);
-
-    this.config = opt && opt.config ? opt.config : null;
-
-    // Inject editor
-    if (opt && (opt.sm || opt.em)) this.editor = opt.sm || opt.em;
+    this.listenTo(this, 'add', this.onAdd);
+    this.config = opt.config;
+    this.em = opt.em;
 
     this.model = function (attrs, options) {
       var model;
-
-      if (!options.sm && opt && opt.sm) options.sm = opt.sm;
-
-      if (!options.em && opt && opt.em) options.em = opt.em;
-
-      if (opt && opt.config) options.config = opt.config;
-
-      if (opt && opt.componentTypes) options.componentTypes = opt.componentTypes;
-
       var df = opt.componentTypes;
+      options.em = opt.em;
+      options.config = opt.config;
+      options.componentTypes = df;
 
       for (var it = 0; it < df.length; it++) {
         var dfId = df[it].id;
@@ -24525,10 +24810,10 @@ module.exports = Backbone.Collection.extend({
     var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     if (typeof models === 'string') {
-      var parsed = this.editor.get('Parser').parseHtml(models);
+      var parsed = this.em.get('Parser').parseHtml(models);
       models = parsed.html;
 
-      var cssc = this.editor.get('CssComposer');
+      var cssc = this.em.get('CssComposer');
 
       if (parsed.css && cssc) {
         var avoidUpdateStyle = opt.avoidUpdateStyle;
@@ -24543,23 +24828,21 @@ module.exports = Backbone.Collection.extend({
     return Backbone.Collection.prototype.add.apply(this, [models, opt]);
   },
   onAdd: function onAdd(model, c, opts) {
-    var em = this.editor;
-    var style = model.get('style');
+    var em = this.em;
+    var style = model.getStyle();
     var avoidInline = em && em.getConfig('avoidInlineStyle');
 
-    if (!(0, _underscore.isEmpty)(style) && !avoidInline && em && em.get && em.get('Config').forceClass) {
-      var cssC = this.editor.get('CssComposer');
-      var newClass = this.editor.get('SelectorManager').add(model.cid);
-      model.set({ style: {} });
-      model.get('classes').add(newClass);
-      var rule = cssC.add(newClass);
-      rule.set('style', style);
+    if (!(0, _underscore.isEmpty)(style) && !avoidInline && em && em.get && em.getConfig('forceClass')) {
+      var name = model.cid;
+      var rule = em.get('CssComposer').setClassRule(name, style);
+      model.setStyle({});
+      model.addClass(name);
     }
   }
 });
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24606,7 +24889,7 @@ module.exports = Backbone.View.extend({
    * @private
    * */
   addToCollection: function addToCollection(model, fragmentEl, index) {
-    if (!this.compView) this.compView = __webpack_require__(2);
+    if (!this.compView) this.compView = __webpack_require__(3);
     var fragment = fragmentEl || null,
         viewObject = this.compView;
 
@@ -24684,7 +24967,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24695,7 +24978,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Component = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'text',
     droppable: false,
@@ -24706,20 +24988,19 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({
-
   events: {
-    'dblclick': 'enableEditing'
+    dblclick: 'enableEditing'
   },
 
   initialize: function initialize(o) {
@@ -24844,202 +25125,112 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 54 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Backbone) {
-
-var $ = Backbone.$;
-
-module.exports = {
-
-  /**
-   * Start select position event
-   * @param {HTMLElement} trg
-   * @private
-   * */
-  startSelectPosition: function startSelectPosition(trg, doc) {
-    this.isPointed = false;
-    var utils = this.editorModel.get('Utils');
-    if (utils && !this.sorter) this.sorter = new utils.Sorter({
-      container: this.getCanvasBody(),
-      placer: this.canvas.getPlacerEl(),
-      containerSel: '*',
-      itemSel: '*',
-      pfx: this.ppfx,
-      direction: 'a',
-      document: doc,
-      wmargin: 1,
-      nested: 1,
-      em: this.editorModel,
-      canvasRelative: 1
-    });
-    this.sorter.startSort(trg);
-  },
-
-
-  /**
-   * Get frame position
-   * @return {Object}
-   * @private
-   */
-  getOffsetDim: function getOffsetDim() {
-    var frameOff = this.offset(this.canvas.getFrameEl());
-    var canvasOff = this.offset(this.canvas.getElement());
-    var top = frameOff.top - canvasOff.top;
-    var left = frameOff.left - canvasOff.left;
-    return { top: top, left: left };
-  },
-
-
-  /**
-   * Stop select position event
-   * @private
-   * */
-  stopSelectPosition: function stopSelectPosition() {
-    this.posTargetCollection = null;
-    this.posIndex = this.posMethod == 'after' && this.cDim.length !== 0 ? this.posIndex + 1 : this.posIndex; //Normalize
-    if (this.sorter) {
-      this.sorter.moved = 0;
-      this.sorter.endMove();
-    }
-    if (this.cDim) {
-      this.posIsLastEl = this.cDim.length !== 0 && this.posMethod == 'after' && this.posIndex == this.cDim.length;
-      this.posTargetEl = this.cDim.length === 0 ? $(this.outsideElem) : !this.posIsLastEl && this.cDim[this.posIndex] ? $(this.cDim[this.posIndex][5]).parent() : $(this.outsideElem);
-      this.posTargetModel = this.posTargetEl.data("model");
-      this.posTargetCollection = this.posTargetEl.data("model-comp");
-    }
-  },
-
-
-  /**
-   * Enabel select position
-   * @private
-   */
-  enable: function enable() {
-    this.startSelectPosition();
-  },
-
-
-  /**
-   * Check if the pointer is near to the float component
-   * @param {number} index
-   * @param {string} method
-   * @param {Array<Array>} dims
-   * @return {Boolean}
-   * @private
-   * */
-  nearFloat: function nearFloat(index, method, dims) {
-    var i = index || 0;
-    var m = method || 'before';
-    var len = dims.length;
-    var isLast = len !== 0 && m == 'after' && i == len;
-    if (len !== 0 && (!isLast && !dims[i][4] || dims[i - 1] && !dims[i - 1][4] || isLast && !dims[i - 1][4])) return 1;
-    return 0;
-  },
-  run: function run() {
-    this.enable();
-  },
-  stop: function stop() {
-    this.stopSelectPosition();
-    this.$wrapper.css('cursor', '');
-    this.$wrapper.unbind();
-  }
-};
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
 /* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(_) {
 
-var Backbone = __webpack_require__(0);
-var CreateComponent = __webpack_require__(23);
 
-module.exports = _.extend({}, CreateComponent, {
-  init: function init() {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _config = __webpack_require__(183);
+
+var _config2 = _interopRequireDefault(_config);
+
+var _ItemView = __webpack_require__(56);
+
+var _ItemView2 = _interopRequireDefault(_ItemView);
+
+var _ItemsView = __webpack_require__(57);
+
+var _ItemsView2 = _interopRequireDefault(_ItemsView);
+
+var _underscore = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+module.exports = function () {
+  var em = void 0;
+  var layers = void 0;
+  var config = {};
+  var View = _ItemsView2.default;
+
+  return {
+    name: 'LayerManager',
+
+    init: function init() {
+      var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      config = _extends({}, _config2.default, opts);
+      config.stylePrefix = opts.pStylePrefix;
+      em = config.em;
+
+      return this;
+    },
+    onLoad: function onLoad() {
+      var collection = em.get('DomComponents').getComponents();
+      var parent = collection.parent;
+      var options = {
+        level: 0,
+        config: config,
+        opened: config.opened || {}
+      };
+
+      // Show wrapper if requested
+      if (config.showWrapper && parent) {
+        View = _ItemView2.default;
+        options.model = parent;
+      } else {
+        options.collection = collection;
+      }
+
+      layers = new View(options);
+      em && em.on('component:selected', this.componentChanged);
+      this.componentChanged();
+    },
+    postRender: function postRender() {
+      var elTo = config.appendTo;
+
+      if (elTo) {
+        var el = (0, _underscore.isElement)(elTo) ? elTo : document.querySelector(elTo);
+        el.appendChild(this.render());
+      }
+    },
+
+
+    /**
+     * Return the view of layers
+     * @return {View}
+     */
+    getAll: function getAll() {
+      return layers;
+    },
+
+
+    /**
+     * Triggered when the selected component is changed
+     * @private
+     */
+    componentChanged: function componentChanged(e, md) {
+      var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      if (opts.fromLayers) return;
+      var opened = em.get('opened');
+      var model = em.getSelected();
+      var parent = model && model.collection ? model.collection.parent : null;
+      for (var cid in opened) {
+        opened[cid].set('open', 0);
+      }while (parent) {
+        parent.set('open', 1);
+        opened[parent.cid] = parent;
+        parent = parent.collection ? parent.collection.parent : null;
+      }
+    },
+    render: function render() {
+      return layers.render().el;
     }
-
-    CreateComponent.init.apply(this, args);
-    _.bindAll(this, 'insertComponent');
-    this.allowDraw = 0;
-  },
-
-
-  /**
-   * Run method
-   * @private
-   * */
-  run: function run(em, sender, options) {
-    this.em = em;
-    this.sender = sender;
-    this.opt = options || {};
-    this.$wr = this.$wrapper;
-    this.enable();
-  },
-  enable: function enable() {
-    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
-    }
-
-    CreateComponent.enable.apply(this, args);
-    this.$wr.on('click', this.insertComponent);
-  },
-
-
-  /**
-   * Start insert event
-   * @private
-   * */
-  insertComponent: function insertComponent() {
-    this.$wr.off('click', this.insertComponent);
-    this.stopSelectPosition();
-    var object = this.buildContent();
-    this.beforeInsert(object);
-    var index = this.sorter.lastPos.index;
-    // By default, collections do not trigger add event, so silent is used
-    var model = this.create(this.sorter.target, object, index, null, { silent: false });
-
-    if (this.opt.terminateAfterInsert && this.sender) this.sender.set('active', false);else this.enable();
-
-    if (!model) return;
-
-    this.afterInsert(model, this);
-  },
-
-
-  /**
-   * Trigger before insert
-   * @param   {Object}  obj
-   * @private
-   * */
-  beforeInsert: function beforeInsert(obj) {},
-
-
-  /**
-   * Trigger after insert
-   * @param  {Object}  model  Model created after insert
-   * @private
-   * */
-  afterInsert: function afterInsert(model) {},
-
-
-  /**
-   * Create different object, based on content, to insert inside canvas
-   *
-   * @return   {Object}
-   * @private
-   * */
-  buildContent: function buildContent() {
-    return this.opt.content || {};
-  }
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+  };
+};
 
 /***/ }),
 /* 56 */
@@ -25050,18 +25241,18 @@ module.exports = _.extend({}, CreateComponent, {
 
 var _underscore = __webpack_require__(1);
 
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
+var inputProp = 'contentEditable';
 var ItemsView = void 0;
 
 module.exports = __webpack_require__(0).View.extend({
-
   events: {
     'mousedown [data-toggle-move]': 'startSort',
     'click [data-toggle-visible]': 'toggleVisibility',
     'click [data-toggle-select]': 'handleSelect',
     'click [data-toggle-open]': 'toggleOpening',
-    'dblclick input': 'handleEdit',
-    'focusout input': 'handleEditEnd'
+    'dblclick [data-name]': 'handleEdit',
+    'focusout [data-name]': 'handleEditEnd'
   },
 
   template: function template(model) {
@@ -25069,9 +25260,15 @@ module.exports = __webpack_require__(0).View.extend({
     var ppfx = this.ppfx;
     var hidable = this.config.hidable;
     var count = this.countChildren(model);
-    var addClass = !count ? pfx + 'no-chld' : '';
+    var addClass = !count ? this.clsNoChild : '';
+    var clsTitle = this.clsTitle + ' ' + addClass;
+    var clsTitleC = this.clsTitleC + ' ' + ppfx + 'one-bg';
+    var clsCaret = this.clsCaret + ' fa fa-chevron-right';
+    var clsInput = this.inputNameCls + ' ' + ppfx + 'no-app';
     var level = this.level + 1;
-    return '\n      ' + (hidable ? '<i id="' + pfx + 'btn-eye" class="' + pfx + 'btn fa fa-eye ' + (this.isVisible() ? '' : 'fa-eye-slash') + '" data-toggle-visible></i>' : '') + '\n\n      <div class="' + pfx + 'title-c ' + ppfx + 'one-bg">\n        <div class="' + pfx + 'title ' + addClass + '" style="padding-left: ' + (30 + level * 10) + 'px" data-toggle-select>\n          <div class="' + pfx + 'title-inn">\n            <i id="' + pfx + 'caret" class="fa fa-chevron-right ' + this.caretCls + '" data-toggle-open></i>\n            ' + model.getIcon() + '\n            <input class="' + ppfx + 'no-app ' + this.inputNameCls + '" value="' + model.getName() + '" readonly>\n          </div>\n        </div>\n      </div>\n      <div id="' + pfx + 'counter">' + (count ? count : '') + '</div>\n      <div id="' + pfx + 'move" data-toggle-move>\n        <i class="fa fa-arrows"></i>\n      </div>\n      <div class="' + pfx + 'children"></div>\n    ';
+    var gut = 30 + level * 10 + 'px';
+    var name = model.getName();
+    return '\n      ' + (hidable ? '<i class="' + pfx + 'layer-vis fa fa-eye ' + (this.isVisible() ? '' : 'fa-eye-slash') + '" data-toggle-visible></i>' : '') + '\n\n      <div class="' + clsTitleC + '">\n        <div class="' + clsTitle + '" style="padding-left: ' + gut + '" data-toggle-select>\n          <div class="' + pfx + 'layer-title-inn">\n            <i class="' + clsCaret + '" data-toggle-open></i>\n            ' + model.getIcon() + '\n            <span class="' + clsInput + '" data-name>' + name + '</span>\n          </div>\n        </div>\n      </div>\n      <div class="' + this.clsCount + '">' + (count || '') + '</div>\n      <div class="' + this.clsMove + '" data-toggle-move>\n        <i class="fa fa-arrows"></i>\n      </div>\n      <div class="' + this.clsChildren + '"></div>\n    ';
   },
   initialize: function initialize() {
     var o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -25093,17 +25290,21 @@ module.exports = __webpack_require__(0).View.extend({
     this.listenTo(model, 'change:status', this.updateStatus);
     this.listenTo(model, 'change:open', this.updateOpening);
     this.listenTo(model, 'change:style:display', this.updateVisibility);
-    this.className = pfx + 'item no-select';
-    this.editBtnCls = pfx + 'nav-item-edit';
-    this.inputNameCls = ppfx + 'nav-comp-name';
-    this.caretCls = ppfx + 'nav-item-caret';
-    this.titleCls = pfx + 'title';
+    this.className = pfx + 'layer no-select ' + ppfx + 'two-color';
+    this.inputNameCls = ppfx + 'layer-name';
+    this.clsTitleC = pfx + 'layer-title-c';
+    this.clsTitle = pfx + 'layer-title';
+    this.clsCaret = pfx + 'layer-caret';
+    this.clsCount = pfx + 'layer-count';
+    this.clsMove = pfx + 'layer-move';
+    this.clsChildren = pfx + 'layer-children';
+    this.clsNoChild = pfx + 'layer-no-chld';
     this.$el.data('model', model);
     this.$el.data('collection', components);
   },
   getVisibilityEl: function getVisibilityEl() {
     if (!this.eyeEl) {
-      this.eyeEl = this.$el.children('#' + this.pfx + 'btn-eye');
+      this.eyeEl = this.$el.children('.' + this.pfx + 'layer-vis');
     }
 
     return this.eyeEl;
@@ -25111,7 +25312,7 @@ module.exports = __webpack_require__(0).View.extend({
   updateVisibility: function updateVisibility() {
     var pfx = this.pfx;
     var model = this.model;
-    var hClass = pfx + 'hide';
+    var hClass = pfx + 'layer-hidden';
     var hideIcon = 'fa-eye-slash';
     var hidden = model.getStyle().display == 'none';
     var method = hidden ? 'addClass' : 'removeClass';
@@ -25146,10 +25347,10 @@ module.exports = __webpack_require__(0).View.extend({
    * Handle the edit of the component name
    */
   handleEdit: function handleEdit(e) {
-    e.stopPropagation();
-    var inputName = this.getInputName();
-    inputName.readOnly = false;
-    inputName.focus();
+    e && e.stopPropagation();
+    var inputEl = this.getInputName();
+    inputEl[inputProp] = true;
+    inputEl.focus();
   },
 
 
@@ -25157,10 +25358,11 @@ module.exports = __webpack_require__(0).View.extend({
    * Handle with the end of editing of the component name
    */
   handleEditEnd: function handleEditEnd(e) {
-    e.stopPropagation();
-    var inputName = this.getInputName();
-    inputName.readOnly = true;
-    this.model.set('custom-name', inputName.value);
+    e && e.stopPropagation();
+    var inputEl = this.getInputName();
+    var name = inputEl.textContent;
+    inputEl[inputProp] = false;
+    this.model.set({ name: name });
   },
 
 
@@ -25191,7 +25393,7 @@ module.exports = __webpack_require__(0).View.extend({
       this.getCaret().addClass(chvDown);
       opened[model.cid] = model;
     } else {
-      this.$el.removeClass("open");
+      this.$el.removeClass('open');
       this.getCaret().removeClass(chvDown);
       delete opened[model.cid];
     }
@@ -25228,13 +25430,10 @@ module.exports = __webpack_require__(0).View.extend({
    * */
   startSort: function startSort(e) {
     e.stopPropagation();
-
-    //Right or middel click
-    if (e.button !== 0) {
-      return;
-    }
-
-    this.sorter && this.sorter.startSort(e.target);
+    var sorter = this.sorter;
+    // Right or middel click
+    if (e.button !== 0) return;
+    sorter && sorter.startSort(e.target);
   },
 
 
@@ -25288,19 +25487,19 @@ module.exports = __webpack_require__(0).View.extend({
     var model = this.model;
     var c = this.countChildren(model);
     var pfx = this.pfx;
-    var noChildCls = pfx + 'no-chld';
-    var title = this.$el.children('.' + pfx + 'title-c').children('.' + pfx + 'title');
-    //tC = `> .${pfx}title-c > .${pfx}title`;
-    if (!this.$counter) {
-      this.$counter = this.$el.children('#' + pfx + 'counter');
+    var noChildCls = this.clsNoChild;
+    var title = this.$el.children('.' + this.clsTitleC).children('.' + this.clsTitle);
+
+    if (!this.cnt) {
+      this.cnt = this.$el.children('.' + this.clsCount);
     }
 
     if (c) {
       title.removeClass(noChildCls);
-      this.$counter.html(c);
+      this.cnt.html(c);
     } else {
       title.addClass(noChildCls);
-      this.$counter.empty();
+      this.cnt.empty();
       model.set('open', 0);
     }
   },
@@ -25325,7 +25524,7 @@ module.exports = __webpack_require__(0).View.extend({
   getCaret: function getCaret() {
     if (!this.caret) {
       var pfx = this.pfx;
-      this.caret = this.$el.children('.' + pfx + 'title-c').find('#' + pfx + 'caret');
+      this.caret = this.$el.children('.' + this.clsTitleC).find('.' + this.clsCaret);
     }
 
     return this.caret;
@@ -25350,10 +25549,10 @@ module.exports = __webpack_require__(0).View.extend({
       parent: model,
       level: level
     }).render().$el;
-    el.find('.' + pfx + 'children').append(children);
+    el.find('.' + this.clsChildren).append(children);
 
     if (!model.get('draggable') || !this.config.sortable) {
-      el.children('#' + pfx + 'move').remove();
+      el.children('.' + this.clsMove).remove();
     }
 
     !vis && (this.className += ' ' + pfx + 'hide');
@@ -25372,10 +25571,9 @@ module.exports = __webpack_require__(0).View.extend({
 "use strict";
 
 
-var Backbone = __webpack_require__(0);
 var ItemView = __webpack_require__(56);
 
-module.exports = Backbone.View.extend({
+module.exports = __webpack_require__(0).View.extend({
   initialize: function initialize() {
     var o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
@@ -25387,33 +25585,39 @@ module.exports = Backbone.View.extend({
     this.ppfx = config.pStylePrefix || '';
     this.pfx = config.stylePrefix || '';
     this.parent = o.parent;
-    this.listenTo(this.collection, 'add', this.addTo);
-    this.listenTo(this.collection, 'reset resetNavigator', this.render);
-    this.className = this.pfx + 'items';
+    var pfx = this.pfx;
+    var ppfx = this.ppfx;
+    var parent = this.parent;
+    var coll = this.collection;
+    this.listenTo(coll, 'add', this.addTo);
+    this.listenTo(coll, 'reset resetNavigator', this.render);
+    this.className = pfx + 'layers';
+    var em = config.em;
 
     if (config.sortable && !this.opt.sorter) {
-      var pfx = this.pfx;
-      var utils = config.em.get('Utils');
+      var utils = em.get('Utils');
       this.opt.sorter = new utils.Sorter({
         container: config.sortContainer || this.el,
-        containerSel: '.' + pfx + 'items',
-        itemSel: '.' + pfx + 'item',
-        ppfx: this.ppfx,
+        containerSel: '.' + this.className,
+        itemSel: '.' + pfx + 'layer',
         ignoreViewChildren: 1,
+        onEndMove: function onEndMove(created, sorter) {
+          var srcModel = sorter.getSourceModel();
+          em.setSelected(srcModel, { forceChange: 1 });
+        },
+
         avoidSelectOnEnd: 1,
-        pfx: pfx,
-        nested: 1
+        nested: 1,
+        ppfx: ppfx,
+        pfx: pfx
       });
     }
 
     this.sorter = this.opt.sorter || '';
 
     // For the sorter
-    this.$el.data('collection', this.collection);
-
-    if (this.parent) {
-      this.$el.data('model', this.parent);
-    }
+    this.$el.data('collection', coll);
+    parent && this.$el.data('model', parent);
   },
 
 
@@ -25496,18 +25700,218 @@ module.exports = Backbone.View.extend({
     var _this = this;
 
     var frag = document.createDocumentFragment();
-    this.el.innerHTML = '';
+    var el = this.el;
+    el.innerHTML = '';
     this.collection.each(function (model) {
       return _this.addToCollection(model, frag);
     });
-    this.el.appendChild(frag);
-    this.$el.attr('class', this.className);
+    el.appendChild(frag);
+    el.className = this.className;
     return this;
   }
 });
 
 /***/ }),
 /* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Backbone) {
+
+var $ = Backbone.$;
+
+module.exports = {
+  /**
+   * Start select position event
+   * @param {HTMLElement} trg
+   * @private
+   * */
+  startSelectPosition: function startSelectPosition(trg, doc) {
+    this.isPointed = false;
+    var utils = this.editorModel.get('Utils');
+    if (utils && !this.sorter) this.sorter = new utils.Sorter({
+      container: this.getCanvasBody(),
+      placer: this.canvas.getPlacerEl(),
+      containerSel: '*',
+      itemSel: '*',
+      pfx: this.ppfx,
+      direction: 'a',
+      document: doc,
+      wmargin: 1,
+      nested: 1,
+      em: this.editorModel,
+      canvasRelative: 1
+    });
+    trg && this.sorter.startSort(trg);
+  },
+
+
+  /**
+   * Get frame position
+   * @return {Object}
+   * @private
+   */
+  getOffsetDim: function getOffsetDim() {
+    var frameOff = this.offset(this.canvas.getFrameEl());
+    var canvasOff = this.offset(this.canvas.getElement());
+    var top = frameOff.top - canvasOff.top;
+    var left = frameOff.left - canvasOff.left;
+    return { top: top, left: left };
+  },
+
+
+  /**
+   * Stop select position event
+   * @private
+   * */
+  stopSelectPosition: function stopSelectPosition() {
+    this.posTargetCollection = null;
+    this.posIndex = this.posMethod == 'after' && this.cDim.length !== 0 ? this.posIndex + 1 : this.posIndex; //Normalize
+    if (this.sorter) {
+      this.sorter.moved = 0;
+      this.sorter.endMove();
+    }
+    if (this.cDim) {
+      this.posIsLastEl = this.cDim.length !== 0 && this.posMethod == 'after' && this.posIndex == this.cDim.length;
+      this.posTargetEl = this.cDim.length === 0 ? $(this.outsideElem) : !this.posIsLastEl && this.cDim[this.posIndex] ? $(this.cDim[this.posIndex][5]).parent() : $(this.outsideElem);
+      this.posTargetModel = this.posTargetEl.data('model');
+      this.posTargetCollection = this.posTargetEl.data('model-comp');
+    }
+  },
+
+
+  /**
+   * Enabel select position
+   * @private
+   */
+  enable: function enable() {
+    this.startSelectPosition();
+  },
+
+
+  /**
+   * Check if the pointer is near to the float component
+   * @param {number} index
+   * @param {string} method
+   * @param {Array<Array>} dims
+   * @return {Boolean}
+   * @private
+   * */
+  nearFloat: function nearFloat(index, method, dims) {
+    var i = index || 0;
+    var m = method || 'before';
+    var len = dims.length;
+    var isLast = len !== 0 && m == 'after' && i == len;
+    if (len !== 0 && (!isLast && !dims[i][4] || dims[i - 1] && !dims[i - 1][4] || isLast && !dims[i - 1][4])) return 1;
+    return 0;
+  },
+  run: function run() {
+    this.enable();
+  },
+  stop: function stop() {
+    this.stopSelectPosition();
+    this.$wrapper.css('cursor', '');
+    this.$wrapper.unbind();
+  }
+};
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(_) {
+
+var Backbone = __webpack_require__(0);
+var CreateComponent = __webpack_require__(23);
+
+module.exports = _.extend({}, CreateComponent, {
+  init: function init() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    CreateComponent.init.apply(this, args);
+    _.bindAll(this, 'insertComponent');
+    this.allowDraw = 0;
+  },
+
+
+  /**
+   * Run method
+   * @private
+   * */
+  run: function run(em, sender, options) {
+    this.em = em;
+    this.sender = sender;
+    this.opt = options || {};
+    this.$wr = this.$wrapper;
+    this.enable();
+  },
+  enable: function enable() {
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    CreateComponent.enable.apply(this, args);
+    this.$wr.on('click', this.insertComponent);
+  },
+
+
+  /**
+   * Start insert event
+   * @private
+   * */
+  insertComponent: function insertComponent() {
+    this.$wr.off('click', this.insertComponent);
+    this.stopSelectPosition();
+    var object = this.buildContent();
+    this.beforeInsert(object);
+    var index = this.sorter.lastPos.index;
+    // By default, collections do not trigger add event, so silent is used
+    var model = this.create(this.sorter.target, object, index, null, {
+      silent: false
+    });
+
+    if (this.opt.terminateAfterInsert && this.sender) this.sender.set('active', false);else this.enable();
+
+    if (!model) return;
+
+    this.afterInsert(model, this);
+  },
+
+
+  /**
+   * Trigger before insert
+   * @param   {Object}  obj
+   * @private
+   * */
+  beforeInsert: function beforeInsert(obj) {},
+
+
+  /**
+   * Trigger after insert
+   * @param  {Object}  model  Model created after insert
+   * @private
+   * */
+  afterInsert: function afterInsert(model) {},
+
+
+  /**
+   * Create different object, based on content, to insert inside canvas
+   *
+   * @return   {Object}
+   * @private
+   * */
+  buildContent: function buildContent() {
+    return this.opt.content || {};
+  }
+});
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25650,7 +26054,7 @@ module.exports = function parse_str(str, array) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25659,55 +26063,60 @@ module.exports = function parse_str(str, array) {
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     id: '',
     label: '',
     open: true,
     attributes: {}
   }
-
 });
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-module.exports = __webpack_require__(61);
-
-/***/ }),
-/* 61 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _cashDom = __webpack_require__(11);
 
 var _cashDom2 = _interopRequireDefault(_cashDom);
 
+var _editor = __webpack_require__(63);
+
+var _editor2 = _interopRequireDefault(_editor);
+
 var _underscore = __webpack_require__(1);
 
-var _polyfills = __webpack_require__(62);
+var _polyfills = __webpack_require__(229);
 
 var _polyfills2 = _interopRequireDefault(_polyfills);
+
+var _plugin_manager = __webpack_require__(230);
+
+var _plugin_manager2 = _interopRequireDefault(_plugin_manager);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 (0, _polyfills2.default)();
 
 module.exports = function () {
-  var defaultConfig = __webpack_require__(63);
-  var Editor = __webpack_require__(64);
-  var PluginManager = __webpack_require__(230);
-  var plugins = new PluginManager();
+  var plugins = new _plugin_manager2.default();
   var editors = [];
+  var defaultConfig = {
+    // If true renders editor on init
+    autorender: 1,
+
+    // Array of plugins to init
+    plugins: [],
+
+    // Custom options for plugins
+    pluginsOpts: {}
+  };
 
   return {
-
     $: _cashDom2.default,
 
     editors: editors,
@@ -25715,18 +26124,16 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.301',
+    version: '0.14.13',
 
     /**
      * Initializes an editor based on passed options
      * @param {Object} config Configuration object
      * @param {string|HTMLElement} config.container Selector which indicates where render the editor
-     * @param {Object|string} config.components='' HTML string or Component model in JSON format
-     * @param {Object|string} config.style='' CSS string or CSS model in JSON format
-     * @param {Boolean} [config.fromElement=false] If true, will fetch HTML and CSS from selected container
-     * @param {Boolean} [config.undoManager=true] Enable/Disable undo manager
+     * @param {Boolean} [config.autorender=true] If true, auto-render the content
      * @param {Array} [config.plugins=[]] Array of plugins to execute on start
-     * @return {grapesjs.Editor} GrapesJS editor instance
+     * @param {Object} [config.pluginsOpts={}] Custom options for plugins
+     * @return {Editor} Editor instance
      * @example
      * var editor = grapesjs.init({
      *   container: '#myeditor',
@@ -25738,14 +26145,10 @@ module.exports = function () {
       var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       var els = config.container;
-
-      if (!els) {
-        throw new Error("'container' is required");
-      }
-
-      (0, _underscore.defaults)(config, defaultConfig);
-      config.el = els instanceof window.HTMLElement ? els : document.querySelector(els);
-      var editor = new Editor(config).init();
+      if (!els) throw new Error("'container' is required");
+      config = _extends({}, defaultConfig, config);
+      config.el = (0, _underscore.isElement)(els) ? els : document.querySelector(els);
+      var editor = new _editor2.default(config).init();
 
       // Load plugins
       config.plugins.forEach(function (pluginId) {
@@ -25762,97 +26165,16 @@ module.exports = function () {
       // A plugin might have extended/added some custom type so this
       // is a good point to load stuff like components, css rules, etc.
       editor.getModel().loadOnStart();
-
       config.autorender && editor.render();
-
       editors.push(editor);
+
       return editor;
     }
   };
 }();
 
 /***/ }),
-/* 62 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-/**
- * File made for IE/Edge support
- * https://github.com/artf/grapesjs/issues/214
- */
-
-exports.default = function () {
-
-  /**
-   * Check if IE/Edge
-   * @return {Boolean}
-   */
-  var isIE = function isIE() {
-    var match = void 0;
-    var agent = window.navigator.userAgent;
-    var rules = [['edge', /Edge\/([0-9\._]+)/], ['ie', /MSIE\s(7\.0)/], ['ie', /MSIE\s([0-9\.]+);.*Trident\/[4-7].0/], ['ie', /Trident\/7\.0.*rv\:([0-9\.]+).*\).*Gecko$/]];
-
-    for (var i = 0; i < rules.length; i++) {
-      var rule = rules[i];
-      match = rule[1].exec(agent);
-      if (match) break;
-    }
-
-    return !!match;
-  };
-
-  if (isIE()) {
-    var originalCreateHTMLDocument = DOMImplementation.prototype.createHTMLDocument;
-    DOMImplementation.prototype.createHTMLDocument = function (title) {
-      if (!title) title = '';
-      return originalCreateHTMLDocument.apply(document.implementation, [title]);
-    };
-  }
-};
-
-/***/ }),
 /* 63 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-  // If true renders editor on init
-  autorender: 1,
-
-  // Where init the editor
-  container: '',
-
-  // HTML string or object of components
-  components: '',
-
-  // CSS string or object of rules
-  style: '',
-
-  // If true, will fetch HTML and CSS from selected container
-  fromElement: 0,
-
-  // ---
-
-  // Storage Manager
-  storageManager: {},
-
-  // Array of plugins to init
-  plugins: [],
-
-  // Custom options for plugins
-  pluginsOpts: {}
-};
-
-/***/ }),
-/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25866,9 +26188,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = function (config) {
   var c = config || {},
-      defaults = __webpack_require__(65),
-      EditorModel = __webpack_require__(66),
-      EditorView = __webpack_require__(229);
+      defaults = __webpack_require__(64),
+      EditorModel = __webpack_require__(65),
+      EditorView = __webpack_require__(228);
 
   for (var name in defaults) {
     if (!(name in c)) c[name] = defaults[name];
@@ -25882,7 +26204,6 @@ module.exports = function (config) {
   });
 
   return {
-
     $: _cashDom2.default,
 
     /**
@@ -25896,6 +26217,12 @@ module.exports = function (config) {
      * @private
      */
     DomComponents: em.get('DomComponents'),
+
+    /**
+     * @property {LayerManager}
+     * @private
+     */
+    LayerManager: em.get('LayerManager'),
 
     /**
      * @property {CssComposer}
@@ -26403,6 +26730,8 @@ module.exports = function (config) {
     *
     * ## Components
     * * `component:add` - Triggered when a new component is added to the editor, the model is passed as an argument to the callback
+    * * `component:remove` - Triggered when a component is removed, the model is passed as an argument to the callback
+    * * `component:clone` - Triggered when a new component is added by a clone command, the model is passed as an argument to the callback
     * * `component:update` - Triggered when a component is updated (moved, styled, etc.), the model is passed as an argument to the callback
     * * `component:update:{propertyName}` - Listen any property change, the model is passed as an argument to the callback
     * * `component:styleUpdate` - Triggered when the style of the component is updated, the model is passed as an argument to the callback
@@ -26434,6 +26763,13 @@ module.exports = function (config) {
     * * `storage:store` - Triggered when something is stored to the storage, stored object passed as an argumnet
     * * `storage:end` - After the storage request is ended
     * * `storage:error` - On any error on storage request, passes the error as an argument
+    * ## Canvas
+    * * `canvas:dragenter` - When something is dragged inside the canvas, `DataTransfer` instance passed as an argument
+    * * `canvas:dragover` - When something is dragging on canvas, `DataTransfer` instance passed as an argument
+    * * `canvas:drop` - Something is dropped in canvas, `DataTransfer` instance and the dropped model are passed as arguments
+    * * `canvas:dragend` - When a drag operation is ended, `DataTransfer` instance passed as an argument
+    * * `canvas:dragdata` - On any dataTransfer parse, `DataTransfer` instance and the `result` are passed as arguments.
+    *  By changing `result.content` you're able to customize what is dropped
     * ## Selectors
     * * `selector:add` - Triggers when a new selector/class is created
     * ## RTE
@@ -26476,7 +26812,7 @@ module.exports = function (config) {
     */
 
 /***/ }),
-/* 65 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26486,8 +26822,14 @@ module.exports = {
   // Style prefix
   stylePrefix: 'gjs-',
 
-  //TEMP
+  // HTML string or object of components
   components: '',
+
+  // CSS string or object of rules
+  style: '',
+
+  // If true, will fetch HTML and CSS from selected container
+  fromElement: 0,
 
   // Show an alert before unload the page with unsaved changes
   noticeOnUnload: true,
@@ -26543,6 +26885,9 @@ module.exports = {
   // Return JS of components inside HTML from 'editor.getHtml()'
   jsInHtml: false,
 
+  // Enable native HTML5 drag and drop
+  nativeDnD: 1,
+
   // Show the wrapper component in the final code, eg. in editor.getHtml()
   exportWrapper: 0,
 
@@ -26554,6 +26899,16 @@ module.exports = {
   // use of media queries (@media) or even pseudo selectors (eg. :hover).
   // When `avoidInlineStyle` is true all styles are inserted inside the css rule
   avoidInlineStyle: 0,
+
+  // (experimental)
+  // The structure of components is always on the screen but it's not the same
+  // for style rules. When you delete a component you might leave a lot of styles
+  // which will never be used again, therefore they might be removed.
+  // With this option set to true, styles not used from the CSS generator (so in
+  // any case where `CssGenerator.build` is used) will be removed automatically.
+  // But be careful, not always leaving the style not used mean you wouldn't
+  // use it later, but this option comes really handy when deal with big templates.
+  clearStyles: 0,
 
   // Dom element
   el: '',
@@ -26619,7 +26974,6 @@ module.exports = {
 
   //Configurations for Style Manager
   styleManager: {
-
     sectors: [{
       name: 'General',
       open: false,
@@ -26645,11 +26999,13 @@ module.exports = {
       open: false,
       buildProps: ['transition', 'perspective', 'transform']
     }]
-
   },
 
-  //Configurations for Block Manager
+  // Configurations for Block Manager
   blockManager: {},
+
+  // Configurations for Trait Manager
+  traitManager: {},
 
   // Texts
 
@@ -26657,7 +27013,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 66 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26667,12 +27023,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var deps = [__webpack_require__(67), __webpack_require__(71), __webpack_require__(72), __webpack_require__(75), __webpack_require__(83), __webpack_require__(88), __webpack_require__(91), __webpack_require__(95), __webpack_require__(99), __webpack_require__(111), __webpack_require__(117), __webpack_require__(32), __webpack_require__(136), __webpack_require__(142), __webpack_require__(147), __webpack_require__(154), __webpack_require__(184), __webpack_require__(190), __webpack_require__(220)];
+var deps = [__webpack_require__(66), __webpack_require__(70), __webpack_require__(71), __webpack_require__(74), __webpack_require__(82), __webpack_require__(87), __webpack_require__(90), __webpack_require__(94), __webpack_require__(98), __webpack_require__(110), __webpack_require__(116), __webpack_require__(32), __webpack_require__(135), __webpack_require__(141), __webpack_require__(146), __webpack_require__(153), __webpack_require__(55), __webpack_require__(184), __webpack_require__(191), __webpack_require__(219)];
 
 var Backbone = __webpack_require__(0);
 var timedInterval = void 0;
 
-__webpack_require__(228)({
+__webpack_require__(227)({
   Backbone: Backbone,
   $: Backbone.$
 });
@@ -26702,6 +27058,7 @@ module.exports = Backbone.Model.extend({
     this.config = c;
     this.set('Config', c);
     this.set('modules', []);
+    this.set('toLoad', []);
 
     if (c.el && c.fromElement) this.config.components = c.el.innerHTML;
 
@@ -26889,22 +27246,16 @@ module.exports = Backbone.Model.extend({
   /**
    * Select a component
    * @param  {Component|HTMLElement} el Component to select
-   * @param  {Object} opts Options, optional
+   * @param  {Object} [opts={}] Options, optional
    * @private
    */
   setSelected: function setSelected(el) {
     var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     var model = el;
-
-    if (el instanceof window.HTMLElement) {
-      model = $(el).data('model');
-    }
-
-    if (model && !model.get("selectable")) {
-      return;
-    }
-
+    (0, _underscore.isElement)(el) && (model = $(el).data('model'));
+    if (model && !model.get('selectable')) return;
+    opts.forceChange && this.set('selectedComponent', '');
     this.set('selectedComponent', model, opts);
   },
 
@@ -27009,7 +27360,8 @@ module.exports = Backbone.Model.extend({
     var protCss = !avoidProt ? config.protectedCss : '';
 
     return protCss + this.get('CodeManager').getCode(wrp, 'css', {
-      cssc: cssc, wrappesIsBody: wrappesIsBody
+      cssc: cssc,
+      wrappesIsBody: wrappesIsBody
     });
   },
 
@@ -27210,17 +27562,16 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 67 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = function () {
-
-  var Sorter = __webpack_require__(68);
-  var Resizer = __webpack_require__(69);
-  var Dragger = __webpack_require__(70);
+  var Sorter = __webpack_require__(67);
+  var Resizer = __webpack_require__(68);
+  var Dragger = __webpack_require__(69);
 
   return {
     /**
@@ -27245,15 +27596,17 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 68 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
 var $ = Backbone.$;
 
@@ -27348,18 +27701,17 @@ module.exports = Backbone.View.extend({
     var pfx = this.ppfx || this.pfx;
     var sortCls = pfx + 'grabbing';
     var emBody = em ? em.get('Canvas').getBody() : '';
+
+    // Avoid updating body className as it causes a huge repaint
+    // Noticeable with "fast" drag of blocks
     if (active) {
       em && em.get('Canvas').startAutoscroll();
-      body.className += ' ' + sortCls;
-      if (em) {
-        emBody.className += ' ' + sortCls;
-      }
+      //body.className += ' ' + sortCls;
+      //if (em) emBody.className += ' ' + sortCls;
     } else {
       em && em.get('Canvas').stopAutoscroll();
-      body.className = body.className.replace(sortCls, '').trim();
-      if (em) {
-        emBody.className = emBody.className.replace(sortCls, '').trim();
-      }
+      //body.className = body.className.replace(sortCls, '').trim();
+      //if(em) emBody.className = emBody.className.replace(sortCls, '').trim();
     }
   },
 
@@ -27487,7 +27839,7 @@ module.exports = Backbone.View.extend({
     el.className = pfx + 'placeholder';
     el.style.display = 'none';
     el.style['pointer-events'] = 'none';
-    ins.className = pfx + "placeholder-int";
+    ins.className = pfx + 'placeholder-int';
     el.appendChild(ins);
     return el;
   },
@@ -27529,8 +27881,8 @@ module.exports = Backbone.View.extend({
       srcModel && srcModel.set && srcModel.set('status', 'freezed');
     }
 
-    (0, _mixins.on)(container, 'mousemove', this.onMove);
-    (0, _mixins.on)(docs, 'mouseup', this.endMove);
+    (0, _mixins.on)(container, 'mousemove dragover', this.onMove);
+    (0, _mixins.on)(docs, 'mouseup dragend', this.endMove);
     (0, _mixins.on)(docs, 'keydown', this.rollback);
     onStart && onStart();
 
@@ -27565,8 +27917,14 @@ module.exports = Backbone.View.extend({
     if (dropContent && em) {
       if (!dropModel) {
         var comps = em.get('DomComponents').getComponents();
-        var tempModel = comps.add(dropContent, { avoidUpdateStyle: 1, temporary: 1 });
-        dropModel = comps.remove(tempModel, { temporary: 1 });
+        var opts = {
+          avoidStore: 1,
+          avoidChildren: 1,
+          avoidUpdateStyle: 1,
+          temporary: 1
+        };
+        var tempModel = comps.add(dropContent, opts);
+        dropModel = comps.remove(tempModel, opts);
         this.dropModel = dropModel instanceof Array ? dropModel[0] : dropModel;
       }
       return dropModel;
@@ -27699,13 +28057,18 @@ module.exports = Backbone.View.extend({
     if ($el.css('float') !== 'none') return;
     if (parent && $(parent).css('display') == 'flex') return;
     switch (style.position) {
-      case 'static':case 'relative':case '':
+      case 'static':
+      case 'relative':
+      case '':
         break;
       default:
         return;
     }
     switch (el.tagName) {
-      case 'TR':case 'TBODY':case 'THEAD':case 'TFOOT':
+      case 'TR':
+      case 'TBODY':
+      case 'THEAD':
+      case 'TFOOT':
         return true;
     }
     switch ($el.css('display')) {
@@ -27917,7 +28280,6 @@ module.exports = Backbone.View.extend({
     var width = rect.width;
     var height = rect.height;
 
-    //console.log(pos, {top, left});
     if (y < top + off || // near top edge
     y > top + height - off || // near bottom edge
     x < left + off || // near left edge
@@ -27960,8 +28322,6 @@ module.exports = Backbone.View.extend({
       height = el.offsetHeight;
       width = el.offsetWidth;
     }
-
-    //console.log('get dim', top, left, this.canvasRelative);
 
     return [top, left, height, width];
   },
@@ -28065,17 +28425,17 @@ module.exports = Backbone.View.extend({
         //If x lefter than center
         if (posX < xCenter) {
           xLimit = xCenter;
-          result.method = "before";
+          result.method = 'before';
         } else {
           leftLimit = xCenter;
-          result.method = "after";
+          result.method = 'after';
         }
       } else {
         // If y upper than center
         if (posY < yCenter) {
-          result.method = "before";
+          result.method = 'before';
           break;
-        } else result.method = "after"; // After last element
+        } else result.method = 'after'; // After last element
       }
     }
     return result;
@@ -28149,8 +28509,8 @@ module.exports = Backbone.View.extend({
     var created;
     var docs = this.getDocuments();
     var container = this.getContainerEl();
-    (0, _mixins.off)(container, 'mousemove', this.onMove);
-    (0, _mixins.off)(docs, 'mouseup', this.endMove);
+    (0, _mixins.off)(container, 'mousemove dragover', this.onMove);
+    (0, _mixins.off)(docs, 'mouseup dragend', this.endMove);
     (0, _mixins.off)(docs, 'keydown', this.rollback);
     //this.$document.off('mouseup', this.endMove);
     //this.$document.off('keydown', this.rollback);
@@ -28158,12 +28518,11 @@ module.exports = Backbone.View.extend({
     var clsReg = new RegExp('(?:^|\\s)' + this.freezeClass + '(?!\\S)', 'gi');
     var src = this.eV;
 
-    if (src) {
+    if (src && this.selectOnEnd) {
       var srcModel = this.getSourceModel();
       if (srcModel && srcModel.set) {
         srcModel.set('status', '');
         srcModel.set('status', 'selected');
-        //this.selectOnEnd && srcModel.set('status', 'selected');
       }
     }
 
@@ -28172,9 +28531,7 @@ module.exports = Backbone.View.extend({
     }
 
     if (this.plh) this.plh.style.display = 'none';
-
-    if (typeof this.onEndMove === 'function') this.onEndMove(created);
-
+    if ((0, _underscore.isFunction)(this.onEndMove)) this.onEndMove(created, this);
     var dragHelper = this.dragHelper;
 
     if (dragHelper) {
@@ -28214,7 +28571,8 @@ module.exports = Backbone.View.extend({
       var opts = { at: index, noIncrement: 1 };
 
       if (!dropContent) {
-        modelTemp = targetCollection.add({}, opts);
+        // Putting `avoidStore` here will make the UndoManager behave wrong
+        modelTemp = targetCollection.add({}, _extends({}, opts));
 
         if (model) {
           modelToDrop = model.collection.remove(model);
@@ -28303,7 +28661,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 69 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28313,7 +28671,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _underscore = __webpack_require__(1);
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -28354,6 +28712,13 @@ var defaultOpts = {
   // from the current focused element (currently used only in SelectComponent)
   currentUnit: 1,
 
+  // With this option active the mousemove event won't be altered when
+  // the pointer comes over iframes
+  silentFrames: 0,
+
+  // If true the container of handlers won't be updated
+  avoidContainerUpdate: 0,
+
   // Handlers
   tl: 1, // Top left
   tc: 1, // Top center
@@ -28385,7 +28750,6 @@ var getBoundingRect = function getBoundingRect(el, win) {
 };
 
 var Resizer = function () {
-
   /**
    * Init the Resizer with options
    * @param  {Object} options
@@ -28471,6 +28835,22 @@ var Resizer = function () {
     }
 
     /**
+     * Toggle iframes pointer event
+     * @param {Boolean} silent If true, iframes will be silented
+     */
+
+  }, {
+    key: 'toggleFrames',
+    value: function toggleFrames(silent) {
+      if (this.opts.silentFrames) {
+        var frames = document.querySelectorAll('iframe');
+        (0, _underscore.each)(frames, function (frame) {
+          return frame.style.pointerEvents = silent ? 'none' : '';
+        });
+      }
+    }
+
+    /**
      * Detects if the passed element is a resize handler
      * @param  {HTMLElement} el
      * @return {Boolean}
@@ -28512,14 +28892,17 @@ var Resizer = function () {
     /**
      * Return element position
      * @param  {HTMLElement} el
+     * @param  {Object} opts Custom options
      * @return {Object}
      */
 
   }, {
     key: 'getElementPos',
     value: function getElementPos(el) {
+      var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
       var posFetcher = this.posFetcher || '';
-      return posFetcher ? posFetcher(el) : getBoundingRect(el);
+      return posFetcher ? posFetcher(el, opts) : getBoundingRect(el);
     }
 
     /**
@@ -28537,15 +28920,19 @@ var Resizer = function () {
 
       // Show the handlers
       this.el = el;
+      var config = this.opts;
       var unit = 'px';
-      var rect = this.getElementPos(el);
+      var rect = this.getElementPos(el, { target: 'container' });
       var container = this.container;
       var contStyle = container.style;
-      contStyle.left = rect.left + unit;
-      contStyle.top = rect.top + unit;
-      contStyle.width = rect.width + unit;
-      contStyle.height = rect.height + unit;
-      container.style.display = 'block';
+
+      if (!config.avoidContainerUpdate) {
+        contStyle.left = rect.left + unit;
+        contStyle.top = rect.top + unit;
+        contStyle.width = rect.width + unit;
+        contStyle.height = rect.height + unit;
+        contStyle.display = 'block';
+      }
 
       (0, _mixins.on)(this.getDocumentEl(), 'mousedown', this.handleMouseDown);
     }
@@ -28574,16 +28961,14 @@ var Resizer = function () {
     key: 'start',
     value: function start(e) {
       //Right or middel click
-      if (e.button !== 0) {
-        return;
-      }
+      if (e.button !== 0) return;
       e.preventDefault();
       e.stopPropagation();
       var el = this.el;
       var resizer = this;
       var config = this.opts || {};
       var attrName = 'data-' + config.prefix + 'handler';
-      var rect = this.getElementPos(el);
+      var rect = this.getElementPos(el, { target: 'el' });
       this.handlerAttr = e.target.getAttribute(attrName);
       this.clickedHandler = e.target;
       this.startDim = {
@@ -28609,6 +28994,7 @@ var Resizer = function () {
       (0, _mixins.on)(doc, 'keydown', this.handleKeyDown);
       (0, _mixins.on)(doc, 'mouseup', this.stop);
       (0, _underscore.isFunction)(this.onStart) && this.onStart(e, { docs: doc, config: config, el: el, resizer: resizer });
+      this.toggleFrames(1);
       this.move(e);
     }
 
@@ -28664,6 +29050,7 @@ var Resizer = function () {
       (0, _mixins.off)(doc, 'keydown', this.handleKeyDown);
       (0, _mixins.off)(doc, 'mouseup', this.stop);
       this.updateRect(1);
+      this.toggleFrames();
       (0, _underscore.isFunction)(this.onEnd) && this.onEnd(e, { docs: doc, config: config });
     }
 
@@ -28682,7 +29069,9 @@ var Resizer = function () {
       var updateTarget = this.updateTarget;
       var selectedHandler = this.getSelectedHandler();
       var unitHeight = config.unitHeight,
-          unitWidth = config.unitWidth;
+          unitWidth = config.unitWidth,
+          keyWidth = config.keyWidth,
+          keyHeight = config.keyHeight;
 
       // Use custom updating strategy if requested
 
@@ -28695,16 +29084,18 @@ var Resizer = function () {
         });
       } else {
         var elStyle = el.style;
-        elStyle.width = rect.w + unitWidth;
-        elStyle.height = rect.h + unitHeight;
+        elStyle[keyWidth] = rect.w + unitWidth;
+        elStyle[keyHeight] = rect.h + unitHeight;
       }
 
       var unitRect = 'px';
-      var rectEl = this.getElementPos(el);
-      conStyle.left = rectEl.left + unitRect;
-      conStyle.top = rectEl.top + unitRect;
-      conStyle.width = rectEl.width + unitRect;
-      conStyle.height = rectEl.height + unitRect;
+      var rectEl = this.getElementPos(el, { target: 'container' });
+      if (!config.avoidContainerUpdate) {
+        conStyle.left = rectEl.left + unitRect;
+        conStyle.top = rectEl.top + unitRect;
+        conStyle.width = rectEl.width + unitRect;
+        conStyle.height = rectEl.height + unitRect;
+      }
     }
 
     /**
@@ -28844,7 +29235,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 70 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28864,7 +29255,6 @@ var getBoundingRect = function getBoundingRect(el, win) {
 };
 
 module.exports = {
-
   // TODO move to opts
   setKey: function setKey(keys, command) {
     //key(keys, command);
@@ -29191,7 +29581,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 71 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29240,7 +29630,6 @@ module.exports = function () {
   };
 
   return {
-
     keymaster: keymaster,
 
     name: 'Keymaps',
@@ -29366,7 +29755,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 72 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29383,7 +29772,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
                                                                                                                                                                                                                                                                    */
 
 
-var _backboneUndo = __webpack_require__(73);
+var _backboneUndo = __webpack_require__(72);
 
 var _backboneUndo2 = _interopRequireDefault(_backboneUndo);
 
@@ -29397,7 +29786,6 @@ module.exports = function () {
   var configDef = {};
 
   return {
-
     name: 'UndoManager',
 
     /**
@@ -29413,6 +29801,32 @@ module.exports = function () {
       this.em = em;
       um = new _backboneUndo2.default({ track: true, register: [] });
       um.changeUndoType('change', { condition: false });
+      um.changeUndoType('add', {
+        on: function on(model, collection) {
+          var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+          if (options.avoidStore) return;
+          return {
+            object: collection,
+            before: undefined,
+            after: model,
+            options: _extends({}, options)
+          };
+        }
+      });
+      um.changeUndoType('remove', {
+        on: function on(model, collection) {
+          var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+          if (options.avoidStore) return;
+          return {
+            object: collection,
+            before: model,
+            after: undefined,
+            options: _extends({}, options)
+          };
+        }
+      });
       var customUndoType = {
         on: function on(object, value) {
           var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -29630,7 +30044,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 73 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -29647,7 +30061,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 (function (factory) {
 	if (true) {
 		// AMD support
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(74)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(73)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -30472,7 +30886,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 74 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Backbone.js 1.2.1
@@ -32353,7 +32767,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
 
 /***/ }),
-/* 75 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32368,15 +32782,14 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
  */
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(76),
-      LocalStorage = __webpack_require__(77),
-      RemoteStorage = __webpack_require__(78);
+      defaults = __webpack_require__(75),
+      LocalStorage = __webpack_require__(76),
+      RemoteStorage = __webpack_require__(77);
 
   var storages = {};
   var defaultStorages = {};
 
   return {
-
     /**
      * Name of the module
      * @type {String}
@@ -32565,16 +32978,20 @@ module.exports = function () {
 
       for (var i = 0, len = keys.length; i < len; i++) {
         keysF.push(c.id + keys[i]);
-      }st && st.load(keysF, function (res) {
-        // Restore keys name
-        var reg = new RegExp('^' + c.id + '');
-        for (var itemKey in res) {
-          var itemKeyR = itemKey.replace(reg, '');
-          result[itemKeyR] = res[itemKey];
-        }
+      }if (st) {
+        st.load(keysF, function (res) {
+          // Restore keys name
+          var reg = new RegExp('^' + c.id + '');
+          for (var itemKey in res) {
+            var itemKeyR = itemKey.replace(reg, '');
+            result[itemKeyR] = res[itemKey];
+          }
 
+          clb && clb(result);
+        });
+      } else {
         clb && clb(result);
-      });
+      }
     },
 
 
@@ -32602,7 +33019,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 76 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32666,11 +33083,10 @@ module.exports = {
   // true: application/json; charset=utf-8'
   // false: 'x-www-form-urlencoded'
   contentTypeJson: false
-
 };
 
 /***/ }),
-/* 77 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32679,14 +33095,13 @@ module.exports = {
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     checkLocal: true
   },
 
   /**
-  * @private
-  */
+   * @private
+   */
   store: function store(data, clb) {
     this.checkStorageEnvironment();
 
@@ -32740,7 +33155,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 78 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32755,7 +33170,6 @@ var _underscore = __webpack_require__(1);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 module.exports = __webpack_require__(0).Model.extend({
-
   fetch: _fetch2.default,
 
   defaults: {
@@ -32813,7 +33227,8 @@ module.exports = __webpack_require__(0).Model.extend({
     var em = this.get('em');
     var complete = this.get('onComplete');
     var typeJson = this.get('contentTypeJson');
-    var res = typeJson && typeof text === 'string' ? JSON.parse(text) : text;
+    var parsable = text && typeof text === 'string';
+    var res = typeJson && parsable ? JSON.parse(text) : text;
     complete && complete(res);
     clb && clb(res);
     em && em.trigger('storage:response', res);
@@ -32904,7 +33319,7 @@ module.exports = __webpack_require__(0).Model.extend({
 });
 
 /***/ }),
-/* 79 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(setImmediate) {(function (root) {
@@ -33141,10 +33556,10 @@ module.exports = __webpack_require__(0).Model.extend({
 
 })(this);
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(80).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(79).setImmediate))
 
 /***/ }),
-/* 80 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -33197,13 +33612,13 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(81);
+__webpack_require__(80);
 exports.setImmediate = setImmediate;
 exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 81 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -33393,10 +33808,10 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(82)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(81)))
 
 /***/ }),
-/* 82 */
+/* 81 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -33586,7 +34001,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 83 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33603,13 +34018,12 @@ process.umask = function() { return 0; };
  */
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(84),
-      Devices = __webpack_require__(85),
-      DevicesView = __webpack_require__(87);
+      defaults = __webpack_require__(83),
+      Devices = __webpack_require__(84),
+      DevicesView = __webpack_require__(86);
   var devices, view;
 
   return {
-
     /**
      * Name of the module
      * @type {String}
@@ -33707,19 +34121,31 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 84 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-
   devices: [],
 
   deviceLabel: 'Device'
-
 };
+
+/***/ }),
+/* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Backbone = __webpack_require__(0);
+var Device = __webpack_require__(85);
+
+module.exports = Backbone.Collection.extend({
+  model: Device
+});
 
 /***/ }),
 /* 85 */
@@ -33729,23 +34155,8 @@ module.exports = {
 
 
 var Backbone = __webpack_require__(0);
-var Device = __webpack_require__(86);
-
-module.exports = Backbone.Collection.extend({
-  model: Device
-});
-
-/***/ }),
-/* 86 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.Model.extend({
-
   idAttribute: 'name',
 
   defaults: {
@@ -33770,7 +34181,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 87 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33779,11 +34190,10 @@ module.exports = Backbone.Model.extend({
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.View.extend({
-
   template: _.template('\n    <div class="<%= ppfx %>device-label"><%= deviceLabel %></div>\n    <div class="<%= ppfx %>field <%= ppfx %>select">\n      <span id="<%= ppfx %>input-holder">\n        <select class="<%= ppfx %>devices"></select>\n      </span>\n      <div class="<%= ppfx %>sel-arrow">\n        <div class="<%= ppfx %>d-s-arrow"></div>\n      </div>\n    </div>\n    <button style="display:none" class="<%= ppfx %>add-trasp">+</button>'),
 
   events: {
-    'change': 'updateDevice'
+    change: 'updateDevice'
   },
 
   initialize: function initialize(o) {
@@ -33861,7 +34271,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 88 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33869,13 +34279,12 @@ module.exports = Backbone.View.extend({
 
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(89),
-      parserCss = __webpack_require__(90),
+      defaults = __webpack_require__(88),
+      parserCss = __webpack_require__(89),
       parserHtml = __webpack_require__(26);
   var pHtml, pCss;
 
   return {
-
     compTypes: '',
 
     /**
@@ -33927,24 +34336,40 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 89 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-
   textTags: ['br', 'b', 'i', 'u', 'a', 'ul', 'ol']
-
 };
 
 /***/ }),
-/* 90 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+
+var _underscore = __webpack_require__(1);
+
+// At-rules
+// https://developer.mozilla.org/it/docs/Web/API/CSSRule#Type_constants
+var atRules = {
+  4: 'media',
+  5: 'font-face',
+  6: 'page',
+  7: 'keyframes',
+  11: 'counter-style',
+  12: 'supports',
+  13: 'document',
+  14: 'font-feature-values',
+  15: 'viewport'
+};
+var atRuleKeys = (0, _underscore.keys)(atRules);
+var singleAtRules = ['5', '6', '11', '15'];
 
 module.exports = function (config) {
   return {
@@ -33963,7 +34388,9 @@ module.exports = function (config) {
      * //add: ['.test2 .test3']
      * //}
      */
-    parseSelector: function parseSelector(str) {
+    parseSelector: function parseSelector() {
+      var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
       var add = [];
       var result = [];
       var sels = str.split(',');
@@ -33971,7 +34398,7 @@ module.exports = function (config) {
         var sel = sels[i].trim();
         // Will accept only concatenated classes and last
         // class might be with state (eg. :hover), nothing else.
-        if (/^(\.{1}[\w\-]+)+(:{1,2}[\w\-()]+)?$/ig.test(sel)) {
+        if (/^(\.{1}[\w\-]+)+(:{1,2}[\w\-()]+)?$/gi.test(sel)) {
           var cls = sel.split('.').filter(Boolean);
           result.push(cls);
         } else {
@@ -33986,54 +34413,85 @@ module.exports = function (config) {
 
 
     /**
+     * Parse style declarations of the node
+     * @param {CSSRule} node
+     * @return {Object}
+     */
+    parseStyle: function parseStyle(node) {
+      var stl = node.style;
+      var style = {};
+
+      for (var i = 0, len = stl.length; i < len; i++) {
+        var propName = stl[i];
+        var propValue = stl.getPropertyValue(propName);
+        var important = stl.getPropertyPriority(propName);
+        style[propName] = '' + propValue + (important ? ' !' + important : '');
+      }
+
+      return style;
+    },
+
+
+    /**
+     * Get the condition when possible
+     * @param  {CSSRule} node
+     * @return {string}
+     */
+    parseCondition: function parseCondition(node) {
+      var condition = node.conditionText || node.media && node.media.mediaText || node.name || node.selectorText || '';
+      return condition.trim();
+    },
+
+
+    /**
      * Fetch data from node
-     * @param  {StyleSheet|CSSMediaRule} el
+     * @param  {StyleSheet|CSSRule} el
      * @return {Array<Object>}
      */
     parseNode: function parseNode(el) {
       var result = [];
-      var nodes = el.cssRules;
+      var nodes = el.cssRules || [];
 
       for (var i = 0, len = nodes.length; i < len; i++) {
         var node = nodes[i];
-        var sels = node.selectorText;
-        var selsAdd = [];
+        var type = node.type.toString();
+        var singleAtRule = 0;
+        var atRuleType = '';
+        var condition = '';
+        // keyText is for CSSKeyframeRule
+        var sels = node.selectorText || node.keyText;
+        var isSingleAtRule = singleAtRules.indexOf(type) >= 0;
 
-        // It's a CSSMediaRule
-        if (node.cssRules) {
+        // Check if the node is an at-rule
+        if (isSingleAtRule) {
+          singleAtRule = 1;
+          atRuleType = atRules[type];
+          condition = this.parseCondition(node);
+        } else if (atRuleKeys.indexOf(type) >= 0) {
           var subRules = this.parseNode(node);
-          var mediaText = node.media.mediaText;
+          condition = this.parseCondition(node);
 
           for (var s = 0, lens = subRules.length; s < lens; s++) {
             var subRule = subRules[s];
-            subRule.mediaText = mediaText ? mediaText.trim() : '';
+            condition && (subRule.mediaText = condition);
+            subRule.atRuleType = atRules[type];
           }
-
           result = result.concat(subRules);
         }
 
-        if (!sels) continue;
-
+        if (!sels && !isSingleAtRule) continue;
+        var style = this.parseStyle(node);
         var selsParsed = this.parseSelector(sels);
+        var selsAdd = selsParsed.add;
         sels = selsParsed.result;
-        selsAdd = selsParsed.add;
 
-        // Create style object from the big one
-        var stl = node.style;
-        var style = {};
-
-        for (var j = 0, len2 = stl.length; j < len2; j++) {
-          var propName = stl[j];
-          var propValue = stl.getPropertyValue(propName);
-          var important = stl.getPropertyPriority(propName);
-          style[propName] = '' + propValue + (important ? ' !' + important : '');
-        }
-
-        var lastRule = '';
+        var lastRule = void 0;
         // For each group of selectors
         for (var k = 0, len3 = sels.length; k < len3; k++) {
           var selArr = sels[k];
           var model = {};
+          singleAtRule && (model.singleAtRule = singleAtRule);
+          atRuleType && (model.atRuleType = atRuleType);
 
           //Isolate state from selector
           var stateArr = selArr[selArr.length - 1].split(/:(.+)/);
@@ -34056,13 +34514,18 @@ module.exports = function (config) {
           if (lastRule) {
             lastRule.selectorsAdd = selsAddStr;
           } else {
-            result.push({
+            var _model = {
               selectors: [],
               selectorsAdd: selsAddStr,
               style: style
-            });
+            };
+            singleAtRule && (_model.singleAtRule = singleAtRule);
+            atRuleType && (_model.atRuleType = atRuleType);
+            condition && (_model.mediaText = condition);
+            result.push(_model);
           }
         }
+        // console.log('LAST PUSH', result[result.length - 1]);
       }
 
       return result;
@@ -34076,28 +34539,21 @@ module.exports = function (config) {
      */
     parse: function parse(str) {
       var el = document.createElement('style');
-      /*
-      el.innerHTML = ".cssClass {border: 2px solid black; background-color: blue;} " +
-      ".red, .red2 {color:red; padding:5px} .test1.red {color:black} .red:hover{color: blue} " +
-      "@media screen and (min-width: 480px){ .red{color:white} }";
-      */
       el.innerHTML = str;
 
-      // There is no .sheet without adding it to the <head>
+      // There is no .sheet before adding it to the <head>
       document.head.appendChild(el);
       var sheet = el.sheet;
       document.head.removeChild(el);
       var result = this.parseNode(sheet);
 
-      if (result.length == 1) result = result[0];
-
-      return result;
+      return result.length == 1 ? result[0] : result;
     }
   };
 };
 
 /***/ }),
-/* 91 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34156,16 +34612,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _underscore = __webpack_require__(1);
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 module.exports = function (config) {
+  var _ref;
+
   var c = config || {},
-      defaults = __webpack_require__(92),
+      defaults = __webpack_require__(91),
       Selector = __webpack_require__(7),
       Selectors = __webpack_require__(13),
-      ClassTagsView = __webpack_require__(93);
+      ClassTagsView = __webpack_require__(92);
   var selectors, selectorTags;
 
-  return {
-
+  return _ref = {
     Selector: Selector,
 
     Selectors: Selectors,
@@ -34184,160 +34643,105 @@ module.exports = function (config) {
      */
     getConfig: function getConfig() {
       return c;
-    },
+    }
+  }, _defineProperty(_ref, 'getConfig', function getConfig() {
+    return c;
+  }), _defineProperty(_ref, 'init', function init(conf) {
+    c = conf || {};
 
+    for (var name in defaults) {
+      if (!(name in c)) c[name] = defaults[name];
+    }
 
-    /**
-     * Initialize module. Automatically called with a new instance of the editor
-     * @param {Object} config Configurations
-     * @return {this}
-     * @private
-     */
-    init: function init(conf) {
-      c = conf || {};
+    var em = c.em;
+    var ppfx = c.pStylePrefix;
 
-      for (var name in defaults) {
-        if (!(name in c)) c[name] = defaults[name];
-      }
+    if (ppfx) {
+      c.stylePrefix = ppfx + c.stylePrefix;
+    }
 
-      var em = c.em;
-      var ppfx = c.pStylePrefix;
+    selectorTags = new ClassTagsView({
+      collection: new Selectors([], { em: em, config: c }),
+      config: c
+    });
 
-      if (ppfx) {
-        c.stylePrefix = ppfx + c.stylePrefix;
-      }
+    // Global selectors container
+    selectors = new Selectors(c.selectors);
+    selectors.on('add', function (model) {
+      return em.trigger('selector:add', model);
+    });
 
-      selectorTags = new ClassTagsView({
-        collection: new Selectors([], { em: em, config: c }),
+    return this;
+  }), _defineProperty(_ref, 'postRender', function postRender() {
+    var elTo = this.getConfig().appendTo;
+
+    if (elTo) {
+      var el = (0, _underscore.isElement)(elTo) ? elTo : document.querySelector(elTo);
+      el.appendChild(this.render([]));
+    }
+  }), _defineProperty(_ref, 'add', function add(name) {
+    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if ((typeof name === 'undefined' ? 'undefined' : _typeof(name)) == 'object') {
+      opts = name;
+    } else {
+      opts.name = name;
+    }
+
+    if (opts.label && !opts.name) {
+      opts.name = Selector.escapeName(opts.label);
+    }
+
+    var cname = opts.name;
+    var selector = cname ? this.get(cname, opts.type) : selectors.where(opts)[0];
+
+    if (!selector) {
+      return selectors.add(opts);
+    }
+
+    return selector;
+  }), _defineProperty(_ref, 'addClass', function addClass(classes) {
+    var added = [];
+
+    if ((0, _underscore.isString)(classes)) {
+      classes = classes.trim().split(' ');
+    }
+
+    classes.forEach(function (name) {
+      return added.push(selectors.add({ name: name }));
+    });
+    return added;
+  }), _defineProperty(_ref, 'get', function get(name) {
+    var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Selector.TYPE_CLASS;
+
+    return selectors.where({ name: name, type: type })[0];
+  }), _defineProperty(_ref, 'getAll', function getAll() {
+    return selectors;
+  }), _defineProperty(_ref, 'render', function render(selectors) {
+    if (selectors) {
+      var view = new ClassTagsView({
+        collection: new Selectors(selectors),
         config: c
       });
-
-      // Global selectors container
-      selectors = new Selectors(c.selectors);
-      selectors.on('add', function (model) {
-        return em.trigger('selector:add', model);
-      });
-
-      return this;
-    },
-
-
-    /**
-     * Add a new selector to collection if it's not already exists. Class type is a default one
-     * @param {String} name Selector name
-     * @param {Object} opts Selector options
-     * @param {String} [opts.label=''] Label for the selector, if it's not provided the label will be the same as the name
-     * @param {String} [opts.type='class'] Type of the selector. At the moment, only 'class' is available
-     * @return {Model}
-     * @example
-     * var selector = selectorManager.add('selectorName');
-     * // Same as
-     * var selector = selectorManager.add('selectorName', {
-     *   type: 'class',
-     *   label: 'selectorName'
-     * });
-     * */
-    add: function add(name) {
-      var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      if ((typeof name === 'undefined' ? 'undefined' : _typeof(name)) == 'object') {
-        opts = name;
-      } else {
-        opts.name = name;
-      }
-
-      if (opts.label && !opts.name) {
-        opts.name = Selector.escapeName(opts.label);
-      }
-
-      var cname = opts.name;
-      var selector = cname ? this.get(cname, opts.type) : selectors.where(opts)[0];
-
-      if (!selector) {
-        return selectors.add(opts);
-      }
-
-      return selector;
-    },
-
-
-    /**
-     * Add class selectors
-     * @param {Array|string} classes Array or string of classes
-     * @return {Array} Array of added selectors
-     * @example
-     * sm.addClass('class1');
-     * sm.addClass('class1 class2');
-     * sm.addClass(['class1', 'class2']);
-     * // -> [SelectorObject, ...]
-     */
-    addClass: function addClass(classes) {
-      var added = [];
-
-      if ((0, _underscore.isString)(classes)) {
-        classes = classes.trim().split(' ');
-      }
-
-      classes.forEach(function (name) {
-        return added.push(selectors.add({ name: name }));
-      });
-      return added;
-    },
-
-
-    /**
-     * Get the selector by its name
-     * @param {String} name Selector name
-     * @param {String} tyoe Selector type
-     * @return {Model|null}
-     * @example
-     * var selector = selectorManager.get('selectorName');
-     * */
-    get: function get(name) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Selector.TYPE_CLASS;
-
-      return selectors.where({ name: name, type: type })[0];
-    },
-
-
-    /**
-     * Get all selectors
-     * @return {Collection}
-     * */
-    getAll: function getAll() {
-      return selectors;
-    },
-
-
-    /**
-     * Render class selectors. If an array of selectors is provided a new instance of the collection will be rendered
-     * @param {Array<Object>} selectors
-     * @return {HTMLElement}
-     * @private
-     */
-    render: function render(selectors) {
-      if (selectors) {
-        var view = new ClassTagsView({
-          collection: new Selectors(selectors),
-          config: c
-        });
-        return view.render().el;
-      } else return selectorTags.render().el;
-    }
-  };
+      return view.render().el;
+    } else return selectorTags.render().el;
+  }), _ref;
 };
 
 /***/ }),
-/* 92 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-
   // Style prefix
   stylePrefix: 'clm-',
+
+  // Specify the element to use as a container, string (query) or HTMLElement
+  // With the empty value, nothing will be rendered
+  appendTo: '',
 
   // Default selectors
   selectors: [],
@@ -34355,14 +34759,14 @@ module.exports = {
 };
 
 /***/ }),
-/* 93 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(_) {
 
 var Backbone = __webpack_require__(0);
-var ClassTagView = __webpack_require__(94);
+var ClassTagView = __webpack_require__(93);
 
 module.exports = Backbone.View.extend({
   template: _.template('\n  <div id="<%= pfx %>up">\n    <div id="<%= pfx %>label"><%= label %></div>\n    <div id="<%= pfx %>status-c">\n      <span id="<%= pfx %>input-c">\n        <div class="<%= ppfx %>field <%= ppfx %>select">\n          <span id="<%= ppfx %>input-holder">\n            <select id="<%= pfx %>states">\n              <option value=""><%= statesLabel %></option>\n            </select>\n          </span>\n          <div class="<%= ppfx %>sel-arrow">\n            <div class="<%= ppfx %>d-s-arrow"></div>\n          </div>\n        </div>\n      </span>\n    </div>\n  </div>\n  <div id="<%= pfx %>tags-field" class="<%= ppfx %>field">\n    <div id="<%= pfx %>tags-c"></div>\n    <input id="<%= pfx %>new" />\n    <span id="<%= pfx %>add-tag" class="fa fa-plus"></span>\n  </div>\n  <div id="<%= pfx %>sel-help">\n    <div id="<%= pfx %>label"><%= selectedLabel %></div>\n    <div id="<%= pfx %>sel"></div>\n    <div style="clear:both"></div>\n  </div>\n  <div>\n    <ul class="css-rule-list">\n      <li>123</li>\n    </ul>\n  <div>\n  '),
@@ -34385,12 +34789,12 @@ module.exports = Backbone.View.extend({
     this.events['blur #' + this.newInputId] = 'endNewTag';
     this.events['keyup #' + this.newInputId] = 'onInputKeyUp';
     this.events['change #' + this.stateInputId] = 'stateChanged';
-    window.asfsafsafsaf = this.collection;
+
     this.target = this.config.em;
     this.em = this.target;
 
     this.listenTo(this.target, 'change:selectedComponent', this.componentChanged);
-    this.listenTo(this.target, 'targetClassUpdated', this.updateSelector);
+    this.listenTo(this.target, 'component:update:classes', this.updateSelector);
 
     this.listenTo(this.collection, 'add', this.addNew);
     this.listenTo(this.collection, 'reset', this.renderClasses);
@@ -34567,7 +34971,8 @@ module.exports = Backbone.View.extend({
     }
 
     var state = selected.get('state');
-    var result = this.collection.getFullString();
+    var coll = this.collection;
+    var result = coll.getFullString(coll.getStyleable());
     result = result || '#' + selected.getId();
     result += state ? ':' + state : '';
     var el = this.el.querySelector('#' + this.pfx + 'sel');
@@ -34583,7 +34988,6 @@ module.exports = Backbone.View.extend({
   stateChanged: function stateChanged(e) {
     if (this.compTarget) {
       this.compTarget.set('state', this.$states.val());
-      if (this.target) this.target.trigger('targetStateUpdated');
       this.updateSelector();
     }
   },
@@ -34612,11 +35016,6 @@ module.exports = Backbone.View.extend({
         compCls.add(model);
         var lenA = compCls.length;
         this.collection.add(model);
-
-        if (lenA > lenB) {
-          target.trigger('targetClassAdded');
-        }
-
         this.updateStateVis();
       }
     }
@@ -34697,30 +35096,31 @@ module.exports = Backbone.View.extend({
     return this.$statesC;
   },
   render: function render() {
+    var ppfx = this.ppfx;
     var config = this.config;
-    this.$el.html(this.template({
+    var $el = this.$el;
+    $el.html(this.template({
       selectedLabel: config.selectedLabel,
       statesLabel: config.statesLabel,
       label: config.label,
       pfx: this.pfx,
       ppfx: this.ppfx
     }));
-
-    this.$input = this.$el.find('input#' + this.newInputId);
-    this.$addBtn = this.$el.find('#' + this.addBtnId);
-    this.$classes = this.$el.find('#' + this.pfx + 'tags-c');
-    this.$states = this.$el.find('#' + this.stateInputId);
-    this.$statesC = this.$el.find('#' + this.stateInputC);
+    this.$input = $el.find('input#' + this.newInputId);
+    this.$addBtn = $el.find('#' + this.addBtnId);
+    this.$classes = $el.find('#' + this.pfx + 'tags-c');
+    this.$states = $el.find('#' + this.stateInputId);
+    this.$statesC = $el.find('#' + this.stateInputC);
     this.$states.append(this.getStateOptions());
     this.renderClasses();
-    this.$el.attr('class', this.className);
+    $el.attr('class', this.className + ' ' + ppfx + 'one-bg ' + ppfx + 'two-color');
     return this;
   }
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 94 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34809,7 +35209,6 @@ module.exports = __webpack_require__(0).View.extend({
    */
   changeStatus: function changeStatus() {
     this.model.set('active', !this.model.get('active'));
-    this.target.trigger('targetClassUpdated');
   },
 
 
@@ -34831,7 +35230,6 @@ module.exports = __webpack_require__(0).View.extend({
     setTimeout(function () {
       return _this.remove();
     }, 0);
-    em && em.trigger('targetClassRemoved');
   },
 
 
@@ -34864,7 +35262,7 @@ module.exports = __webpack_require__(0).View.extend({
 });
 
 /***/ }),
-/* 95 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34888,18 +35286,17 @@ module.exports = __webpack_require__(0).View.extend({
  */
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(96),
-      ModalM = __webpack_require__(97),
-      ModalView = __webpack_require__(98);
+      defaults = __webpack_require__(95),
+      ModalM = __webpack_require__(96),
+      ModalView = __webpack_require__(97);
   var model, modal;
 
   return {
-
     /**
-      * Name of the module
-      * @type {String}
-      * @private
-      */
+     * Name of the module
+     * @type {String}
+     * @private
+     */
     name: 'Modal',
 
     /**
@@ -34924,9 +35321,9 @@ module.exports = function () {
 
       return this;
     },
-    postRender: function postRender(editorView) {
-      // c.em.config.el || 'body'
-      this.render().appendTo(editorView.el);
+    postRender: function postRender(view) {
+      var el = view.model.getConfig().el || view.el;
+      this.render().appendTo(el);
     },
 
 
@@ -35036,14 +35433,13 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 96 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-
   stylePrefix: 'mdl-',
 
   title: '',
@@ -35051,11 +35447,10 @@ module.exports = {
   content: '',
 
   backdrop: true
-
-};;
+};
 
 /***/ }),
-/* 97 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35072,7 +35467,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 98 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35085,7 +35480,7 @@ module.exports = __webpack_require__(0).View.extend({
         content = _ref.content,
         title = _ref.title;
 
-    return '<div class="' + pfx + 'dialog ' + ppfx + 'one-bg">\n      <div class="' + pfx + 'header">\n        <div class="' + pfx + 'title">' + title + '</div>\n        <div class="' + pfx + 'btn-close">&Cross;</div>\n      </div>\n      <div class="' + pfx + 'content">\n        <div id="' + pfx + 'c">' + content + '</div>\n        <div style="clear:both"></div>\n      </div>\n    </div>\n    <div class="' + pfx + 'backlayer"></div>\n    <div class="' + pfx + 'collector" style="display: none"></div>';
+    return '<div class="' + pfx + 'dialog ' + ppfx + 'one-bg ' + ppfx + 'two-color">\n      <div class="' + pfx + 'header">\n        <div class="' + pfx + 'title">' + title + '</div>\n        <div class="' + pfx + 'btn-close">&Cross;</div>\n      </div>\n      <div class="' + pfx + 'content">\n        <div id="' + pfx + 'c">' + content + '</div>\n        <div style="clear:both"></div>\n      </div>\n    </div>\n    <div class="' + pfx + 'backlayer"></div>\n    <div class="' + pfx + 'collector" style="display: none"></div>';
   },
 
 
@@ -35210,7 +35605,7 @@ module.exports = __webpack_require__(0).View.extend({
 });
 
 /***/ }),
-/* 99 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35236,15 +35631,14 @@ module.exports = __webpack_require__(0).View.extend({
  * @module CodeManager
  */
 module.exports = function () {
-
   var c = {},
-      defaults = __webpack_require__(100),
-      gHtml = __webpack_require__(101),
-      gCss = __webpack_require__(102),
-      gJson = __webpack_require__(103),
-      gJs = __webpack_require__(104),
-      eCM = __webpack_require__(105),
-      editorView = __webpack_require__(110);
+      defaults = __webpack_require__(99),
+      gHtml = __webpack_require__(100),
+      gCss = __webpack_require__(101),
+      gJson = __webpack_require__(102),
+      gJs = __webpack_require__(103),
+      eCM = __webpack_require__(104),
+      editorView = __webpack_require__(109);
 
   var generators = {},
       defGenerators = {},
@@ -35440,7 +35834,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 100 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35454,7 +35848,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 101 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35484,7 +35878,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 102 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35617,7 +36011,7 @@ module.exports = __webpack_require__(0).Model.extend({
 });
 
 /***/ }),
-/* 103 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35626,7 +36020,6 @@ module.exports = __webpack_require__(0).Model.extend({
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.Model.extend({
-
   /** @inheritdoc */
   build: function build(model) {
     var json = model.toJSON();
@@ -35662,7 +36055,7 @@ module.exports = Backbone.Model.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 104 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35723,7 +36116,7 @@ module.exports = Backbone.Model.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 105 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35733,12 +36126,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var Backbone = __webpack_require__(0);
 var CodeMirror = __webpack_require__(6);
-var htmlMode = __webpack_require__(106);
+var htmlMode = __webpack_require__(105);
 var cssMode = __webpack_require__(27);
-var formatting = __webpack_require__(109);
+var formatting = __webpack_require__(108);
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     input: '',
     label: '',
@@ -35773,7 +36165,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 106 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
@@ -35781,7 +36173,7 @@ module.exports = Backbone.Model.extend({
 
 (function(mod) {
   if (true) // CommonJS
-    mod(__webpack_require__(6), __webpack_require__(107), __webpack_require__(108), __webpack_require__(27));
+    mod(__webpack_require__(6), __webpack_require__(106), __webpack_require__(107), __webpack_require__(27));
   else if (typeof define == "function" && define.amd) // AMD
     define(["../../lib/codemirror", "../xml/xml", "../javascript/javascript", "../css/css"], mod);
   else // Plain browser env
@@ -35931,7 +36323,7 @@ module.exports = Backbone.Model.extend({
 
 
 /***/ }),
-/* 107 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
@@ -36338,7 +36730,7 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
 
 
 /***/ }),
-/* 108 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
@@ -37201,7 +37593,7 @@ CodeMirror.defineMIME("application/typescript", { name: "javascript", typescript
 
 
 /***/ }),
-/* 109 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function(mod) {
@@ -37328,7 +37720,7 @@ CodeMirror.defineMIME("application/typescript", { name: "javascript", typescript
 
 
 /***/ }),
-/* 110 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37337,7 +37729,6 @@ CodeMirror.defineMIME("application/typescript", { name: "javascript", typescript
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.View.extend({
-
   template: _.template('\n  <div class="<%= pfx %>editor" id="<%= pfx %><%= codeName %>">\n  \t<div id="<%= pfx %>title"><%= label %></div>\n  \t<div id="<%= pfx %>code"></div>\n  </div>'),
 
   initialize: function initialize(o) {
@@ -37356,7 +37747,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 111 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37411,15 +37802,14 @@ module.exports = Backbone.View.extend({
  */
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(112),
+      defaults = __webpack_require__(111),
       Panel = __webpack_require__(28),
-      Panels = __webpack_require__(114),
+      Panels = __webpack_require__(113),
       PanelView = __webpack_require__(30),
-      PanelsView = __webpack_require__(116);
+      PanelsView = __webpack_require__(115);
   var panels, PanelsViewObj;
 
   return {
-
     /**
      * Name of the module
      * @type {String}
@@ -37493,9 +37883,9 @@ module.exports = function () {
      *  visible  : true,
      *  buttons  : [...],
      * });
-     * 
+     *
      * const newPanel = panelManager.removePanel('myNewPanel');
-     * 
+     *
      */
     removePanel: function removePanel(panel) {
       return panels.remove(panel);
@@ -37555,7 +37945,7 @@ module.exports = function () {
      * Remove button from the panel
      * @param {string} panelId Panel's ID
      * @param {Object|Button|String} button Button object or instance of Button or button id
-     * @return {Button|null} Removed button. 
+     * @return {Button|null} Removed button.
      * @example
      * const removedButton = panelManager.removeButton('myNewPanel',{
      *   id: 'myNewButton',
@@ -37564,10 +37954,10 @@ module.exports = function () {
      *   attributes: { title: 'Some title'},
      *   active: false,
      * });
-     * 
+     *
      * // It's also possible to use the button id
      * const removedButton = panelManager.removeButton('myNewPanel','myNewButton');
-     * 
+     *
      */
     removeButton: function removeButton(panelId, button) {
       var pn = this.getPanel(panelId);
@@ -37629,12 +38019,11 @@ module.exports = function () {
 
 
     Panel: Panel
-
   };
 };
 
 /***/ }),
-/* 112 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37719,7 +38108,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 113 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37728,7 +38117,6 @@ module.exports = {
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     id: '',
     className: '',
@@ -37753,7 +38141,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 114 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37767,7 +38155,7 @@ module.exports = Backbone.Collection.extend({
 });
 
 /***/ }),
-/* 115 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37778,7 +38166,6 @@ var _underscore = __webpack_require__(1);
 var $ = Backbone.$;
 
 module.exports = Backbone.View.extend({
-
   tagName: 'span',
 
   initialize: function initialize(o) {
@@ -37898,7 +38285,7 @@ module.exports = Backbone.View.extend({
    * @return   void
    * */
   updateAttributes: function updateAttributes() {
-    this.$el.attr(this.model.get("attributes"));
+    this.$el.attr(this.model.get('attributes'));
   },
 
 
@@ -38053,7 +38440,6 @@ module.exports = Backbone.View.extend({
     this.toogleActive();
   },
   toogleActive: function toogleActive() {
-
     if (this.parentM) this.swapParent();
 
     var active = this.model.get('active');
@@ -38105,7 +38491,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 116 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38148,14 +38534,18 @@ module.exports = Backbone.View.extend({
    * */
   addToCollection: function addToCollection(model, fragmentEl) {
     var fragment = fragmentEl || null;
+    var config = this.config;
+    var el = model.get('el');
     var view = new PanelView({
+      el: el,
       model: model,
-      config: this.config
+      config: config
     });
     var rendered = view.render().el;
     var appendTo = model.get('appendTo');
 
-    if (appendTo) {
+    // Do nothing if the panel was requested to be another element
+    if (el) {} else if (appendTo) {
       var appendEl = document.querySelector(appendTo);
       appendEl.appendChild(rendered);
     } else {
@@ -38170,31 +38560,32 @@ module.exports = Backbone.View.extend({
     return rendered;
   },
   render: function render() {
-    var fragment = document.createDocumentFragment();
-    this.$el.empty();
+    var _this = this;
 
+    var $el = this.$el;
+    var frag = document.createDocumentFragment();
+    $el.empty();
     this.collection.each(function (model) {
-      this.addToCollection(model, fragment);
-    }, this);
-
-    this.$el.append(fragment);
-    this.$el.attr('class', this.className);
+      return _this.addToCollection(model, frag);
+    });
+    $el.append(frag);
+    $el.attr('class', this.className);
     return this;
   }
 });
 
 /***/ }),
-/* 117 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _RichTextEditor = __webpack_require__(118);
+var _RichTextEditor = __webpack_require__(117);
 
 var _RichTextEditor2 = _interopRequireDefault(_RichTextEditor);
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38215,7 +38606,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 module.exports = function () {
   var config = {};
-  var defaults = __webpack_require__(119);
+  var defaults = __webpack_require__(118);
   var toolbar = void 0,
       actions = void 0,
       lastEl = void 0,
@@ -38230,7 +38621,6 @@ module.exports = function () {
   };
 
   return {
-
     customRte: null,
 
     /**
@@ -38494,7 +38884,7 @@ module.exports = function () {
       if (customRte) {
         customRte.disable(el, rte);
       } else {
-        rte.disable();
+        rte && rte.disable();
       }
 
       hideToolbar();
@@ -38504,7 +38894,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 118 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38519,7 +38909,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // The initial version of this RTE was borrowed from https://github.com/jaredreich/pell
 // and adapted to the GrapesJS's need
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -38822,14 +39212,13 @@ var RichTextEditor = function () {
 exports.default = RichTextEditor;
 
 /***/ }),
-/* 119 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-
   stylePrefix: 'rte-',
 
   // If true, moves the toolbar below the element when the top canvas
@@ -38841,7 +39230,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 120 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38851,6 +39240,10 @@ module.exports = {
   stylePrefix: 'sm-',
 
   sectors: [],
+
+  // Specify the element to use as a container, string (query) or HTMLElement
+  // With the empty value, nothing will be rendered
+  appendTo: '',
 
   // Text to show in case no element selected
   textNoElement: 'Select an element before using Style Manager',
@@ -38870,27 +39263,27 @@ module.exports = {
   showComputed: true,
 
   // Adds the possibility to clear property value from the target style
-  clearProperties: false,
+  clearProperties: 0,
 
   // Properties not to take in account for computed styles
   avoidComputed: ['width', 'height']
 };
 
 /***/ }),
-/* 121 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Sector = __webpack_require__(122);
+var Sector = __webpack_require__(121);
 
 module.exports = __webpack_require__(0).Collection.extend({
-	model: Sector
+  model: Sector
 });
 
 /***/ }),
-/* 122 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38900,10 +39293,9 @@ var _underscore = __webpack_require__(1);
 
 var Backbone = __webpack_require__(0);
 var Properties = __webpack_require__(14);
-var PropertyFactory = __webpack_require__(133);
+var PropertyFactory = __webpack_require__(132);
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     id: '',
     name: '',
@@ -38991,7 +39383,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 123 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39061,7 +39453,7 @@ module.exports = __webpack_require__(9).extend({
 });
 
 /***/ }),
-/* 124 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39070,10 +39462,9 @@ module.exports = __webpack_require__(9).extend({
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var Property = __webpack_require__(36);
-var Layers = __webpack_require__(125);
+var Layers = __webpack_require__(124);
 
 module.exports = Property.extend({
-
   defaults: _extends({}, Property.prototype.defaults, {
     // Array of layers (which contain properties)
     layers: [],
@@ -39095,7 +39486,7 @@ module.exports = Property.extend({
 });
 
 /***/ }),
-/* 125 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39103,10 +39494,9 @@ module.exports = Property.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Layer = __webpack_require__(126);
+var Layer = __webpack_require__(125);
 
 module.exports = Backbone.Collection.extend({
-
   model: Layer,
 
   initialize: function initialize() {
@@ -39226,14 +39616,13 @@ module.exports = Backbone.Collection.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 126 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone) {
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     index: '',
     value: '',
@@ -39282,14 +39671,14 @@ module.exports = Backbone.Model.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 127 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var LayerView = __webpack_require__(128);
+var LayerView = __webpack_require__(127);
 
 module.exports = Backbone.View.extend({
   initialize: function initialize(o) {
@@ -39413,14 +39802,13 @@ module.exports = Backbone.View.extend({
 });
 
 /***/ }),
-/* 128 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone) {
 
 module.exports = Backbone.View.extend({
-
   events: {
     click: 'active',
     'click [data-close-layer]': 'remove',
@@ -39573,7 +39961,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 129 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39584,29 +39972,30 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Property = __webpack_require__(43);
 
 module.exports = Property.extend({
-
   defaults: _extends({}, Property.prototype.defaults, {
     showInput: 1
   })
-
 });
 
 /***/ }),
-/* 130 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var Property = __webpack_require__(9);
 
 module.exports = Property.extend({
-
-  events: {
-    'change [type=range]': 'inputValueChanged',
-    'input [type=range]': 'inputValueChangedSoft'
+  events: function events() {
+    return _extends({}, Property.prototype.events, {
+      'change [type=range]': 'inputValueChanged',
+      'input [type=range]': 'inputValueChangedSoft',
+      change: ''
+    });
   },
-
   templateInput: function templateInput(model) {
     var ppfx = this.ppfx;
     return '\n      <div class="' + ppfx + 'field ' + ppfx + 'field-range">\n        <input type="range"\n          min="' + model.get('min') + '"\n          max="' + model.get('max') + '"\n          step="' + model.get('step') + '"/>\n      </div>\n    ';
@@ -39645,7 +40034,7 @@ module.exports = Property.extend({
 });
 
 /***/ }),
-/* 131 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39663,7 +40052,7 @@ module.exports = Property.extend({
 });
 
 /***/ }),
-/* 132 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39786,7 +40175,7 @@ module.exports = __webpack_require__(5).extend({
 });
 
 /***/ }),
-/* 133 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39821,64 +40210,114 @@ module.exports = function () {
 
         // Fixed values
         switch (prop) {
-          case 'margin-top':case 'margin-right':case 'margin-bottom':case 'margin-left':
-          case 'padding-top':case 'padding-right':case 'padding-bottom':case 'padding-left':
-          case 'width':case 'max-width':case 'min-width':
-          case 'height':case 'max-height':case 'min-height':
+          case 'margin-top':
+          case 'margin-right':
+          case 'margin-bottom':
+          case 'margin-left':
+          case 'padding-top':
+          case 'padding-right':
+          case 'padding-bottom':
+          case 'padding-left':
+          case 'width':
+          case 'max-width':
+          case 'min-width':
+          case 'height':
+          case 'max-height':
+          case 'min-height':
             obj.fixedValues = ['initial', 'inherit', 'auto'];
             break;
           case 'font-size':
             obj.fixedValues = ['medium', 'xx-small', 'x-small', 'small', 'large', 'x-large', 'xx-large', 'smaller', 'larger', 'length', 'initial', 'inherit'];
             break;
-          case 'letter-spacing':case 'line-height':
+          case 'letter-spacing':
+          case 'line-height':
             obj.fixedValues = ['normal', 'initial', 'inherit'];
             break;
         }
 
         // Type
         switch (prop) {
-          case 'float':case 'position':
+          case 'float':
+          case 'position':
           case 'text-align':
             obj.type = 'radio';
             break;
-          case 'display':case 'font-family':
+          case 'display':
+          case 'font-family':
           case 'font-weight':
           case 'border-style':
           case 'box-shadow-type':
-          case 'background-repeat':case 'background-position':case 'background-attachment':case 'background-size':
-          case 'transition-property':case 'transition-timing-function':
+          case 'background-repeat':
+          case 'background-position':
+          case 'background-attachment':
+          case 'background-size':
+          case 'transition-property':
+          case 'transition-timing-function':
           case 'cursor':
           case 'overflow':
             obj.type = 'select';
             break;
-          case 'top':case 'right':case 'bottom':case 'left':
-          case 'margin-top':case 'margin-right':case 'margin-bottom':case 'margin-left':
-          case 'padding-top':case 'padding-right':case 'padding-bottom':case 'padding-left':
-          case 'min-height':case 'min-width':case 'max-height':case 'max-width':
-          case 'width':case 'height':
-          case 'font-size':case 'letter-spacing':case 'line-height':
-          case 'text-shadow-h':case 'text-shadow-v':case 'text-shadow-blur':
+          case 'top':
+          case 'right':
+          case 'bottom':
+          case 'left':
+          case 'margin-top':
+          case 'margin-right':
+          case 'margin-bottom':
+          case 'margin-left':
+          case 'padding-top':
+          case 'padding-right':
+          case 'padding-bottom':
+          case 'padding-left':
+          case 'min-height':
+          case 'min-width':
+          case 'max-height':
+          case 'max-width':
+          case 'width':
+          case 'height':
+          case 'font-size':
+          case 'letter-spacing':
+          case 'line-height':
+          case 'text-shadow-h':
+          case 'text-shadow-v':
+          case 'text-shadow-blur':
           case 'border-radius-c':
-          case 'border-top-left-radius':case 'border-top-right-radius':case 'border-bottom-left-radius':case 'border-bottom-right-radius':
+          case 'border-top-left-radius':
+          case 'border-top-right-radius':
+          case 'border-bottom-left-radius':
+          case 'border-bottom-right-radius':
           case 'border-width':
-          case 'box-shadow-h':case 'box-shadow-v':case 'box-shadow-blur':case 'box-shadow-spread':
+          case 'box-shadow-h':
+          case 'box-shadow-v':
+          case 'box-shadow-blur':
+          case 'box-shadow-spread':
           case 'transition-duration':
           case 'perspective':
-          case 'transform-rotate-x':case 'transform-rotate-y':case 'transform-rotate-z':
-          case 'transform-scale-x':case 'transform-scale-y':case 'transform-scale-z':
+          case 'transform-rotate-x':
+          case 'transform-rotate-y':
+          case 'transform-rotate-z':
+          case 'transform-scale-x':
+          case 'transform-scale-y':
+          case 'transform-scale-z':
             obj.type = 'integer';
             break;
-          case 'margin':case 'padding':
+          case 'margin':
+          case 'padding':
           case 'border-radius':
           case 'border':
           case 'transform':
             obj.type = 'composite';
             break;
-          case 'color':case 'text-shadow-color':
-          case 'background-color':case 'border-color':case 'box-shadow-color':
+          case 'color':
+          case 'text-shadow-color':
+          case 'background-color':
+          case 'border-color':
+          case 'box-shadow-color':
             obj.type = 'color';
             break;
-          case 'text-shadow':case 'box-shadow':case 'background':
+          case 'text-shadow':
+          case 'box-shadow':
+          case 'background':
           case 'transition':
             obj.type = 'stack';
             break;
@@ -39893,8 +40332,10 @@ module.exports = function () {
 
         // Defaults
         switch (prop) {
-          case 'float':case 'background-color':
-          case 'background-image':case 'text-shadow':
+          case 'float':
+          case 'background-color':
+          case 'background-image':
+          case 'text-shadow':
             obj.defaults = 'none';
             break;
           case 'display':
@@ -39903,25 +40344,49 @@ module.exports = function () {
           case 'position':
             obj.defaults = 'static';
             break;
-          case 'top':case 'right':case 'bottom':case 'left':
-          case 'margin-top':case 'margin-right':case 'margin-bottom':case 'margin-left':
-          case 'padding-top':case 'padding-right':case 'padding-bottom':case 'padding-left':
-          case 'text-shadow-h':case 'text-shadow-v':case 'text-shadow-blur':
+          case 'top':
+          case 'right':
+          case 'bottom':
+          case 'left':
+          case 'margin-top':
+          case 'margin-right':
+          case 'margin-bottom':
+          case 'margin-left':
+          case 'padding-top':
+          case 'padding-right':
+          case 'padding-bottom':
+          case 'padding-left':
+          case 'text-shadow-h':
+          case 'text-shadow-v':
+          case 'text-shadow-blur':
           case 'border-radius-c':
-          case 'border-top-left-radius':case 'border-top-right-radius':case 'border-bottom-left-radius':case 'border-bottom-right-radius':
-          case 'box-shadow-h':case 'box-shadow-v':case 'box-shadow-spread':
+          case 'border-top-left-radius':
+          case 'border-top-right-radius':
+          case 'border-bottom-left-radius':
+          case 'border-bottom-right-radius':
+          case 'box-shadow-h':
+          case 'box-shadow-v':
+          case 'box-shadow-spread':
           case 'perspective':
-          case 'transform-rotate-x':case 'transform-rotate-y':case 'transform-rotate-z':
+          case 'transform-rotate-x':
+          case 'transform-rotate-y':
+          case 'transform-rotate-z':
             obj.defaults = 0;
             break;
-          case 'transform-scale-x':case 'transform-scale-y':case 'transform-scale-z':
+          case 'transform-scale-x':
+          case 'transform-scale-y':
+          case 'transform-scale-z':
             obj.defaults = 1;
             break;
           case 'box-shadow-blur':
             obj.defaults = '5px';
             break;
-          case 'min-height':case 'min-width':case 'max-height':case 'max-width':
-          case 'width':case 'height':
+          case 'min-height':
+          case 'min-width':
+          case 'max-height':
+          case 'max-width':
+          case 'width':
+          case 'height':
           case 'background-size':
           case 'cursor':
             obj.defaults = 'auto';
@@ -39929,17 +40394,21 @@ module.exports = function () {
           case 'font-family':
             obj.defaults = 'Arial, Helvetica, sans-serif';
             break;
-          case 'font-size':case 'border-width':
+          case 'font-size':
+          case 'border-width':
             obj.defaults = 'medium';
             break;
           case 'font-weight':
             obj.defaults = '400';
             break;
-          case 'letter-spacing':case 'line-height':
+          case 'letter-spacing':
+          case 'line-height':
             obj.defaults = 'normal';
             break;
-          case 'color':case 'text-shadow-color':
-          case 'border-color':case 'box-shadow-color':
+          case 'color':
+          case 'text-shadow-color':
+          case 'border-color':
+          case 'box-shadow-color':
             obj.defaults = 'black';
             break;
           case 'text-align':
@@ -39976,44 +40445,78 @@ module.exports = function () {
 
         // Units
         switch (prop) {
-          case 'top':case 'right':case 'bottom':case 'left':
-          case 'margin-top':case 'margin-right':case 'margin-bottom':case 'margin-left':
-          case 'padding-top':case 'padding-right':case 'padding-bottom':case 'padding-left':
-          case 'min-height':case 'min-width':case 'max-height':case 'max-width':
-          case 'width':case 'height':
-          case 'text-shadow-h':case 'text-shadow-v':case 'text-shadow-blur':
+          case 'top':
+          case 'right':
+          case 'bottom':
+          case 'left':
+          case 'margin-top':
+          case 'margin-right':
+          case 'margin-bottom':
+          case 'margin-left':
+          case 'padding-top':
+          case 'padding-right':
+          case 'padding-bottom':
+          case 'padding-left':
+          case 'min-height':
+          case 'min-width':
+          case 'max-height':
+          case 'max-width':
+          case 'width':
+          case 'height':
+          case 'text-shadow-h':
+          case 'text-shadow-v':
+          case 'text-shadow-blur':
           case 'border-radius-c':
-          case 'border-top-left-radius':case 'border-top-right-radius':case 'border-bottom-left-radius':case 'border-bottom-right-radius':
-          case 'box-shadow-h':case 'box-shadow-v':
+          case 'border-top-left-radius':
+          case 'border-top-right-radius':
+          case 'border-bottom-left-radius':
+          case 'border-bottom-right-radius':
+          case 'box-shadow-h':
+          case 'box-shadow-v':
             obj.units = ['px', '%'];
             break;
-          case 'font-size':case 'letter-spacing':case 'line-height':
+          case 'font-size':
+          case 'letter-spacing':
+          case 'line-height':
             obj.units = ['px', 'em', 'rem', '%'];
             break;
           case 'border-width':
             obj.units = ['px', 'em'];
             break;
-          case 'box-shadow-blur':case 'box-shadow-spread':
+          case 'box-shadow-blur':
+          case 'box-shadow-spread':
           case 'perspective':
             obj.units = ['px'];
             break;
           case 'transition-duration':
             obj.units = ['s'];
             break;
-          case 'transform-rotate-x':case 'transform-rotate-y':case 'transform-rotate-z':
+          case 'transform-rotate-x':
+          case 'transform-rotate-y':
+          case 'transform-rotate-z':
             obj.units = ['deg'];
             break;
         }
 
         // Min/Max
         switch (prop) {
-          case 'padding-top':case 'padding-right':case 'padding-bottom':case 'padding-left':
-          case 'min-height':case 'min-width':case 'max-height':case 'max-width':
-          case 'width':case 'height':
+          case 'padding-top':
+          case 'padding-right':
+          case 'padding-bottom':
+          case 'padding-left':
+          case 'min-height':
+          case 'min-width':
+          case 'max-height':
+          case 'max-width':
+          case 'width':
+          case 'height':
           case 'font-size':
           case 'text-shadow-blur':
           case 'border-radius-c':
-          case 'border-top-left-radius':case 'border-top-right-radius':case 'border-bottom-left-radius':case 'border-bottom-right-radius':
+          case 'border-top-left-radius':
+          case 'border-top-right-radius':
+          case 'border-bottom-left-radius':
+          case 'border-bottom-right-radius':
           case 'border-width':
           case 'box-shadow-blur':
           case 'transition-duration':
@@ -40024,7 +40527,9 @@ module.exports = function () {
 
         // Preview
         switch (prop) {
-          case 'text-shadow':case 'box-shadow':case 'background':
+          case 'text-shadow':
+          case 'box-shadow':
+          case 'background':
             obj.preview = true;
             break;
         }
@@ -40161,7 +40666,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 134 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40171,13 +40676,17 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var SectorView = __webpack_require__(135);
+var SectorView = __webpack_require__(134);
 
 module.exports = Backbone.View.extend({
-  initialize: function initialize(o) {
-    this.config = o.config || {};
-    this.pfx = this.config.stylePrefix || '';
+  initialize: function initialize() {
+    var o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    var config = o.config || {};
+    this.pfx = config.stylePrefix || '';
+    this.ppfx = config.pStylePrefix || '';
     this.target = o.target || {};
+    this.config = config;
 
     // The target that will emit events for properties
     var target = {};
@@ -40189,9 +40698,10 @@ module.exports = Backbone.View.extend({
     body.removeChild(dummy);
     this.propTarget = target;
     var coll = this.collection;
+    var events = 'change:selectedComponent component:update:classes component:update:state change:device';
     this.listenTo(coll, 'add', this.addTo);
     this.listenTo(coll, 'reset', this.render);
-    this.listenTo(this.target, 'change:selectedComponent targetClassAdded targetClassRemoved targetClassUpdated ' + 'targetStateUpdated targetStyleUpdated change:device', this.targetUpdated);
+    this.listenTo(this.target, events, this.targetUpdated);
   },
 
 
@@ -40212,47 +40722,38 @@ module.exports = Backbone.View.extend({
    */
   targetUpdated: function targetUpdated() {
     var em = this.target;
-    var model = em.getSelected();
-    var um = em.get('UndoManager');
-    var cc = em.get('CssComposer');
-    var avoidInline = em.getConfig('avoidInlineStyle');
-
-    if (!model) {
-      return;
-    }
-
-    var id = model.getId();
-    var config = em.get('Config');
-    var classes = model.get('classes');
     var pt = this.propTarget;
 
     // aryeh edits
-    editor.pt = pt;
-    // var iContainer = cc.getBySelectorsAdd('.table-build th');
+    em.get('Editor').pt = pt;
 
+    var model = em.getSelected();
+    if (!model) return;
+
+    var config = em.get('Config');
     var state = !config.devicePreviewMode ? model.get('state') : '';
-    var opts = { state: state };
-    var stateStr = state ? ':' + state : null;
-    var view = model.view;
-    var media = em.getCurrentMedia();
+    var el = model.getEl();
     pt.helper = null;
 
-    if (view) {
-      pt.computed = window.getComputedStyle(view.el, state ? ':' + state : null);
+    // Create computed style container
+    if (el) {
+      var stateStr = state ? ':' + state : null;
+      pt.computed = window.getComputedStyle(el, stateStr);
     }
 
+    // Create a new rule for the state as a helper
     var appendStateRule = function appendStateRule() {
       var style = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      var sm = em.get('SelectorManager');
-      var helperClass = sm.add('hc-state');
-      var helperRule = cc.get([helperClass]);
+      var cc = em.get('CssComposer');
+      var helperCls = 'hc-state';
+      var rules = cc.getAll();
+      var helperRule = cc.getClassRule(helperCls);
 
       if (!helperRule) {
-        helperRule = cc.add([helperClass]);
+        helperRule = cc.setClassRule(helperCls);
       } else {
         // I will make it last again, otherwise it could be overridden
-        var rules = cc.getAll();
         rules.remove(helperRule);
         rules.add(helperRule);
       }
@@ -40262,58 +40763,8 @@ module.exports = Backbone.View.extend({
       pt.helper = helperRule;
     };
 
-    // If true the model will be always a rule
-    if (avoidInline) {
-      var ruleId = cc.getIdRule(id, opts);
-
-      if (!ruleId) {
-        model = cc.setIdRule(id, {}, opts);
-      } else {
-        model = ruleId;
-      }
-    }
-
-    if (classes.length) {
-      var valid = classes.getStyleable();
-      var iContainer = cc.get(valid, state, media);
-
-      // aryeh edits
-      // editor.pt = pt;
-      // var iContainer = cc.getBySelectorsAdd('.table-build th');
-
-      if (!iContainer && valid.length) {
-        // I stop undo manager here as after adding the CSSRule (generally after
-        // selecting the component) and calling undo() it will remove the rule from
-        // the collection, therefore updating it in style manager will not affect it
-        // #268
-        um.stop();
-        iContainer = cc.add(valid, state, media);
-        iContainer.setStyle(model.getStyle());
-        model.setStyle({});
-        um.start();
-      }
-
-      if (!iContainer) {
-        // In this case it's just a Component without any valid selector
-        pt.model = model;
-        pt.trigger('update');
-        return;
-      }
-
-      // If the state is not empty, there should be a helper rule in play
-      // The helper rule will get the same style of the iContainer
-      state && appendStateRule(iContainer.getStyle());
-
-      pt.model = iContainer;
-      pt.trigger('update');
-      return;
-    }
-
-    if (state) {
-      var ruleState = cc.getIdRule(id, opts);
-      state && appendStateRule(ruleState && ruleState.getStyle());
-    }
-
+    model = em.get('StyleManager').getModelToStyle(model);
+    state && appendStateRule(model.getStyle());
     pt.model = model;
     pt.trigger('update');
   },
@@ -40348,22 +40799,25 @@ module.exports = Backbone.View.extend({
     return rendered;
   },
   render: function render() {
-    var fragment = document.createDocumentFragment();
-    this.$el.empty();
+    var _this = this;
 
+    var frag = document.createDocumentFragment();
+    var $el = this.$el;
+    var pfx = this.pfx;
+    var ppfx = this.ppfx;
+    $el.empty();
     this.collection.each(function (model) {
-      this.addToCollection(model, fragment);
-    }, this);
-
-    this.$el.attr('id', this.pfx + 'sectors');
-    this.$el.append(fragment);
+      return _this.addToCollection(model, frag);
+    });
+    $el.append(frag);
+    $el.addClass(pfx + 'sectors ' + ppfx + 'one-bg ' + ppfx + 'two-color');
     return this;
   }
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 135 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40373,7 +40827,6 @@ var Backbone = __webpack_require__(0);
 var PropertiesView = __webpack_require__(15);
 
 module.exports = Backbone.View.extend({
-
   template: _.template('\n  <div class="<%= pfx %>title" data-sector-title>\n    <i id="<%= pfx %>caret" class="fa"></i>\n    <%= label %>\n  </div>'),
 
   events: {
@@ -40420,7 +40873,7 @@ module.exports = Backbone.View.extend({
    * Show the content of the sector
    * */
   show: function show() {
-    this.$el.addClass(this.pfx + "open");
+    this.$el.addClass(this.pfx + 'open');
     this.getPropertiesEl().style.display = '';
     this.$caret.removeClass(this.caretR).addClass(this.caretD);
   },
@@ -40430,7 +40883,7 @@ module.exports = Backbone.View.extend({
    * Hide the content of the sector
    * */
   hide: function hide() {
-    this.$el.removeClass(this.pfx + "open");
+    this.$el.removeClass(this.pfx + 'open');
     this.getPropertiesEl().style.display = 'none';
     this.$caret.removeClass(this.caretD).addClass(this.caretR);
   },
@@ -40474,7 +40927,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 136 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40522,16 +40975,15 @@ module.exports = Backbone.View.extend({
 
 module.exports = function () {
   var c = {};
-  var defaults = __webpack_require__(137);
-  var Assets = __webpack_require__(138);
-  var AssetsView = __webpack_require__(141);
+  var defaults = __webpack_require__(136);
+  var Assets = __webpack_require__(137);
+  var AssetsView = __webpack_require__(140);
   var FileUpload = __webpack_require__(46);
   var assets = void 0,
       am = void 0,
       fu = void 0;
 
   return {
-
     /**
      * Name of the module
      * @type {String}
@@ -40624,7 +41076,6 @@ module.exports = function () {
      */
     add: function add(asset) {
       var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
 
       // Put the model at the beginning
       if (typeof opts.at == 'undefined') {
@@ -40866,7 +41317,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 137 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40958,7 +41409,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 138 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40973,7 +41424,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.default).extend({
   types: [{
     id: 'image',
-    model: __webpack_require__(139),
+    model: __webpack_require__(138),
     view: __webpack_require__(44),
     isType: function isType(value) {
       if (typeof value == 'string') {
@@ -40988,7 +41439,7 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
 });
 
 /***/ }),
-/* 139 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40996,28 +41447,25 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Asset = __webpack_require__(140);
+var Asset = __webpack_require__(139);
 
 module.exports = Asset.extend({
-
   defaults: _extends({}, Asset.prototype.defaults, {
     type: 'image',
     unitDim: 'px',
     height: 0,
     width: 0
   })
-
 });
 
 /***/ }),
-/* 140 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = __webpack_require__(0).Model.extend({
-
   idAttribute: 'src',
 
   defaults: {
@@ -41046,7 +41494,7 @@ module.exports = __webpack_require__(0).Model.extend({
 });
 
 /***/ }),
-/* 141 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41057,7 +41505,6 @@ var AssetImageView = __webpack_require__(44);
 var FileUploader = __webpack_require__(46);
 
 module.exports = Backbone.View.extend({
-
   events: {
     submit: 'handleSubmit'
   },
@@ -41065,7 +41512,7 @@ module.exports = Backbone.View.extend({
   template: function template(view) {
     var pfx = view.pfx;
     var ppfx = view.ppfx;
-    return '\n    <div class="' + pfx + 'assets-cont">\n      <div class="' + pfx + 'assets-header">\n        <form class="' + pfx + 'add-asset">\n          <div class="' + ppfx + 'field ' + pfx + 'add-field">\n            <input placeholder="' + view.config.inputPlaceholder + '"/>\n          </div>\n          <button class="' + ppfx + 'btn-prim">' + view.config.addBtnText + '</button>\n          <div style="clear:both"></div>\n        </form>\n        <div class="' + pfx + 'dips" style="display:none">\n          <button class="fa fa-th <%' + ppfx + 'btnt"></button>\n          <button class="fa fa-th-list <%' + ppfx + 'btnt"></button>\n        </div>\n      </div>\n      <div class="' + pfx + 'assets" data-el="assets"></div>\n      <div style="clear:both"></div>\n    </div>\n    ';
+    return '\n    <div class="' + pfx + 'assets-cont">\n      <div class="' + pfx + 'assets-header">\n        <form class="' + pfx + 'add-asset">\n          <div class="' + ppfx + 'field ' + pfx + 'add-field">\n            <input placeholder="' + view.config.inputPlaceholder + '"/>\n          </div>\n          <button class="' + ppfx + 'btn-prim">' + view.config.addBtnText + '</button>\n          <div style="clear:both"></div>\n        </form>\n      </div>\n      <div class="' + pfx + 'assets" data-el="assets"></div>\n      <div style="clear:both"></div>\n    </div>\n    ';
   },
   initialize: function initialize(o) {
     this.options = o;
@@ -41235,7 +41682,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 142 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41264,17 +41711,16 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 module.exports = function () {
   var em = void 0;
   var c = {},
-      defaults = __webpack_require__(143),
+      defaults = __webpack_require__(142),
       CssRule = __webpack_require__(47),
-      CssRules = __webpack_require__(144),
-      CssRulesView = __webpack_require__(145);
+      CssRules = __webpack_require__(143),
+      CssRulesView = __webpack_require__(144);
   var Selectors = __webpack_require__(13);
   var Selector = __webpack_require__(7);
 
   var rules, rulesView;
 
   return {
-
     Selectors: Selectors,
 
     /**
@@ -41315,7 +41761,6 @@ module.exports = function () {
       var elStyle = c.em && c.em.config.style || '';
       c.rules = elStyle || c.rules;
 
-      c.sm = c.em;
       em = c.em;
       rules = new CssRules([], c);
       rulesView = new CssRulesView({
@@ -41449,6 +41894,17 @@ module.exports = function () {
     },
 
 
+    // aryeh add
+    getBySelectorsAdd: function getBySelectorsAdd(selectorsAdd) {
+      var rule = null;
+      rules.each(function (m) {
+        if (rule) return;
+        if (m.config.selectorsAdd === selectorsAdd) rule = m;
+      });
+      return rule;
+    },
+
+
     /**
      * Get the rule
      * @param {Array<Selector>} selectors Array of selectors
@@ -41472,17 +41928,6 @@ module.exports = function () {
       rules.each(function (m) {
         if (rule) return;
         if (m.compare(selectors, state, width, ruleProps)) rule = m;
-      });
-      return rule;
-    },
-
-
-    // aryeh add
-    getBySelectorsAdd: function getBySelectorsAdd(selectorsAdd) {
-      var rule = null;
-      rules.each(function (m) {
-        if (rule) return;
-        if (m.config.selectorsAdd === selectorsAdd) rule = m;
       });
       return rule;
     },
@@ -41656,27 +42101,25 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 143 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-
   // Style prefix
   stylePrefix: 'css-',
 
   // Custom CSS string to render on top
-  'staticRules': '',
+  staticRules: '',
 
   // Default CSS style
   rules: []
-
 };
 
 /***/ }),
-/* 144 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41688,13 +42131,13 @@ var CssRule = __webpack_require__(47);
 module.exports = Backbone.Collection.extend({
   initialize: function initialize(models, opt) {
     // Inject editor
-    if (opt && opt.sm) this.editor = opt.sm;
+    if (opt && opt.em) this.editor = opt.em;
 
     // Not used
     this.model = function (attrs, options) {
       var model;
 
-      if (!options.sm && opt && opt.sm) options.sm = opt.sm;
+      if (!options.em && opt && opt.em) options.em = opt.em;
 
       switch (1) {
         default:
@@ -41716,18 +42159,19 @@ module.exports = Backbone.Collection.extend({
 });
 
 /***/ }),
-/* 145 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Backbone = __webpack_require__(0);
-var CssRuleView = __webpack_require__(146);
+var CssRuleView = __webpack_require__(49);
+var CssGroupRuleView = __webpack_require__(145);
 
-module.exports = Backbone.View.extend({
+module.exports = __webpack_require__(0).View.extend({
   initialize: function initialize(o) {
     var config = o.config || {};
+    this.atRules = {};
     this.config = config;
     this.em = config.em;
     this.pfx = config.stylePrefix || '';
@@ -41758,20 +42202,45 @@ module.exports = Backbone.View.extend({
   addToCollection: function addToCollection(model, fragmentEl) {
     var fragment = fragmentEl || null;
     var viewObject = CssRuleView;
+    var config = this.config;
+    var rendered = void 0,
+        view = void 0;
+    var opts = { model: model, config: config };
 
-    var view = new viewObject({
-      model: model,
-      config: this.config
-    });
-    var rendered = view.render().el;
+    // I have to render keyframes of the same name together
+    // Unfortunately at the moment I didn't find the way of appending them
+    // if not staticly, via appendData
+    if (model.get('atRuleType') == 'keyframes') {
+      var atRule = model.getAtRule();
+      var atRuleEl = this.atRules[atRule];
 
-    if (fragment) fragment.appendChild(rendered);else this.$el.append(rendered);
+      if (!atRuleEl) {
+        var styleEl = document.createElement('style');
+        atRuleEl = document.createTextNode('');
+        styleEl.appendChild(document.createTextNode(atRule + '{'));
+        styleEl.appendChild(atRuleEl);
+        styleEl.appendChild(document.createTextNode('}'));
+        this.atRules[atRule] = atRuleEl;
+        rendered = styleEl;
+      }
+
+      view = new CssGroupRuleView(opts);
+      atRuleEl.appendData(view.render().el.textContent);
+    } else {
+      view = new CssRuleView(opts);
+      rendered = view.render().el;
+    }
+
+    if (rendered) {
+      if (fragment) fragment.appendChild(rendered);else this.$el.append(rendered);
+    }
 
     return rendered;
   },
   render: function render() {
     var _this = this;
 
+    this.atRules = {};
     var $el = this.$el;
     var frag = document.createDocumentFragment();
     $el.empty();
@@ -41785,35 +42254,27 @@ module.exports = Backbone.View.extend({
 });
 
 /***/ }),
-/* 146 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-module.exports = __webpack_require__(0).View.extend({
-  tagName: 'style',
-
-  initialize: function initialize() {
-    var o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    this.config = o.config || {};
-    var model = this.model;
-    var toTrack = 'change:style change:state change:mediaText';
-    this.listenTo(model, toTrack, this.render);
-    this.listenTo(model, 'destroy remove', this.remove);
-    this.listenTo(model.get('selectors'), 'change', this.render);
+module.exports = __webpack_require__(49).extend({
+  _createElement: function _createElement(tagName) {
+    return document.createTextNode('');
   },
+
   render: function render() {
     var model = this.model;
     var important = model.get('important');
-    this.el.innerHTML = this.model.toCSS({ important: important });
+    this.el.textContent = model.getDeclaration({ important: important });
     return this;
   }
 });
 
 /***/ }),
-/* 147 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41821,21 +42282,21 @@ module.exports = __webpack_require__(0).View.extend({
 
 var _underscore = __webpack_require__(1);
 
+var defaultOpts = __webpack_require__(147);
+var TraitsView = __webpack_require__(148);
+
 module.exports = function () {
   var c = {};
-  var defaultOpts = __webpack_require__(148);
-  var TraitsView = __webpack_require__(149);
   var TraitsViewer = void 0;
 
   return {
-
     TraitsView: TraitsView,
 
     /**
      * Name of the module
      * @type {String}
      * @private
-    */
+     */
     name: 'TraitManager',
 
     /**
@@ -41865,6 +42326,14 @@ module.exports = function () {
         config: c
       });
       return this;
+    },
+    postRender: function postRender() {
+      var elTo = this.getConfig().appendTo;
+
+      if (elTo) {
+        var el = (0, _underscore.isElement)(elTo) ? elTo : document.querySelector(elTo);
+        el.appendChild(this.render());
+      }
     },
 
 
@@ -41896,20 +42365,26 @@ module.exports = function () {
      */
     getType: function getType(name) {
       return TraitsViewer.itemsView[name];
+    },
+    render: function render() {
+      return TraitsViewer.render().el;
     }
   };
 };
 
 /***/ }),
-/* 148 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-
   stylePrefix: 'trt-',
+
+  // Specify the element to use as a container, string (query) or HTMLElement
+  // With the empty value, nothing will be rendered
+  appendTo: '',
 
   labelContainer: 'Component settings',
 
@@ -41921,39 +42396,41 @@ module.exports = {
 
   // Default options for the target input
   optionsTarget: [{ value: '', name: 'This window' }, { value: '_blank', name: 'New window' }]
-
 };
 
 /***/ }),
-/* 149 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var DomainViews = __webpack_require__(49);
+var DomainViews = __webpack_require__(50);
 var TraitView = __webpack_require__(10);
-var TraitSelectView = __webpack_require__(150);
-var TraitCheckboxView = __webpack_require__(151);
-var TraitNumberView = __webpack_require__(152);
-var TraitColorView = __webpack_require__(153);
+var TraitSelectView = __webpack_require__(149);
+var TraitCheckboxView = __webpack_require__(150);
+var TraitNumberView = __webpack_require__(151);
+var TraitColorView = __webpack_require__(152);
 
 module.exports = DomainViews.extend({
-
   itemView: TraitView,
 
   itemsView: {
-    'text': TraitView,
-    'number': TraitNumberView,
-    'select': TraitSelectView,
-    'checkbox': TraitCheckboxView,
-    'color': TraitColorView
+    text: TraitView,
+    number: TraitNumberView,
+    select: TraitSelectView,
+    checkbox: TraitCheckboxView,
+    color: TraitColorView
   },
 
-  initialize: function initialize(o) {
-    this.config = o.config || {};
+  initialize: function initialize() {
+    var o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    var config = o.config || {};
+    this.config = config;
     this.em = o.editor;
-    this.pfx = this.config.stylePrefix || '';
+    this.pfx = config.stylePrefix || '';
+    this.ppfx = config.pStylePrefix || '';
     this.className = this.pfx + 'traits';
     this.listenTo(this.em, 'change:selectedComponent', this.updatedCollection);
     this.updatedCollection();
@@ -41965,7 +42442,8 @@ module.exports = DomainViews.extend({
    * @private
    */
   updatedCollection: function updatedCollection() {
-    this.el.className = this.className;
+    var ppfx = this.ppfx;
+    this.el.className = this.className + ' ' + ppfx + 'one-bg ' + ppfx + 'two-color';
     var comp = this.em.get('selectedComponent');
     if (comp) {
       this.collection = comp.get('traits');
@@ -41975,7 +42453,7 @@ module.exports = DomainViews.extend({
 });
 
 /***/ }),
-/* 150 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42044,7 +42522,7 @@ module.exports = TraitView.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 151 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42099,7 +42577,7 @@ module.exports = TraitView.extend({
 });
 
 /***/ }),
-/* 152 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42154,7 +42632,7 @@ module.exports = TraitView.extend({
 });
 
 /***/ }),
-/* 153 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42172,16 +42650,17 @@ module.exports = TraitView.extend({
   getInputEl: function getInputEl() {
     if (!this.$input) {
       var value = this.getModelValue();
-      var inputNumber = new InputColor({
+      var inputColor = new InputColor({
         target: this.config.em,
         contClass: this.ppfx + 'field-color',
         model: this.model,
         ppfx: this.ppfx
       });
-      this.input = inputNumber.render();
+      this.input = inputColor.render();
       this.$input = this.input.colorEl;
       value = value || '';
       this.model.set('value', value).trigger('change:value');
+      this.input.setValue(value);
     }
     return this.$input.get(0);
   },
@@ -42200,7 +42679,7 @@ module.exports = TraitView.extend({
 });
 
 /***/ }),
-/* 154 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42245,73 +42724,73 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 module.exports = function () {
   var c = {};
   var em = void 0;
-  var defaults = __webpack_require__(155);
+  var defaults = __webpack_require__(154);
   var Component = __webpack_require__(4);
-  var ComponentView = __webpack_require__(2);
-  var Components = __webpack_require__(50);
-  var ComponentsView = __webpack_require__(51);
+  var ComponentView = __webpack_require__(3);
+  var Components = __webpack_require__(51);
+  var ComponentsView = __webpack_require__(52);
 
   var component, componentView;
   var componentTypes = [{
     id: 'cell',
-    model: __webpack_require__(159),
-    view: __webpack_require__(160)
+    model: __webpack_require__(158),
+    view: __webpack_require__(159)
   }, {
     id: 'row',
-    model: __webpack_require__(161),
-    view: __webpack_require__(162)
+    model: __webpack_require__(160),
+    view: __webpack_require__(161)
   }, {
     id: 'table',
-    model: __webpack_require__(163),
-    view: __webpack_require__(164)
+    model: __webpack_require__(162),
+    view: __webpack_require__(163)
   }, {
     id: 'thead',
-    model: __webpack_require__(165),
-    view: __webpack_require__(166)
+    model: __webpack_require__(164),
+    view: __webpack_require__(165)
   }, {
     id: 'tbody',
     model: __webpack_require__(20),
-    view: __webpack_require__(167)
+    view: __webpack_require__(166)
   }, {
     id: 'tfoot',
-    model: __webpack_require__(168),
-    view: __webpack_require__(169)
+    model: __webpack_require__(167),
+    view: __webpack_require__(168)
   }, {
     id: 'map',
-    model: __webpack_require__(170),
-    view: __webpack_require__(171)
+    model: __webpack_require__(169),
+    view: __webpack_require__(170)
   }, {
     id: 'link',
-    model: __webpack_require__(172),
-    view: __webpack_require__(173)
+    model: __webpack_require__(171),
+    view: __webpack_require__(172)
   }, {
     id: 'video',
-    model: __webpack_require__(174),
-    view: __webpack_require__(175)
+    model: __webpack_require__(173),
+    view: __webpack_require__(174)
   }, {
     id: 'image',
     model: __webpack_require__(21),
     view: __webpack_require__(16)
   }, {
     id: 'region',
-    model: __webpack_require__(176),
-    view: __webpack_require__(177)
+    model: __webpack_require__(175),
+    view: __webpack_require__(176)
   }, {
     id: 'script',
-    model: __webpack_require__(178),
-    view: __webpack_require__(179)
+    model: __webpack_require__(177),
+    view: __webpack_require__(178)
   }, {
     id: 'svg',
-    model: __webpack_require__(180),
-    view: __webpack_require__(181)
+    model: __webpack_require__(179),
+    view: __webpack_require__(180)
   }, {
     id: 'textnode',
-    model: __webpack_require__(182),
-    view: __webpack_require__(183)
+    model: __webpack_require__(181),
+    view: __webpack_require__(182)
   }, {
     id: 'text',
-    model: __webpack_require__(52),
-    view: __webpack_require__(53)
+    model: __webpack_require__(53),
+    view: __webpack_require__(54)
   }, {
     id: 'default',
     model: Component,
@@ -42319,6 +42798,7 @@ module.exports = function () {
   }];
 
   return {
+    Component: Component,
 
     Components: Components,
 
@@ -42406,7 +42886,7 @@ module.exports = function () {
       }
 
       component = new Component(wrapper, {
-        sm: em,
+        em: em,
         config: c,
         componentTypes: componentTypes
       });
@@ -42426,7 +42906,7 @@ module.exports = function () {
      * @private
      */
     onLoad: function onLoad() {
-      this.getComponents().reset(c.components);
+      this.setComponents(c.components);
     },
 
 
@@ -42660,7 +43140,7 @@ module.exports = function () {
      * @return {this}
      */
     clear: function clear() {
-      window.editor.CssComposer.getAll().reset();
+      //window.editor.CssComposer.getAll().reset();
       var c = this.getComponents();
       for (var i = 0, len = c.length; i < len; i++) {
         c.pop();
@@ -42725,12 +43205,10 @@ module.exports = function () {
       var previousModel = em.previous('selectedComponent');
 
       // Deselect the previous component
-      if (previousModel) {
-        previousModel.set({
-          status: '',
-          state: ''
-        });
-      }
+      previousModel && previousModel.set({
+        status: '',
+        state: ''
+      });
 
       model && model.set('status', 'selected');
     }
@@ -42738,7 +43216,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 155 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42780,7 +43258,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 156 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42789,11 +43267,10 @@ module.exports = {
 var _underscore = __webpack_require__(1);
 
 var Backbone = __webpack_require__(0);
-var Trait = __webpack_require__(157);
-var TraitFactory = __webpack_require__(158);
+var Trait = __webpack_require__(156);
+var TraitFactory = __webpack_require__(157);
 
 module.exports = Backbone.Collection.extend({
-
   model: Trait,
 
   initialize: function initialize(coll) {
@@ -42830,22 +43307,25 @@ module.exports = Backbone.Collection.extend({
 });
 
 /***/ }),
-/* 157 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Backbone = __webpack_require__(0);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-module.exports = Backbone.Model.extend({
+var _underscore = __webpack_require__(1);
 
+module.exports = __webpack_require__(0).Model.extend({
   defaults: {
     type: 'text', // text, number, range, select
     label: '',
     name: '',
     min: '',
     max: '',
+    unit: '',
+    step: 1,
     value: '',
     target: '',
     default: '',
@@ -42855,9 +43335,51 @@ module.exports = Backbone.Model.extend({
   },
 
   initialize: function initialize() {
-    if (this.get('target')) {
-      this.target = this.get('target');
+    var target = this.get('target');
+    var name = this.get('name');
+    var changeProp = this.get('changeProp');
+
+    if (target) {
+      this.target = target;
       this.unset('target');
+      var targetEvent = changeProp ? 'change:' + name : 'change:attributes:' + name;
+      this.listenTo(target, targetEvent, this.targetUpdated);
+    }
+  },
+  targetUpdated: function targetUpdated() {
+    var value = this.getTargetValue();
+    !(0, _underscore.isUndefined)(value) && this.set({ value: value }, { fromTarget: 1 });
+  },
+  getTargetValue: function getTargetValue() {
+    var name = this.get('name');
+    var target = this.target;
+    var prop = this.get('changeProp');
+    if (target) return prop ? target.get(name) : target.getAttributes()[name];
+  },
+  setTargetValue: function setTargetValue(value) {
+    var target = this.target;
+    var name = this.get('name');
+    if ((0, _underscore.isUndefined)(value)) return;
+
+    if (this.get('changeProp')) {
+      target.set(name, value);
+    } else {
+      var attrs = _extends({}, target.get('attributes'));
+      attrs[name] = value;
+      target.set('attributes', attrs);
+    }
+  },
+  setValueFromInput: function setValueFromInput(value) {
+    var final = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+    var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+    var toSet = { value: value };
+    this.set(toSet, _extends({}, opts, { avoidStore: 1 }));
+
+    // Have to trigger the change
+    if (final) {
+      this.set('value', '', opts);
+      this.set(toSet, opts);
     }
   },
 
@@ -42881,7 +43403,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 158 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42914,7 +43436,9 @@ module.exports = function () {
 
         // Define placeholder
         switch (prop) {
-          case 'title':case 'alt':case 'id':
+          case 'title':
+          case 'alt':
+          case 'id':
             obj.placeholder = config.labelPlhText;
             break;
           case 'href':
@@ -42938,7 +43462,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 159 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42949,13 +43473,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Component = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'cell',
     tagName: 'td',
     draggable: ['tr']
   })
-
 }, {
   isComponent: function isComponent(el) {
     var result = '';
@@ -42973,19 +43495,19 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 160 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({});
 
 /***/ }),
-/* 161 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42996,7 +43518,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Component = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'row',
     tagName: 'tr',
@@ -43028,19 +43549,19 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 162 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({});
 
 /***/ }),
-/* 163 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43051,7 +43572,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Component = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'table',
     tagName: 'table',
@@ -43081,15 +43601,13 @@ module.exports = Component.extend({
       name: 'ng-class'
       // changeProp: 1,
     }]
-
   })
 
-  // initialize(o, opt) {
-  //   Component.prototype.initialize.apply(this, arguments);
-  //   const components = this.get('components');
-  //   !components.length && components.add({ type: 'tbody' });
-  // },
-
+  //initialize(o, opt) {
+  //Component.prototype.initialize.apply(this, arguments);
+  //const components = this.get('components');
+  //!components.length && components.add({ type: 'tbody' });
+  //}
 }, {
   isComponent: function isComponent(el) {
     var result = '';
@@ -43103,14 +43621,14 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 164 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({
 
@@ -43179,7 +43697,7 @@ module.exports = ComponentView.extend({
 );
 
 /***/ }),
-/* 165 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43190,12 +43708,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var ComponentTableBody = __webpack_require__(20);
 
 module.exports = ComponentTableBody.extend({
-
   defaults: _extends({}, ComponentTableBody.prototype.defaults, {
     type: 'thead',
     tagName: 'thead'
   })
-
 }, {
   isComponent: function isComponent(el) {
     var result = '';
@@ -43209,6 +43725,18 @@ module.exports = ComponentTableBody.extend({
 });
 
 /***/ }),
+/* 165 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Backbone = __webpack_require__(0);
+var ComponentView = __webpack_require__(3);
+
+module.exports = ComponentView.extend({});
+
+/***/ }),
 /* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -43216,7 +43744,7 @@ module.exports = ComponentTableBody.extend({
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({});
 
@@ -43227,29 +43755,15 @@ module.exports = ComponentView.extend({});
 "use strict";
 
 
-var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
-
-module.exports = ComponentView.extend({});
-
-/***/ }),
-/* 168 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var ComponentTableBody = __webpack_require__(20);
 
 module.exports = ComponentTableBody.extend({
-
   defaults: _extends({}, ComponentTableBody.prototype.defaults, {
     type: 'tfoot',
     tagName: 'tfoot'
   })
-
 }, {
   isComponent: function isComponent(el) {
     var result = '';
@@ -43263,19 +43777,19 @@ module.exports = ComponentTableBody.extend({
 });
 
 /***/ }),
-/* 169 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({});
 
 /***/ }),
-/* 170 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43285,7 +43799,6 @@ var Component = __webpack_require__(21);
 var OComponent = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _.extend({}, Component.prototype.defaults, {
     type: 'map',
     void: 0,
@@ -43359,7 +43872,6 @@ module.exports = Component.extend({
     if (qr.t) this.set('mapType', qr.t);
   }
 }, {
-
   /**
    * Detect if the passed element is a valid component.
    * In case the element is valid an object abstracted
@@ -43379,7 +43891,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 171 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43389,7 +43901,6 @@ var Backbone = __webpack_require__(0);
 var ComponentView = __webpack_require__(16);
 
 module.exports = ComponentView.extend({
-
   tagName: 'div',
 
   events: {},
@@ -43409,7 +43920,7 @@ module.exports = ComponentView.extend({
   },
   getIframe: function getIframe() {
     if (!this.iframe) {
-      var ifrm = document.createElement("iframe");
+      var ifrm = document.createElement('iframe');
       ifrm.src = this.model.get('src');
       ifrm.frameBorder = 0;
       ifrm.style.height = '100%';
@@ -43432,7 +43943,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 172 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43440,10 +43951,9 @@ module.exports = ComponentView.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Component = __webpack_require__(52);
+var Component = __webpack_require__(53);
 
 module.exports = Component.extend({
-
   defaults: _extends({}, Component.prototype.defaults, {
     type: 'link',
     tagName: 'a',
@@ -43496,14 +44006,14 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 173 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(53);
+var ComponentView = __webpack_require__(54);
 
 module.exports = ComponentView.extend({
   render: function render() {
@@ -43522,21 +44032,21 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 174 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(_) {
+
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var Component = __webpack_require__(21);
 var OComponent = __webpack_require__(4);
-
 var yt = 'yt';
 var vi = 'vi';
 
 module.exports = Component.extend({
-
-  defaults: _.extend({}, Component.prototype.defaults, {
+  defaults: _extends({}, Component.prototype.defaults, {
     type: 'video',
     tagName: 'video',
     videoId: '',
@@ -43573,6 +44083,13 @@ module.exports = Component.extend({
     this.listenTo(this, 'change:provider', this.updateTraits);
     this.listenTo(this, 'change:videoId', this.updateSrc);
   },
+  initToolbar: function initToolbar() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    OComponent.prototype.initToolbar.apply(this, args);
+  },
 
 
   /**
@@ -43583,7 +44100,8 @@ module.exports = Component.extend({
     var uri = this.parseUri(this.get('src'));
     var qr = uri.query;
     switch (prov) {
-      case yt:case vi:
+      case yt:
+      case vi:
         var videoId = uri.pathname.split('/').pop();
         this.set('videoId', videoId);
         if (qr.autoplay) this.set('autoplay', 1);
@@ -43619,14 +44137,15 @@ module.exports = Component.extend({
    * @private
    */
   getAttrToHTML: function getAttrToHTML() {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
     }
 
     var attr = Component.prototype.getAttrToHTML.apply(this, args);
     var prov = this.get('provider');
     switch (prov) {
-      case yt:case vi:
+      case yt:
+      case vi:
         break;
       default:
         if (this.get('loop')) attr.loop = 'loop';
@@ -43657,7 +44176,7 @@ module.exports = Component.extend({
         this.set('tagName', 'video');
     }
     this.loadTraits(traits);
-    this.sm.trigger('change:selectedComponent');
+    this.em.trigger('change:selectedComponent');
   },
 
 
@@ -43804,7 +44323,6 @@ module.exports = Component.extend({
     return url;
   }
 }, {
-
   /**
    * Detect if the passed element is a valid component.
    * In case the element is valid an object abstracted
@@ -43828,10 +44346,9 @@ module.exports = Component.extend({
     return result;
   }
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 175 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43839,10 +44356,9 @@ module.exports = Component.extend({
 
 var Backbone = __webpack_require__(0);
 var ComponentView = __webpack_require__(16);
-var OComponentView = __webpack_require__(2);
+var OComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({
-
   tagName: 'div',
 
   events: {},
@@ -43894,7 +44410,8 @@ module.exports = ComponentView.extend({
     var videoEl = this.videoEl;
     var md = this.model;
     switch (prov) {
-      case 'yt':case 'vi':
+      case 'yt':
+      case 'vi':
         this.model.trigger('change:videoId');
         break;
       default:
@@ -43959,7 +44476,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 176 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44079,14 +44596,14 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 177 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({
 
@@ -44156,7 +44673,7 @@ module.exports = ComponentView.extend({
 );
 
 /***/ }),
-/* 178 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44165,14 +44682,12 @@ module.exports = ComponentView.extend({
 var Component = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _.extend({}, Component.prototype.defaults, {
     type: 'script',
     droppable: false,
     draggable: false,
     layerable: false
   })
-
 }, {
   isComponent: function isComponent(el) {
     if (el.tagName == 'SCRIPT') {
@@ -44190,7 +44705,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 179 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44200,7 +44715,6 @@ var Backbone = __webpack_require__(0);
 var ComponentView = __webpack_require__(16);
 
 module.exports = ComponentView.extend({
-
   tagName: 'script',
 
   events: {},
@@ -44217,7 +44731,7 @@ module.exports = ComponentView.extend({
       var onload = model.get('onload');
       var svar = 'script' + scriptCount;
       var svarNext = 'script' + (scriptCount + 1);
-      content = "var " + svar + " = document.createElement('script');\n" + svar + ".onload = function(){\n" + (onload ? onload + "();\n" : '') + "typeof " + svarNext + "Start == 'function' && " + svarNext + "Start();\n" + "};\n" + svar + ".src = '" + src + "';\n" + "function " + svar + "Start() { document.body.appendChild(" + svar + "); };\n" + (!scriptCount ? svar + "Start();" : '');
+      content = 'var ' + svar + " = document.createElement('script');\n" + svar + '.onload = function(){\n' + (onload ? onload + '();\n' : '') + 'typeof ' + svarNext + "Start == 'function' && " + svarNext + 'Start();\n' + '};\n' + svar + ".src = '" + src + "';\n" + 'function ' + svar + 'Start() { document.body.appendChild(' + svar + '); };\n' + (!scriptCount ? svar + 'Start();' : '');
       if (em) {
         em.set('scriptCount', scriptCount + 1);
       }
@@ -44231,7 +44745,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 180 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44242,7 +44756,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var Component = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _extends({}, Component.prototype.defaults, {
     highlightable: 0
   }),
@@ -44271,24 +44784,22 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 181 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var ComponentView = __webpack_require__(2);
+var ComponentView = __webpack_require__(3);
 
 module.exports = ComponentView.extend({
-
   _createElement: function _createElement(tagName) {
     return document.createElementNS('http://www.w3.org/2000/svg', tagName);
   }
-
 });
 
 /***/ }),
-/* 182 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44297,7 +44808,6 @@ module.exports = ComponentView.extend({
 var Component = __webpack_require__(4);
 
 module.exports = Component.extend({
-
   defaults: _.extend({}, Component.prototype.defaults, {
     droppable: false,
     editable: true
@@ -44321,15 +44831,40 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
+/* 182 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = __webpack_require__(0).View.extend({});
+
+/***/ }),
 /* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Backbone = __webpack_require__(0);
+module.exports = {
+  stylePrefix: '',
 
-module.exports = Backbone.View.extend({});
+  // Specify the element to use as a container, string (query) or HTMLElement
+  // With the empty value, nothing will be rendered
+  appendTo: '',
+
+  // Enable/Disable globally the possibility to sort layers
+  sortable: 1,
+
+  // Enable/Disable globally the possibility to hide layers
+  hidable: 1,
+
+  // Hide textnodes
+  hideTextnode: 1,
+
+  // Indicates if the wrapper is visible in layers
+  showWrapper: 1
+};
 
 /***/ }),
 /* 184 */
@@ -44338,18 +44873,23 @@ module.exports = Backbone.View.extend({});
 "use strict";
 
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
+
+var _Droppable = __webpack_require__(185);
+
+var _Droppable2 = _interopRequireDefault(_Droppable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(185),
-      Canvas = __webpack_require__(186),
-      CanvasView = __webpack_require__(188);
+      defaults = __webpack_require__(186),
+      Canvas = __webpack_require__(187),
+      CanvasView = __webpack_require__(189);
   var canvas;
   var frameRect;
 
   return {
-
     /**
      * Used inside RTE
      * @private
@@ -44556,11 +45096,11 @@ module.exports = function () {
 
 
     /**
-    * Get the offset of the element
-    * @param  {HTMLElement} el
-    * @return {Object}
-    * @private
-    */
+     * Get the offset of the element
+     * @param  {HTMLElement} el
+     * @return {Object}
+     * @private
+     */
     offset: function offset(el) {
       return CanvasView.offset(el);
     },
@@ -44711,11 +45251,18 @@ module.exports = function () {
      * Start autoscroll
      */
     startAutoscroll: function startAutoscroll() {
+      var _this = this;
+
       this.dragging = 1;
       var toListen = this.getScrollListeners();
       frameRect = CanvasView.getFrameOffset(1);
-      (0, _mixins.on)(toListen, 'mousemove', this.autoscroll);
-      (0, _mixins.on)(toListen, 'mouseup', this.stopAutoscroll);
+
+      // By detaching those from the stack avoid browsers lags
+      // Noticeable with "fast" drag of blocks
+      setTimeout(function () {
+        (0, _mixins.on)(toListen, 'mousemove', _this.autoscroll);
+        (0, _mixins.on)(toListen, 'mouseup', _this.stopAutoscroll);
+      }, 0);
     },
     autoscroll: function autoscroll(e) {
       e.preventDefault();
@@ -44753,6 +45300,9 @@ module.exports = function () {
     getScrollListeners: function getScrollListeners() {
       return [this.getFrameEl().contentWindow, this.getElement()];
     },
+    postRender: function postRender() {
+      if ((0, _mixins.hasDnd)(c.em)) this.droppable = new _Droppable2.default(c.em);
+    },
 
 
     /**
@@ -44773,8 +45323,191 @@ module.exports = function () {
 "use strict";
 
 
-module.exports = {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       This class makes the canvas droppable
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+var _mixins = __webpack_require__(2);
+
+var _underscore = __webpack_require__(1);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Droppable = function () {
+  function Droppable(em) {
+    _classCallCheck(this, Droppable);
+
+    this.em = em;
+    var el = em.get('DomComponents').getWrapper().getEl();
+    this.el = el;
+    this.counter = 0;
+    (0, _underscore.bindAll)(this, 'handleDragEnter', 'handleDragOver', 'handleDrop', 'handleDragLeave');
+    (0, _mixins.on)(el, 'dragenter', this.handleDragEnter);
+    (0, _mixins.on)(el, 'dragover', this.handleDragOver);
+    (0, _mixins.on)(el, 'drop', this.handleDrop);
+    (0, _mixins.on)(el, 'dragleave', this.handleDragLeave);
+
+    return this;
+  }
+
+  _createClass(Droppable, [{
+    key: 'endDrop',
+    value: function endDrop(cancel, ev) {
+      var em = this.em;
+      this.counter = 0;
+      this.over = 0;
+      // force out like in BlockView
+      var sorter = this.sorter;
+      cancel && (sorter.moved = 0);
+      sorter.endMove();
+      em.trigger('canvas:dragend', ev);
+    }
+  }, {
+    key: 'handleDragLeave',
+    value: function handleDragLeave(ev) {
+      this.updateCounter(-1, ev);
+    }
+  }, {
+    key: 'updateCounter',
+    value: function updateCounter(value, ev) {
+      this.counter += value;
+      this.counter === 0 && this.endDrop(1, ev);
+    }
+  }, {
+    key: 'handleDragEnter',
+    value: function handleDragEnter(ev) {
+      var em = this.em;
+      var dt = ev.dataTransfer;
+      this.updateCounter(1, ev);
+      if (this.over) return;
+      this.over = 1;
+      var utils = em.get('Utils');
+      var canvas = em.get('Canvas');
+      this.sorter = new utils.Sorter({
+        em: em,
+        wmargin: 1,
+        nested: 1,
+        canvasRelative: 1,
+        direction: 'a',
+        container: canvas.getBody(),
+        placer: canvas.getPlacerEl(),
+        eventMoving: 'mousemove dragover',
+        containerSel: '*',
+        itemSel: '*',
+        pfx: 'gjs-',
+        onStart: function onStart() {
+          return em.stopDefault();
+        },
+        onEndMove: function onEndMove(model) {
+          em.runDefault();
+
+          if (model && model.get && model.get('activeOnRender')) {
+            model.trigger('active');
+            model.set('activeOnRender', 0);
+          }
+
+          model && em.trigger('canvas:drop', dt, model);
+        },
+        document: canvas.getFrameEl().contentDocument
+      });
+      // For security reason I can't read the drag data on dragenter, but
+      // as I need it for the Sorter context I will use `dragContent` or just
+      // any not empty element
+      var content = em.get('dragContent') || '<br>';
+      this.sorter.setDropContent(content);
+      this.sorter.startSort();
+      em.trigger('canvas:dragenter', dt, content);
+    }
+
+    /**
+     * Always need to have this handler active for enabling the drop
+     * @param {Event} ev
+     */
+
+  }, {
+    key: 'handleDragOver',
+    value: function handleDragOver(ev) {
+      ev.preventDefault();
+      this.em.trigger('canvas:dragover', ev);
+    }
+  }, {
+    key: 'handleDrop',
+    value: function handleDrop(ev) {
+      ev.preventDefault();
+      var dt = ev.dataTransfer;
+      var content = this.getContentByData(dt).content;
+      ev.target.style.border = '';
+
+      if (content) {
+        this.sorter.setDropContent(content);
+      } else {
+        this.sorter.moved = 0;
+      }
+
+      this.endDrop(0, ev);
+    }
+  }, {
+    key: 'getContentByData',
+    value: function getContentByData(dataTransfer) {
+      var em = this.em;
+      var types = dataTransfer.types;
+      var files = dataTransfer.files;
+      var dragContent = em.get('dragContent');
+      var content = dataTransfer.getData('text');
+
+      if (files.length) {
+        content = [];
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var type = file.type.split('/')[0];
+
+          if (type == 'image') {
+            content.push({
+              type: type,
+              file: file,
+              attributes: { alt: file.name }
+            });
+          }
+        }
+      } else if (dragContent) {
+        content = dragContent;
+      } else if (types.indexOf('text/html') >= 0) {
+        content = dataTransfer.getData('text/html').replace(/<\/?meta[^>]*>/g, '');
+      } else if (types.indexOf('text/uri-list') >= 0) {
+        content = {
+          type: 'link',
+          attributes: { href: content },
+          content: content
+        };
+      } else if (types.indexOf('text/json') >= 0) {
+        var json = dataTransfer.getData('text/json');
+        json && (content = JSON.parse(json));
+      }
+
+      var result = { content: content };
+      em.trigger('canvas:dragdata', dataTransfer, result);
+
+      return result;
+    }
+  }]);
+
+  return Droppable;
+}();
+
+exports.default = Droppable;
+
+/***/ }),
+/* 186 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
   stylePrefix: 'cv-',
 
   // Coming soon
@@ -44807,21 +45540,19 @@ module.exports = {
    * }
    */
   customBadgeLabel: ''
-
 };
 
 /***/ }),
-/* 186 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var Frame = __webpack_require__(187);
+var Frame = __webpack_require__(188);
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     frame: '',
     wrapper: '',
@@ -44835,7 +45566,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 187 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44844,30 +45575,30 @@ module.exports = Backbone.Model.extend({
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     wrapper: '',
     width: '',
     height: '',
     attributes: {}
   }
-
 });
 
 /***/ }),
-/* 188 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
-var FrameView = __webpack_require__(189);
+var _mixins = __webpack_require__(2);
+
+var FrameView = __webpack_require__(190);
 var $ = Backbone.$;
 
 module.exports = Backbone.View.extend({
   initialize: function initialize(o) {
     _.bindAll(this, 'renderBody', 'onFrameScroll', 'clearOff');
-    window.onscroll = this.clearOff;
+    (0, _mixins.on)(window, 'scroll resize', this.clearOff);
     this.config = o.config || {};
     this.em = this.config.em || {};
     this.ppfx = this.config.pStylePrefix || '';
@@ -44959,7 +45690,7 @@ module.exports = Backbone.View.extend({
 
       var colorWarn = '#ffca6f';
 
-      var baseCss = '\n        * {\n          box-sizing: border-box;\n        }\n        html, body, #wrapper {\n          min-height: 100%;\n        }\n        body {\n          margin: 0;\n          height: 100%;\n          background-color: #fff\n        }\n        #wrapper {\n          overflow: auto\n        }\n      ';
+      var baseCss = '\n        * {\n          box-sizing: border-box;\n        }\n        html, body, #wrapper {\n          min-height: 100%;\n        }\n        body {\n          margin: 0;\n          height: 100%;\n          background-color: #fff\n        }\n        #wrapper {\n          overflow: auto;\n          overflow-x: hidden;\n        }\n      ';
       // Remove `html { height: 100%;}` from the baseCss as it gives jumpings
       // effects (on ENTER) with RTE like CKEditor (maybe some bug there?!?)
       // With `body {height: auto;}` jumps in CKEditor are removed but in
@@ -44969,7 +45700,7 @@ module.exports = Backbone.View.extend({
       // CKEditor's issue
 
       // I need all this styles to make the editor work properly
-      var frameCss = '\n        ' + baseCss + '\n\n        .' + ppfx + 'dashed *[data-highlightable] {\n          outline: 1px dashed rgba(170,170,170,0.7);\n          outline-offset: -3px\n        }\n\n        .' + ppfx + 'comp-selected {\n          outline: 3px solid #3b97e3 !important;\n        }\n\n        .' + ppfx + 'comp-selected-parent {\n          outline: 2px solid ' + colorWarn + ' !important\n        }\n\n        .' + ppfx + 'no-select {\n          user-select: none;\n          -webkit-user-select:none;\n          -moz-user-select: none;\n        }\n\n        .' + ppfx + 'freezed {\n          opacity: 0.5;\n          pointer-events: none;\n        }\n\n        .' + ppfx + 'no-pointer {\n          pointer-events: none;\n        }\n\n        .' + ppfx + 'plh-image {\n          background: #f5f5f5;\n          border: none;\n          height: 50px;\n          width: 50px;\n          display: block;\n          outline: 3px solid #ffca6f;\n          cursor: pointer;\n          outline-offset: -2px\n        }\n\n        .' + ppfx + 'grabbing {\n          cursor: grabbing;\n          cursor: -webkit-grabbing;\n        }\n\n        * ::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1)\n        }\n\n        * ::-webkit-scrollbar-thumb {\n          background: rgba(255, 255, 255, 0.2)\n        }\n\n        * ::-webkit-scrollbar {\n          width: 10px\n        }\n\n        ' + (conf.canvasCss || '') + '\n        ' + (protCss || '') + '\n      ';
+      var frameCss = '\n        ' + baseCss + '\n\n        .' + ppfx + 'dashed *[data-highlightable] {\n          outline: 1px dashed rgba(170,170,170,0.7);\n          outline-offset: -2px;\n        }\n\n        .' + ppfx + 'comp-selected {\n          outline: 3px solid #3b97e3 !important;\n          outline-offset: -3px;\n        }\n\n        .' + ppfx + 'comp-selected-parent {\n          outline: 2px solid ' + colorWarn + ' !important\n        }\n\n        .' + ppfx + 'no-select {\n          user-select: none;\n          -webkit-user-select:none;\n          -moz-user-select: none;\n        }\n\n        .' + ppfx + 'freezed {\n          opacity: 0.5;\n          pointer-events: none;\n        }\n\n        .' + ppfx + 'no-pointer {\n          pointer-events: none;\n        }\n\n        .' + ppfx + 'plh-image {\n          background: #f5f5f5;\n          border: none;\n          height: 50px;\n          width: 50px;\n          display: block;\n          outline: 3px solid #ffca6f;\n          cursor: pointer;\n          outline-offset: -2px\n        }\n\n        .' + ppfx + 'grabbing {\n          cursor: grabbing;\n          cursor: -webkit-grabbing;\n        }\n\n        * ::-webkit-scrollbar-track {\n          background: rgba(0, 0, 0, 0.1)\n        }\n\n        * ::-webkit-scrollbar-thumb {\n          background: rgba(255, 255, 255, 0.2)\n        }\n\n        * ::-webkit-scrollbar {\n          width: 10px\n        }\n\n        ' + (conf.canvasCss || '') + '\n        ' + (protCss || '') + '\n      ';
 
       if (externalStyles) {
         body.append(externalStyles);
@@ -44991,8 +45722,8 @@ module.exports = Backbone.View.extend({
       // the keyCode/which will be always `0`. Even if it's an old/deprecated
       // property keymaster (and many others) still use it... using `defineProperty`
       // hack seems the only way
-      var createCustomEvent = function createCustomEvent(e) {
-        var oEvent = new KeyboardEvent(e.type, e);
+      var createCustomEvent = function createCustomEvent(e, cls) {
+        var oEvent = new window[cls](e.type, e);
         oEvent.keyCodeVal = e.keyCode;
         ['keyCode', 'which'].forEach(function (prop) {
           Object.defineProperty(oEvent, prop, {
@@ -45003,11 +45734,15 @@ module.exports = Backbone.View.extend({
         });
         return oEvent;
       };
-      fdoc.addEventListener('keydown', function (e) {
-        doc.dispatchEvent(createCustomEvent(e));
-      });
-      fdoc.addEventListener('keyup', function (e) {
-        doc.dispatchEvent(createCustomEvent(e));
+
+      [{ event: 'keydown keyup', class: 'KeyboardEvent'
+        //{ event: 'mousedown mousemove mouseup', class: 'MouseEvent' },
+      }].forEach(function (obj) {
+        return obj.event.split(' ').forEach(function (event) {
+          fdoc.addEventListener(event, function (e) {
+            return doc.dispatchEvent(createCustomEvent(e, obj.class));
+          });
+        });
       });
     }
   },
@@ -45123,7 +45858,7 @@ module.exports = Backbone.View.extend({
     // In editor, I make use of setTimeout as during the append process of elements
     // those will not be available immediatly, therefore 'item' variable
     var script = document.createElement('script');
-    script.innerText = '\n        setTimeout(function() {\n          var item = document.getElementById(\'' + id + '\');\n          if (!item) return;\n          (function(){' + model.getScriptString() + '}.bind(item))()\n        }, 1);';
+    script.innerText = '\n        setTimeout(function() {\n          var item = document.getElementById(\'' + id + '\');\n          if (!item) return;\n          (function(){\n            ' + model.getScriptString() + ';\n          }.bind(item))()\n        }, 1);';
     view.scriptContainer.get(0).appendChild(script);
   },
 
@@ -45171,7 +45906,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 189 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45182,11 +45917,9 @@ var _underscore = __webpack_require__(1);
 var motionsEv = 'transitionend oTransitionEnd transitionend webkitTransitionEnd';
 
 module.exports = __webpack_require__(0).View.extend({
-
   tagName: 'iframe',
 
   attributes: {
-    src: 'about:blank',
     allowfullscreen: 'allowfullscreen'
   },
 
@@ -45207,11 +45940,18 @@ module.exports = __webpack_require__(0).View.extend({
     var em = this.em;
     var device = em.getDeviceModel();
     var style = this.el.style;
-    style.width = device ? device.get('width') : '';
-    style.height = device ? device.get('height') : '';
+    var currW = style.width || '';
+    var currH = style.height || '';
+    var newW = device ? device.get('width') : '';
+    var newH = device ? device.get('height') : '';
+    var noChanges = currW == newW && currH == newH;
+    style.width = newW;
+    style.height = newH;
     this.udpateOffset();
+    // Prevent fixed highlighting box which appears when on
+    // component hover during the animation
     em.stopDefault({ preserveSelected: 1 });
-    this.$el.on(motionsEv, this.udpateOffset);
+    noChanges ? this.udpateOffset() : this.$el.on(motionsEv, this.udpateOffset);
   },
   udpateOffset: function udpateOffset() {
     var em = this.em;
@@ -45233,7 +45973,7 @@ module.exports = __webpack_require__(0).View.extend({
 });
 
 /***/ }),
-/* 190 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45246,8 +45986,8 @@ module.exports = function () {
   var c = {},
       commands = {},
       defaultCommands = {},
-      defaults = __webpack_require__(191),
-      AbsCommands = __webpack_require__(192);
+      defaults = __webpack_require__(192),
+      AbsCommands = __webpack_require__(193);
 
   // Need it here as it would be used below
   var add = function add(id, obj) {
@@ -45261,7 +46001,6 @@ module.exports = function () {
   };
 
   return {
-
     /**
      * Name of the module
      * @type {String}
@@ -45289,32 +46028,32 @@ module.exports = function () {
         if (obj.id) this.add(obj.id, obj);
       }
 
-      var ViewCode = __webpack_require__(193);
+      var ViewCode = __webpack_require__(194);
       defaultCommands['select-comp'] = __webpack_require__(22);
       defaultCommands['create-comp'] = __webpack_require__(23);
-      defaultCommands['delete-comp'] = __webpack_require__(198);
-      defaultCommands['image-comp'] = __webpack_require__(199);
-      defaultCommands['move-comp'] = __webpack_require__(200);
-      defaultCommands['text-comp'] = __webpack_require__(201);
-      defaultCommands['insert-custom'] = __webpack_require__(55);
+      defaultCommands['delete-comp'] = __webpack_require__(199);
+      defaultCommands['image-comp'] = __webpack_require__(200);
+      defaultCommands['move-comp'] = __webpack_require__(201);
+      defaultCommands['text-comp'] = __webpack_require__(202);
+      defaultCommands['insert-custom'] = __webpack_require__(59);
       defaultCommands['export-template'] = ViewCode;
-      defaultCommands['sw-visibility'] = __webpack_require__(202);
-      defaultCommands['open-layers'] = __webpack_require__(203);
-      defaultCommands['open-sm'] = __webpack_require__(206);
-      defaultCommands['open-tm'] = __webpack_require__(207);
-      defaultCommands['open-blocks'] = __webpack_require__(208);
-      defaultCommands['open-assets'] = __webpack_require__(209);
-      defaultCommands['show-offset'] = __webpack_require__(210);
-      defaultCommands['select-parent'] = __webpack_require__(211);
-      defaultCommands.fullscreen = __webpack_require__(212);
-      defaultCommands.preview = __webpack_require__(213);
-      defaultCommands.resize = __webpack_require__(214);
-      defaultCommands.drag = __webpack_require__(215);
+      defaultCommands['sw-visibility'] = __webpack_require__(203);
+      defaultCommands['open-layers'] = __webpack_require__(204);
+      defaultCommands['open-sm'] = __webpack_require__(205);
+      defaultCommands['open-tm'] = __webpack_require__(206);
+      defaultCommands['open-blocks'] = __webpack_require__(207);
+      defaultCommands['open-assets'] = __webpack_require__(208);
+      defaultCommands['show-offset'] = __webpack_require__(209);
+      defaultCommands['select-parent'] = __webpack_require__(210);
+      defaultCommands.fullscreen = __webpack_require__(211);
+      defaultCommands.preview = __webpack_require__(212);
+      defaultCommands.resize = __webpack_require__(213);
+      defaultCommands.drag = __webpack_require__(214);
 
       //custom
-      defaultCommands['build-component'] = __webpack_require__(216);
-      defaultCommands['open-table-editor'] = __webpack_require__(217);
-      defaultCommands['open-region-editor'] = __webpack_require__(218);
+      defaultCommands['build-component'] = __webpack_require__(215);
+      defaultCommands['open-table-editor'] = __webpack_require__(216);
+      defaultCommands['open-region-editor'] = __webpack_require__(217);
 
       defaultCommands['tlb-delete'] = {
         run: function run(ed) {
@@ -45330,7 +46069,7 @@ module.exports = function () {
         }
       };
 
-      defaultCommands['maincolor'] = __webpack_require__(219);
+      defaultCommands['maincolor'] = __webpack_require__(218);
 
       defaultCommands['save'] = {
         run: function run(editor) {
@@ -45429,20 +46168,35 @@ module.exports = function () {
 
           var collection = sel.collection;
           var index = collection.indexOf(sel);
-          collection.add(sel.clone(), { at: index + 1 });
-          ed.trigger('component:update', sel);
+          var added = collection.add(sel.clone(), { at: index + 1 });
+          sel.emitUpdate();
+          ed.trigger('component:clone', added);
         }
       };
 
       defaultCommands['tlb-move'] = {
         run: function run(ed, sender, opts) {
+          var dragger = void 0;
+          var em = ed.getModel();
+          var event = opts && opts.event;
           var sel = ed.getSelected();
-          var dragger;
+          var toolbarStyle = ed.Canvas.getToolbarEl().style;
+          var nativeDrag = event.type == 'dragstart';
+
+          var hideTlb = function hideTlb() {
+            toolbarStyle.display = 'none';
+            em.stopDefault();
+          };
 
           if (!sel || !sel.get('draggable')) {
             console.warn('The element is not draggable');
             return;
           }
+
+          // Without setTimeout the ghost image disappears
+          nativeDrag ? setTimeout(function () {
+            return hideTlb;
+          }, 0) : hideTlb();
 
           var onStart = function onStart(e, opts) {
             console.log('start mouse pos ', opts.start);
@@ -45454,8 +46208,8 @@ module.exports = function () {
 
           var onEnd = function onEnd(e, opts) {
             em.runDefault();
-            em.set('selectedComponent', sel);
-            ed.trigger('component:update', sel);
+            em.setSelected(sel);
+            sel.emitUpdate();
             dragger && dragger.blur();
           };
 
@@ -45464,29 +46218,29 @@ module.exports = function () {
             console.log('Current ', opts.current);
           };
 
-          var toolbarEl = ed.Canvas.getToolbarEl();
-          toolbarEl.style.display = 'none';
-          var em = ed.getModel();
-          em.stopDefault();
-
           if (em.get('designerMode')) {
             // TODO move grabbing func in editor/canvas from the Sorter
             dragger = editor.runCommand('drag', {
               el: sel.view.el,
               options: {
-                event: opts && opts.event,
+                event: event,
                 onStart: onStart,
                 onDrag: onDrag,
                 onEnd: onEnd
               }
             });
           } else {
+            if (nativeDrag) {
+              event.dataTransfer.setDragImage(sel.view.el, 0, 0);
+              //sel.set('status', 'freezed');
+            }
+
             var cmdMove = ed.Commands.get('move-comp');
             cmdMove.onEndMoveFromModel = onEnd;
             cmdMove.initSorterFromModel(sel);
           }
 
-          sel.set('status', 'selected');
+          sel.set('status', 'freezed-selected');
         }
       };
 
@@ -45635,14 +46389,13 @@ module.exports = function () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 191 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-
   ESCAPE_KEY: 27,
 
   stylePrefix: 'com-',
@@ -45666,7 +46419,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 192 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45675,7 +46428,6 @@ module.exports = {
 var $ = Backbone.$;
 
 module.exports = Backbone.View.extend({
-
   /**
    * Initialize method that can't be removed
    * @param  {Object}  o Options
@@ -45793,7 +46545,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 193 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45855,18 +46607,17 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 194 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var DomainViews = __webpack_require__(49);
-var ToolbarButtonView = __webpack_require__(195);
+var DomainViews = __webpack_require__(50);
+var ToolbarButtonView = __webpack_require__(196);
 
 module.exports = DomainViews.extend({
-
   itemView: ToolbarButtonView,
 
   initialize: function initialize(opts) {
@@ -45876,7 +46627,7 @@ module.exports = DomainViews.extend({
 });
 
 /***/ }),
-/* 195 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45885,10 +46636,11 @@ module.exports = DomainViews.extend({
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.View.extend({
-  events: {
-    'mousedown': 'handleClick'
+  events: function events() {
+    return this.model.get('events') || {
+      mousedown: 'handleClick'
+    };
   },
-
   attributes: function attributes() {
     return this.model.get('attributes');
   },
@@ -45898,6 +46650,9 @@ module.exports = Backbone.View.extend({
   handleClick: function handleClick(event) {
     event.preventDefault();
     event.stopPropagation();
+    this.execCommand(event);
+  },
+  execCommand: function execCommand(event) {
     var opts = { event: event };
     var command = this.model.get('command');
     var editor = this.editor;
@@ -45918,19 +46673,19 @@ module.exports = Backbone.View.extend({
 });
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ToolbarButton = __webpack_require__(197);
+var ToolbarButton = __webpack_require__(198);
 
 module.exports = Backbone.Collection.extend({ model: ToolbarButton });
 
 /***/ }),
-/* 197 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45939,16 +46694,14 @@ module.exports = Backbone.Collection.extend({ model: ToolbarButton });
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.Model.extend({
-
-   defaults: {
-      command: '',
-      attributes: {}
-   }
-
+  defaults: {
+    command: '',
+    attributes: {}
+  }
 });
 
 /***/ }),
-/* 198 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46031,17 +46784,16 @@ module.exports = _.extend({}, SelectComponent, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 199 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(_) {
 
 var Backbone = __webpack_require__(0);
-var InsertCustom = __webpack_require__(55);
+var InsertCustom = __webpack_require__(59);
 
 module.exports = _.extend({}, InsertCustom, {
-
   /**
    * Trigger before insert
    * @param   {Object}  object
@@ -46072,16 +46824,16 @@ module.exports = _.extend({}, InsertCustom, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 200 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
 var SelectComponent = __webpack_require__(22);
-var SelectPosition = __webpack_require__(54);
+var SelectPosition = __webpack_require__(58);
 var $ = Backbone.$;
 
 module.exports = _.extend({}, SelectPosition, SelectComponent, {
@@ -46239,7 +46991,7 @@ module.exports = _.extend({}, SelectPosition, SelectComponent, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 201 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46249,7 +47001,6 @@ var Backbone = __webpack_require__(0);
 var CreateComponent = __webpack_require__(23);
 
 module.exports = _.extend({}, CreateComponent, {
-
   /**
    * This event is triggered at the beginning of a draw operation
    * @param   {Object}   component  Object component before creation
@@ -46276,7 +47027,7 @@ module.exports = _.extend({}, CreateComponent, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 202 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46287,158 +47038,45 @@ module.exports = {
     ed.Canvas.getBody().className = this.ppfx + 'dashed';
   },
   stop: function stop(ed) {
-    ed.Canvas.getBody().className = "";
+    ed.Canvas.getBody().className = '';
   }
 };
-
-/***/ }),
-/* 203 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Backbone) {
-
-var Layers = __webpack_require__(204);
-var $ = Backbone.$;
-
-module.exports = {
-  run: function run(em, sender) {
-    if (!this.toAppend) {
-      var collection = em.DomComponents.getComponent().get('components');
-      var config = em.getConfig();
-      var pfx = config.stylePrefix;
-      var panels = em.Panels;
-      var lyStylePfx = config.layers.stylePrefix || 'nv-';
-
-      config.layers.stylePrefix = config.stylePrefix + lyStylePfx;
-      config.layers.pStylePrefix = config.stylePrefix;
-      config.layers.em = em.editor;
-      config.layers.opened = em.editor.get('opened');
-
-      // Check if panel exists otherwise crate it
-      if (!panels.getPanel('views-container')) this.panel = panels.addPanel({ id: 'views-container' });else this.panel = panels.getPanel('views-container');
-
-      var toAppend = $('<div class="' + pfx + 'layers"></div>');
-      this.panel.set('appendContent', toAppend).trigger('change:appendContent');
-      config.layers.sortContainer = toAppend.get(0);
-      var layers = new Layers().init(collection, config.layers);
-      this.$layers = layers.render();
-      toAppend.append(this.$layers);
-      this.toAppend = toAppend;
-    }
-    this.toAppend.show();
-  },
-  stop: function stop() {
-    this.toAppend && this.toAppend.hide();
-  }
-};
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
 /* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/* WEBPACK VAR INJECTION */(function(Backbone) {
 
+var Layers = __webpack_require__(55);
+var $ = Backbone.$;
 
-module.exports = function () {
-  var itemsView = void 0;
-  var config = {};
-  var defaults = __webpack_require__(205);
-  var ItemView = __webpack_require__(56);
-  var ItemsView = __webpack_require__(57);
+module.exports = {
+  run: function run(editor) {
+    var lm = editor.LayerManager;
+    var pn = editor.Panels;
 
-  return {
-    init: function init(collection, opts) {
-      config = opts || config;
-      var em = config.em;
-
-      // Set default options
-      for (var name in defaults) {
-        if (!(name in config)) config[name] = defaults[name];
-      }
-
-      var View = ItemsView;
-      var level = 0;
-      var opened = opts.opened || {};
-      var options = {
-        level: level,
-        config: config,
-        opened: opened
-
-        // Show wrapper if requested
-      };if (config.showWrapper && collection.parent) {
-        View = ItemView;
-        options.model = collection.parent;
-      } else {
-        options.collection = collection;
-      }
-
-      itemsView = new View(options);
-      em && em.on('change:selectedComponent', this.componentChanged);
-      this.componentChanged();
-
-      return this;
-    },
-
-
-    /**
-     * Triggered when the selected component is changed
-     * @private
-     */
-    componentChanged: function componentChanged(e, md) {
-      var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-      if (opts.fromLayers) {
-        return;
-      }
-
-      var em = config.em;
-      var opened = em.get('opened');
-      var model = em.get('selectedComponent');
-      var parent = model && model.collection ? model.collection.parent : null;
-
-      for (var cid in opened) {
-        opened[cid].set('open', 0);
-      }
-
-      while (parent) {
-        parent.set('open', 1);
-        opened[parent.cid] = parent;
-        parent = parent.collection ? parent.collection.parent : null;
-      }
-    },
-    render: function render() {
-      return itemsView.render().$el;
+    if (!this.layers) {
+      var id = 'views-container';
+      var layers = document.createElement('div');
+      var panels = pn.getPanel(id) || pn.addPanel({ id: id });
+      layers.appendChild(lm.render());
+      panels.set('appendContent', layers).trigger('change:appendContent');
+      this.layers = layers;
     }
-  };
+
+    this.layers.style.display = 'block';
+  },
+  stop: function stop() {
+    var layers = this.layers;
+    layers && (layers.style.display = 'none');
+  }
 };
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
 /* 205 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-  stylePrefix: 'nv-',
-
-  // Enable/Disable globally the possibility to sort layers
-  sortable: 1,
-
-  // Enable/Disable globally the possibility to hide layers
-  hidable: 1,
-
-  // Hide textnodes
-  hideTextnode: 1,
-
-  // Indicates if the wrapper is visible in layers
-  showWrapper: 1
-};
-
-/***/ }),
-/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46496,7 +47134,9 @@ module.exports = {
    * @private
    */
   toggleSm: function toggleSm() {
-    if (!this.sender.get('active')) return;
+    var sender = this.sender;
+    if (sender && sender.get && !sender.get('active')) return;
+
     if (this.target.get('selectedComponent')) {
       this.$cn2.show();
       this.$header.hide();
@@ -46515,7 +47155,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 207 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46548,7 +47188,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 208 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46578,7 +47218,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 209 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46612,7 +47252,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 210 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46767,7 +47407,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 211 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46775,10 +47415,11 @@ module.exports = {
 
 module.exports = {
   run: function run(editor) {
-    var comp = editor.getSelected() && editor.getSelected().parent();
+    var sel = editor.getSelected();
+    var comp = sel && sel.parent();
 
-    // recurse through the parent() chain until a selectable parent is found
-    while (comp && !comp.get("selectable")) {
+    // Recurse through the parent() chain until a selectable parent is found
+    while (comp && !comp.get('selectable')) {
       comp = comp.parent();
     }
 
@@ -46791,7 +47432,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 212 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46840,7 +47481,7 @@ module.exports = {
    * it's enabled
    * @param  {strinf} pfx Browser prefix
    * @param  {Event} e
-  */
+   */
   fsChanged: function fsChanged(pfx, e) {
     var d = document;
     var ev = (pfx || '') + 'fullscreenchange';
@@ -46864,7 +47505,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 213 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46933,7 +47574,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 214 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46970,7 +47611,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 215 */
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47008,13 +47649,13 @@ module.exports = {
 };
 
 /***/ }),
-/* 216 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var parse_str = __webpack_require__(58);
+var parse_str = __webpack_require__(60);
 
 var Component = function Component(obj) {
   var that = this;
@@ -47315,7 +47956,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 217 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47476,7 +48117,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 218 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47514,13 +48155,13 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 219 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(_) {
 
-var parse_str = __webpack_require__(58);
+var parse_str = __webpack_require__(60);
 __webpack_require__(34);
 
 module.exports = {
@@ -47599,53 +48240,24 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 220 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-/**
- * * [add](#add)
- * * [get](#get)
- * * [getAll](#getall)
- * * [getAllVisible](#getallvisible)
- * * [getCategories](#getcategories)
- * * [getContainer](#getcontainer)
- * * [render](#render)
- *
- * Block manager helps managing various, draggable, piece of contents that could be easily reused inside templates.
- *
- * Before using methods you should get first the module from the editor instance, in this way:
- *
- * ```js
- * var blockManager = editor.BlockManager;
- * ```
- *
- * @module BlockManager
- * @param {Object} config Configurations
- * @param {Array<Object>} [config.blocks=[]] Default blocks
- * @example
- * ...
- * {
- *     blocks: [
- *      {id:'h1-block' label: 'Heading', content:'<h1>...</h1>'},
- *      ...
- *    ],
- * }
- * ...
- */
+var _underscore = __webpack_require__(1);
+
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(221),
-      Blocks = __webpack_require__(222),
-      BlockCategories = __webpack_require__(224),
-      BlocksView = __webpack_require__(225);
+      defaults = __webpack_require__(220),
+      Blocks = __webpack_require__(221),
+      BlockCategories = __webpack_require__(223),
+      BlocksView = __webpack_require__(224);
   var blocks, blocksVisible, blocksView;
   var categories = [];
 
   return {
-
     /**
      * Name of the module
      * @type {String}
@@ -47712,6 +48324,14 @@ module.exports = function () {
     onLoad: function onLoad() {
       var blocks = this.getAll();
       !blocks.length && blocks.reset(c.blocks);
+    },
+    postRender: function postRender() {
+      var elTo = this.getConfig().appendTo;
+
+      if (elTo) {
+        var el = (0, _underscore.isElement)(elTo) ? elTo : document.querySelector(elTo);
+        el.appendChild(this.render());
+      }
     },
 
 
@@ -47813,6 +48433,7 @@ module.exports = function () {
      * Render blocks
      * @param  {Array} blocks Blocks to render, without the argument will render
      *                        all global blocks
+     * @return {HTMLElement} Rendered element
      * @example
      * // Render all blocks (inside the global collection)
      * blockManager.render();
@@ -47839,9 +48460,57 @@ module.exports = function () {
       }
 
       blocksView.collection.reset(toRender);
+      return this.getContainer();
     }
   };
-};
+}; /**
+    * * [add](#add)
+    * * [get](#get)
+    * * [getAll](#getall)
+    * * [getAllVisible](#getallvisible)
+    * * [getCategories](#getcategories)
+    * * [getContainer](#getcontainer)
+    * * [render](#render)
+    *
+    * Block manager helps managing various, draggable, piece of contents that could be easily reused inside templates.
+    *
+    * Before using methods you should get first the module from the editor instance, in this way:
+    *
+    * ```js
+    * var blockManager = editor.BlockManager;
+    * ```
+    *
+    * @module BlockManager
+    * @param {Object} config Configurations
+    * @param {Array<Object>} [config.blocks=[]] Default blocks
+    * @example
+    * ...
+    * {
+    *     blocks: [
+    *      {id:'h1-block' label: 'Heading', content:'<h1>...</h1>'},
+    *      ...
+    *    ],
+    * }
+    * ...
+    */
+
+/***/ }),
+/* 220 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+module.exports = _defineProperty({
+  // Specify the element to use as a container, string (query) or HTMLElement
+  // With the empty value, nothing will be rendered
+  appendTo: '',
+
+  blocks: []
+
+}, 'appendTo', '');
 
 /***/ }),
 /* 221 */
@@ -47850,13 +48519,12 @@ module.exports = function () {
 "use strict";
 
 
-module.exports = {
+var Backbone = __webpack_require__(0);
+var Block = __webpack_require__(222);
 
-  blocks: [],
-
-  appendTo: ''
-
-};
+module.exports = Backbone.Collection.extend({
+  model: Block
+});
 
 /***/ }),
 /* 222 */
@@ -47866,21 +48534,7 @@ module.exports = {
 
 
 var Backbone = __webpack_require__(0);
-var Block = __webpack_require__(223);
-
-module.exports = Backbone.Collection.extend({
-  model: Block
-});
-
-/***/ }),
-/* 223 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Backbone = __webpack_require__(0);
-var Category = __webpack_require__(59);
+var Category = __webpack_require__(61);
 
 module.exports = Backbone.Model.extend({
 
@@ -47909,7 +48563,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 224 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47918,21 +48572,22 @@ module.exports = Backbone.Model.extend({
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.Collection.extend({
-  model: __webpack_require__(59)
+  model: __webpack_require__(61)
 });
 
 /***/ }),
-/* 225 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(_) {
 
-var Backbone = __webpack_require__(0);
-var BlockView = __webpack_require__(226);
-var CategoryView = __webpack_require__(227);
+var _underscore = __webpack_require__(1);
 
-module.exports = Backbone.View.extend({
+var BlockView = __webpack_require__(225);
+var CategoryView = __webpack_require__(226);
+
+module.exports = __webpack_require__(0).View.extend({
   initialize: function initialize(opts, config) {
     _.bindAll(this, 'getSorter', 'onDrag', 'onDrop');
     this.config = config || {};
@@ -48046,11 +48701,13 @@ module.exports = Backbone.View.extend({
 
     // Check for categories
     if (category && this.categories) {
-      if (typeof category == 'string') {
+      if ((0, _underscore.isString)(category)) {
         category = {
           id: category,
           label: category
         };
+      } else if ((0, _underscore.isObject)(category) && !category.id) {
+        category.id = category.label;
       }
 
       var catModel = this.categories.add(category);
@@ -48094,6 +48751,7 @@ module.exports = Backbone.View.extend({
   render: function render() {
     var _this = this;
 
+    var ppfx = this.ppfx;
     var frag = document.createDocumentFragment();
     this.catsEl = null;
     this.blocksEl = null;
@@ -48104,20 +48762,21 @@ module.exports = Backbone.View.extend({
       return _this.add(model, frag);
     });
     this.append(frag);
-    this.$el.addClass(this.blockContClass + 's');
+    var cls = this.blockContClass + 's ' + ppfx + 'one-bg ' + ppfx + 'two-color';
+    this.$el.addClass(cls);
     return this;
   }
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 226 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
-var _mixins = __webpack_require__(3);
+var _mixins = __webpack_require__(2);
 
 module.exports = Backbone.View.extend({
 
@@ -48210,7 +48869,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 227 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48219,7 +48878,6 @@ module.exports = Backbone.View.extend({
 var Backbone = __webpack_require__(0);
 
 module.exports = Backbone.View.extend({
-
   template: _.template('\n  <div class="<%= pfx %>title">\n    <i class="<%= pfx %>caret-icon"></i>\n    <%= label %>\n  </div>\n  <div class="<%= pfx %>blocks-c"></div>\n  '),
 
   events: {},
@@ -48280,6 +48938,7 @@ module.exports = Backbone.View.extend({
       label: this.model.get('label')
     });
     this.el.className = this.className;
+    this.$el.css({ order: this.model.get('order') });
     this.updateVisibility();
     return this;
   }
@@ -48287,11 +48946,13 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 228 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+
+var _underscore = __webpack_require__(1);
 
 module.exports = function (_ref) {
   var $ = _ref.$,
@@ -48368,38 +49029,6 @@ module.exports = function (_ref) {
       var namespaceArray = name.split('.');
       return name.indexOf('.') !== 0 ? [namespaceArray[0], namespaceArray.slice(1)] : [null, namespaceArray];
     };
-    /*
-    const CashEvent = function(node, eventName, namespaces, delegate, originalCallback, runOnce) {
-       const eventCache = getData(node,'_cashEvents') || setData(node, '_cashEvents', {});
-      const remove = function(c, namespace){
-        if ( c && originalCallback !== c ) { return; }
-        if ( namespace && this.namespaces.indexOf(namespace) < 0 ) { return; }
-        node.removeEventListener(eventName, callback);
-      };
-      const callback = function(e) {
-        var t = this;
-        if (delegate) {
-          t = e.target;
-           while (t && !matches(t, delegate)) {
-            if (t === this) {
-              return (t = false);
-            }
-            t = t.parentNode;
-          }
-        }
-         if (t) {
-          originalCallback.call(t, e, e.data);
-          if ( runOnce ) { remove(); }
-        }
-       };
-       this.remove = remove;
-      this.namespaces = namespaces;
-       node.addEventListener(eventName, callback);
-       eventCache[eventName] = eventCache[eventName] || [];
-      eventCache[eventName].push(this);
-       return this;
-    }
-    */
 
     var on = $.prototype.on;
     var off = $.prototype.off;
@@ -48534,14 +49163,21 @@ module.exports = function (_ref) {
         return node.parentNode && node.parentNode.removeChild(node);
       });
     },
-
     // For spectrum compatibility
     fn.bind = function (ev, h) {
       return this.on(ev, h);
     };
 
     fn.unbind = function (ev, h) {
-      return this.off(ev, h);
+      if ((0, _underscore.isObject)(ev)) {
+        for (var name in ev) {
+          ev.hasOwnProperty(name) && this.off(name, ev[name]);
+        }
+
+        return this;
+      } else {
+        return this.off(ev, h);
+      }
     };
 
     fn.click = function (h) {
@@ -48630,7 +49266,7 @@ module.exports = function (_ref) {
 };
 
 /***/ }),
-/* 229 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48678,6 +49314,50 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
+/* 229 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+/**
+ * File made for IE/Edge support
+ * https://github.com/artf/grapesjs/issues/214
+ */
+
+exports.default = function () {
+  /**
+   * Check if IE/Edge
+   * @return {Boolean}
+   */
+  var isIE = function isIE() {
+    var match = void 0;
+    var agent = window.navigator.userAgent;
+    var rules = [['edge', /Edge\/([0-9\._]+)/], ['ie', /MSIE\s(7\.0)/], ['ie', /MSIE\s([0-9\.]+);.*Trident\/[4-7].0/], ['ie', /Trident\/7\.0.*rv\:([0-9\.]+).*\).*Gecko$/]];
+
+    for (var i = 0; i < rules.length; i++) {
+      var rule = rules[i];
+      match = rule[1].exec(agent);
+      if (match) break;
+    }
+
+    return !!match;
+  };
+
+  if (isIE()) {
+    var originalCreateHTMLDocument = DOMImplementation.prototype.createHTMLDocument;
+    DOMImplementation.prototype.createHTMLDocument = function (title) {
+      if (!title) title = '';
+      return originalCreateHTMLDocument.apply(document.implementation, [title]);
+    };
+  }
+};
+
+/***/ }),
 /* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -48685,7 +49365,6 @@ module.exports = Backbone.View.extend({
 
 
 module.exports = function (config) {
-
   var c = config || {},
       defaults = __webpack_require__(231);
 
@@ -48697,7 +49376,6 @@ module.exports = function (config) {
   var plugins = {};
 
   return {
-
     /**
      * Add new plugin. Plugins could not be overwritten
      * @param {string} id Plugin ID

@@ -1,4 +1,4 @@
-import { isUndefined, defaults } from 'underscore';
+import { isUndefined, isElement, defaults } from 'underscore';
 
 const deps = [
   require('utils'),
@@ -17,6 +17,7 @@ const deps = [
   require('css_composer'),
   require('trait_manager'),
   require('dom_components'),
+  require('navigator'),
   require('canvas'),
   require('commands'),
   require('block_manager')
@@ -51,9 +52,9 @@ module.exports = Backbone.Model.extend({
     this.config = c;
     this.set('Config', c);
     this.set('modules', []);
+    this.set('toLoad', []);
 
-    if(c.el && c.fromElement)
-      this.config.components = c.el.innerHTML;
+    if (c.el && c.fromElement) this.config.components = c.el.innerHTML;
 
     // Load modules
     deps.forEach(name => this.loadModule(name));
@@ -190,7 +191,7 @@ module.exports = Backbone.Model.extend({
     timedInterval && clearInterval(timedInterval);
     timedInterval = setTimeout(() => {
       if (!opt.avoidStore) {
-        this.set('changesCount', this.get('changesCount') + 1, opt)
+        this.set('changesCount', this.get('changesCount') + 1, opt);
       }
     }, 0);
   },
@@ -207,7 +208,7 @@ module.exports = Backbone.Model.extend({
     if (!this.get('selectedComponent')) {
       this.trigger('deselect-comp');
     } else {
-      this.trigger('select-comp',[model,val,options]);
+      this.trigger('select-comp', [model, val, options]);
       this.trigger('component:selected', arguments);
     }
   },
@@ -225,20 +226,14 @@ module.exports = Backbone.Model.extend({
   /**
    * Select a component
    * @param  {Component|HTMLElement} el Component to select
-   * @param  {Object} opts Options, optional
+   * @param  {Object} [opts={}] Options, optional
    * @private
    */
   setSelected(el, opts = {}) {
     let model = el;
-
-    if (el instanceof window.HTMLElement) {
-      model = $(el).data('model');
-    }
-
-    if (model && !model.get("selectable")) {
-      return;
-    }
-
+    isElement(el) && (model = $(el).data('model'));
+    if (model && !model.get('selectable')) return;
+    opts.forceChange && this.set('selectedComponent', '');
     this.set('selectedComponent', model, opts);
   },
 
@@ -261,10 +256,9 @@ module.exports = Backbone.Model.extend({
     var cmp = this.get('DomComponents');
     var cm = this.get('CodeManager');
 
-    if(!cmp || !cm)
-      return;
+    if (!cmp || !cm) return;
 
-    var wrp  = cmp.getComponents();
+    var wrp = cmp.getComponents();
     return cm.getCode(wrp, 'json');
   },
 
@@ -276,8 +270,7 @@ module.exports = Backbone.Model.extend({
    */
   setStyle(style) {
     var rules = this.get('CssComposer').getAll();
-    for(var i = 0, len = rules.length; i < len; i++)
-      rules.pop();
+    for (var i = 0, len = rules.length; i < len; i++) rules.pop();
     rules.add(style);
     return this;
   },
@@ -335,9 +328,13 @@ module.exports = Backbone.Model.extend({
     const wrp = this.get('DomComponents').getComponent();
     const protCss = !avoidProt ? config.protectedCss : '';
 
-    return protCss + this.get('CodeManager').getCode(wrp, 'css', {
-      cssc, wrappesIsBody
-    });
+    return (
+      protCss +
+      this.get('CodeManager').getCode(wrp, 'css', {
+        cssc,
+        wrappesIsBody
+      })
+    );
   },
 
   /**
@@ -347,7 +344,9 @@ module.exports = Backbone.Model.extend({
    */
   getJs() {
     var wrp = this.get('DomComponents').getWrapper();
-    return this.get('CodeManager').getCode(wrp, 'js').trim();
+    return this.get('CodeManager')
+      .getCode(wrp, 'js')
+      .trim();
   },
 
   /**
@@ -359,14 +358,12 @@ module.exports = Backbone.Model.extend({
   store(clb) {
     var sm = this.get('StorageManager');
     var store = {};
-    if(!sm)
-      return;
+    if (!sm) return;
 
     // Fetch what to store
     this.get('storables').forEach(m => {
       var obj = m.store(1);
-      for(var el in obj)
-        store[el] = obj[el];
+      for (var el in obj) store[el] = obj[el];
     });
 
     sm.store(store, () => {
@@ -384,7 +381,7 @@ module.exports = Backbone.Model.extend({
    * @private
    */
   load(clb = null) {
-    this.getCacheLoad(1, (res) => {
+    this.getCacheLoad(1, res => {
       this.get('storables').forEach(module => module.load(res));
       clb && clb(res);
     });
@@ -399,13 +396,11 @@ module.exports = Backbone.Model.extend({
    */
   getCacheLoad(force, clb) {
     var f = force ? 1 : 0;
-    if(this.cacheLoad && !f)
-      return this.cacheLoad;
+    if (this.cacheLoad && !f) return this.cacheLoad;
     var sm = this.get('StorageManager');
     var load = [];
 
-    if(!sm)
-      return {};
+    if (!sm) return {};
 
     this.get('storables').forEach(m => {
       var key = m.storageKey;
@@ -440,8 +435,7 @@ module.exports = Backbone.Model.extend({
    */
   runDefault(opts = {}) {
     var command = this.get('Commands').get(this.config.defaultCommand);
-    if(!command || this.defaultRunning)
-      return;
+    if (!command || this.defaultRunning) return;
     command.stop(this, this, opts);
     command.run(this, this, opts);
     this.defaultRunning = 1;
@@ -454,8 +448,7 @@ module.exports = Backbone.Model.extend({
    */
   stopDefault(opts = {}) {
     var command = this.get('Commands').get(this.config.defaultCommand);
-    if(!command)
-      return;
+    if (!command) return;
     command.stop(this, this, opts);
     this.defaultRunning = 0;
   },
@@ -479,7 +472,6 @@ module.exports = Backbone.Model.extend({
     w.getSelection().removeAllRanges();
   },
 
-
   /**
    * Get the current media text
    * @return {string}
@@ -492,7 +484,6 @@ module.exports = Backbone.Model.extend({
     const width = device && device.get('widthMedia');
     return device && width && !preview ? `(${condition}: ${width})` : '';
   },
-
 
   /**
    * Set/get data from the HTMLElement
@@ -515,5 +506,4 @@ module.exports = Backbone.Model.extend({
       el[varName][name] = value;
     }
   }
-
 });
