@@ -50,7 +50,7 @@ module.exports = config => ({
       var selsAdd = [];
 
       // It's a CSSMediaRule
-      if(node.cssRules) {
+      if(node.cssRules && node.media) {
         var subRules = this.parseNode(node);
         var mediaText = node.media.mediaText;
 

@@ -25700,7 +25700,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.308',
+    version: '0.12.309',
 
     /**
      * Initializes an editor based on passed options
@@ -33965,7 +33965,7 @@ module.exports = function (config) {
         var selsAdd = [];
 
         // It's a CSSMediaRule
-        if (node.cssRules) {
+        if (node.cssRules && node.media) {
           var subRules = this.parseNode(node);
           var mediaText = node.media.mediaText;
 
