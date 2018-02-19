@@ -17605,7 +17605,7 @@ module.exports = {
     methods[method](body, 'mouseover', this.onHover);
     methods[method](body, 'mouseout', this.onOut);
     methods[method](body, 'click', this.onClick);
-    methods[method](win, 'scroll', this.onFrameScroll);
+    methods[method](win, 'scroll resize', this.onFrameScroll);
     methods[method](win, 'keydown', this.onKeyPress);
     em[method]('change:selectedComponent', this.onSelect, this);
   },
@@ -17644,6 +17644,7 @@ module.exports = {
   onHover: function onHover(e) {
     e.stopPropagation();
     var trg = e.target;
+    var model = $(trg).data('model');
 
     // Adjust tools scroll top
     if (!this.adjScroll) {
@@ -17651,18 +17652,12 @@ module.exports = {
       this.onFrameScroll(e);
       this.updateAttached();
     }
-    var model = $(trg).data('model');
-    if (model != 'undefined') {
 
-      if (!model.get("selectable")) {
-        var comp = model && model.parent();
-
-        // recurse through the parent() chain until a selectable parent is found
-        while (comp && !comp.get("hoverable")) {
-          comp = comp.parent();
-        }
-        trg = comp.view.el;
-      }
+    if (model && !model.get('hoverable')) {
+      var comp = model && model.parent();
+      while (comp && !comp.get('hoverable')) {
+        comp = comp.parent();
+      }comp && (trg = comp.view.el);
     }
 
     var pos = this.getElementPos(trg);
@@ -17755,18 +17750,16 @@ module.exports = {
   onClick: function onClick(e) {
     e.stopPropagation();
     var model = $(e.target).data('model');
-    if (typeof model != 'undefined') {
-      if (model.get("selectable") && !$(e.target).hasClass('flex-start')) {
-        model && this.editor.select(model);
+    var editor = this.editor;
+
+    if (model) {
+      if (model.get('selectable')) {
+        editor.select(model);
       } else {
-        var comp = model && model.parent();
-
-        // recurse through the parent() chain until a selectable parent is found
-        while (comp && !comp.get("selectable")) {
-          comp = comp.parent();
-        }
-
-        comp && editor.select(comp);
+        var parent = model.parent();
+        while (parent && !parent.get('selectable')) {
+          parent = parent.parent();
+        }parent && editor.select(parent);
       }
     }
   },
@@ -17784,7 +17777,7 @@ module.exports = {
     var config = canvas.getConfig();
     var customeLabel = config.customBadgeLabel;
     this.cacheEl = el;
-    var model = $el.data("model");
+    var model = $el.data('model');
     if (!model || !model.get('badgable')) return;
     var badge = this.getBadge();
     var badgeLabel = model.getIcon() + model.getName();
@@ -17813,7 +17806,7 @@ module.exports = {
     var $el = $(el);
     var model = $el.data('model');
 
-    if (!model || !model.get("hoverable") || model.get('status') == 'selected') {
+    if (!model || !model.get('hoverable') || model.get('status') == 'selected') {
       return;
     }
 
@@ -17895,7 +17888,6 @@ module.exports = {
           var modelStyle = modelToStyle.getStyle();
           var currentWidth = modelStyle[keyWidth] || computedStyle[keyWidth];
           var currentHeight = modelStyle[keyHeight] || computedStyle[keyHeight];
-
           resizer.startDim.w = parseFloat(currentWidth);
           resizer.startDim.h = parseFloat(currentHeight);
           showOffsets = 0;
@@ -17938,18 +17930,10 @@ module.exports = {
           }
 
           if (!onlyWidth) {
-
-            if (editor.getSelected().allow_height) {
-              style[keyHeight] = rect.h + config.unitHeight;
-              window.toastr.success('Height modifed');
-            } else {
-              $(el).css('height', rect.h + config.unitHeight);
-              window.toastr.warning('Height not modifed');
-            }
+            style[keyHeight] = rect.h + config.unitHeight;
           }
 
           modelToStyle.setStyle(style, { avoidStore: 1 });
-
           var updateEvent = 'update:component:style';
           em && em.trigger(updateEvent + ':' + keyHeight + ' ' + updateEvent + ':' + keyWidth);
 
@@ -18024,6 +18008,7 @@ module.exports = {
     var unit = 'px';
     var toolbarEl = this.canvas.getToolbarEl();
     var toolbarStyle = toolbarEl.style;
+    var origDisp = toolbarStyle.display;
     toolbarStyle.display = 'block';
     var pos = this.canvas.getTargetToElementDim(toolbarEl, el, {
       elPos: elPos,
@@ -18031,8 +18016,8 @@ module.exports = {
     });
     var leftPos = pos.left + pos.elementWidth - pos.targetWidth;
     toolbarStyle.top = pos.top + unit;
-    toolbarStyle.left = leftPos + unit;
-    toolbarStyle.display = '';
+    toolbarStyle.left = (leftPos < 0 ? 0 : leftPos) + unit;
+    toolbarStyle.display = origDisp;
   },
 
 
@@ -25715,7 +25700,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.12.301',
+    version: '0.12.305',
 
     /**
      * Initializes an editor based on passed options
@@ -27251,6 +27236,8 @@ module.exports = function () {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _underscore = __webpack_require__(1);
 
 var _mixins = __webpack_require__(3);
@@ -27348,18 +27335,17 @@ module.exports = Backbone.View.extend({
     var pfx = this.ppfx || this.pfx;
     var sortCls = pfx + 'grabbing';
     var emBody = em ? em.get('Canvas').getBody() : '';
+
+    // Avoid updating body className as it causes a huge repaint
+    // Noticeable with "fast" drag of blocks
     if (active) {
       em && em.get('Canvas').startAutoscroll();
-      body.className += ' ' + sortCls;
-      if (em) {
-        emBody.className += ' ' + sortCls;
-      }
+      //body.className += ' ' + sortCls;
+      //if (em) emBody.className += ' ' + sortCls;
     } else {
       em && em.get('Canvas').stopAutoscroll();
-      body.className = body.className.replace(sortCls, '').trim();
-      if (em) {
-        emBody.className = emBody.className.replace(sortCls, '').trim();
-      }
+      //body.className = body.className.replace(sortCls, '').trim();
+      //if(em) emBody.className = emBody.className.replace(sortCls, '').trim();
     }
   },
 
@@ -27487,7 +27473,7 @@ module.exports = Backbone.View.extend({
     el.className = pfx + 'placeholder';
     el.style.display = 'none';
     el.style['pointer-events'] = 'none';
-    ins.className = pfx + "placeholder-int";
+    ins.className = pfx + 'placeholder-int';
     el.appendChild(ins);
     return el;
   },
@@ -27529,8 +27515,8 @@ module.exports = Backbone.View.extend({
       srcModel && srcModel.set && srcModel.set('status', 'freezed');
     }
 
-    (0, _mixins.on)(container, 'mousemove', this.onMove);
-    (0, _mixins.on)(docs, 'mouseup', this.endMove);
+    (0, _mixins.on)(container, 'mousemove dragover', this.onMove);
+    (0, _mixins.on)(docs, 'mouseup dragend', this.endMove);
     (0, _mixins.on)(docs, 'keydown', this.rollback);
     onStart && onStart();
 
@@ -27565,8 +27551,14 @@ module.exports = Backbone.View.extend({
     if (dropContent && em) {
       if (!dropModel) {
         var comps = em.get('DomComponents').getComponents();
-        var tempModel = comps.add(dropContent, { avoidUpdateStyle: 1, temporary: 1 });
-        dropModel = comps.remove(tempModel, { temporary: 1 });
+        var opts = {
+          avoidStore: 1,
+          avoidChildren: 1,
+          avoidUpdateStyle: 1,
+          temporary: 1
+        };
+        var tempModel = comps.add(dropContent, opts);
+        dropModel = comps.remove(tempModel, opts);
         this.dropModel = dropModel instanceof Array ? dropModel[0] : dropModel;
       }
       return dropModel;
@@ -27699,13 +27691,18 @@ module.exports = Backbone.View.extend({
     if ($el.css('float') !== 'none') return;
     if (parent && $(parent).css('display') == 'flex') return;
     switch (style.position) {
-      case 'static':case 'relative':case '':
+      case 'static':
+      case 'relative':
+      case '':
         break;
       default:
         return;
     }
     switch (el.tagName) {
-      case 'TR':case 'TBODY':case 'THEAD':case 'TFOOT':
+      case 'TR':
+      case 'TBODY':
+      case 'THEAD':
+      case 'TFOOT':
         return true;
     }
     switch ($el.css('display')) {
@@ -27917,7 +27914,6 @@ module.exports = Backbone.View.extend({
     var width = rect.width;
     var height = rect.height;
 
-    //console.log(pos, {top, left});
     if (y < top + off || // near top edge
     y > top + height - off || // near bottom edge
     x < left + off || // near left edge
@@ -27960,8 +27956,6 @@ module.exports = Backbone.View.extend({
       height = el.offsetHeight;
       width = el.offsetWidth;
     }
-
-    //console.log('get dim', top, left, this.canvasRelative);
 
     return [top, left, height, width];
   },
@@ -28065,17 +28059,17 @@ module.exports = Backbone.View.extend({
         //If x lefter than center
         if (posX < xCenter) {
           xLimit = xCenter;
-          result.method = "before";
+          result.method = 'before';
         } else {
           leftLimit = xCenter;
-          result.method = "after";
+          result.method = 'after';
         }
       } else {
         // If y upper than center
         if (posY < yCenter) {
-          result.method = "before";
+          result.method = 'before';
           break;
-        } else result.method = "after"; // After last element
+        } else result.method = 'after'; // After last element
       }
     }
     return result;
@@ -28149,8 +28143,8 @@ module.exports = Backbone.View.extend({
     var created;
     var docs = this.getDocuments();
     var container = this.getContainerEl();
-    (0, _mixins.off)(container, 'mousemove', this.onMove);
-    (0, _mixins.off)(docs, 'mouseup', this.endMove);
+    (0, _mixins.off)(container, 'mousemove dragover', this.onMove);
+    (0, _mixins.off)(docs, 'mouseup dragend', this.endMove);
     (0, _mixins.off)(docs, 'keydown', this.rollback);
     //this.$document.off('mouseup', this.endMove);
     //this.$document.off('keydown', this.rollback);
@@ -28158,12 +28152,11 @@ module.exports = Backbone.View.extend({
     var clsReg = new RegExp('(?:^|\\s)' + this.freezeClass + '(?!\\S)', 'gi');
     var src = this.eV;
 
-    if (src) {
+    if (src && this.selectOnEnd) {
       var srcModel = this.getSourceModel();
       if (srcModel && srcModel.set) {
         srcModel.set('status', '');
         srcModel.set('status', 'selected');
-        //this.selectOnEnd && srcModel.set('status', 'selected');
       }
     }
 
@@ -28172,9 +28165,7 @@ module.exports = Backbone.View.extend({
     }
 
     if (this.plh) this.plh.style.display = 'none';
-
-    if (typeof this.onEndMove === 'function') this.onEndMove(created);
-
+    if ((0, _underscore.isFunction)(this.onEndMove)) this.onEndMove(created, this);
     var dragHelper = this.dragHelper;
 
     if (dragHelper) {
@@ -28214,7 +28205,8 @@ module.exports = Backbone.View.extend({
       var opts = { at: index, noIncrement: 1 };
 
       if (!dropContent) {
-        modelTemp = targetCollection.add({}, opts);
+        // Putting `avoidStore` here will make the UndoManager behave wrong
+        modelTemp = targetCollection.add({}, _extends({}, opts));
 
         if (model) {
           modelToDrop = model.collection.remove(model);
@@ -28224,33 +28216,6 @@ module.exports = Backbone.View.extend({
         opts.silent = false;
         opts.avoidUpdateStyle = 1;
       }
-
-      // aryeh edit
-      if ($('.gjs-pn-btn.fa.fa-bars.gjs-pn-active').length === 0) {
-
-        if (modelToDrop.indexOf && modelToDrop.indexOf('<region') !== -1) {
-          var type = 'region';
-        }
-
-        if (type !== 'region') {
-          if (dst.parentNode.tagName === 'BODY' || dst.className.indexOf('flex-start') === -1) {
-            // modelToDrop = "<div class='flex-start'>" + modelToDrop + "</div>";
-            // modelToDrop = "<div class='flex-start'><div>TEST</div></div>";
-            targetCollection.add("<div class='flex-start'></div>", opts);
-            var targetCollection = $($(dst).children()[opts.at]).data('collection');
-            // targetCollection.add("<div></div>", opt);
-
-            targetCollection.add("<div></div>", opts);
-            var targetCollection = $($($(dst).children()[opts.at]).find('div')).data('collection');
-
-            opts.at++;
-          } else if (dst.className.indexOf('flex-start') > -1) {
-            targetCollection.add("<div></div>", opts);
-            var targetCollection = $($(dst).children()[opts.at]).data('collection');
-          }
-        }
-      }
-      // end aryeh edit
 
       created = targetCollection.add(modelToDrop, opts);
 
@@ -46775,14 +46740,11 @@ module.exports = {
 
 module.exports = {
   run: function run(editor) {
-    var comp = editor.getSelected() && editor.getSelected().parent();
+    var sel = editor.getSelected();
+    var comp = sel && sel.parent();
 
-    // recurse through the parent() chain until a selectable parent is found
-    while (comp && !comp.get("selectable")) {
-      comp = comp.parent();
-    }
-
-    if (comp.view.$el.hasClass('flex-start')) {
+    // Recurse through the parent() chain until a selectable parent is found
+    while (comp && !comp.get('selectable')) {
       comp = comp.parent();
     }
 
