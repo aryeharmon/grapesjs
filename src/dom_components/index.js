@@ -79,6 +79,11 @@ module.exports = () => {
       view: require('./view/ComponentMapView'),
     },
     {
+      id: 'layout',
+      model: require('./model/ComponentLayout'),
+      view: require('./view/ComponentLayoutView'),
+    },
+    {
       id: 'link',
       model: require('./model/ComponentLink'),
       view: require('./view/ComponentLinkView'),

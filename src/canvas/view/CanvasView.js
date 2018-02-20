@@ -126,6 +126,10 @@ module.exports = Backbone.View.extend({
           outline: 1px dashed rgba(170,170,170,0.7);
           outline-offset: -3px
         }
+        .${ppfx}dashed *[data-highlightable][data-layout] {
+          outline: 3px solid rgba(0, 48, 254, 0.7);
+          outline-offset: -3px;
+        }
 
         .${ppfx}comp-selected {
           outline: 3px solid #3b97e3 !important;

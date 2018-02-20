@@ -584,18 +584,74 @@ var template = _.template(assetTemplate);
           var sel = editor.getSelected();
           var html = sel.toHTML();
 
-          window.aryeh = sel;
+          var allClasses = [];
+          var allElements = sel.view.el.querySelectorAll('*');
+
+          for (var i = 0; i < allElements.length; i++) {
+            var classes = allElements[i].className.toString().split(/\s+/);
+            for (var j = 0; j < classes.length; j++) {
+              var cls = classes[j];
+              if (cls && allClasses.indexOf(cls) === -1)
+                allClasses.push(cls);
+            }
+          }
+
+          function elem_css(a, o) {
+              var iframe = window.$('.gjs-frame')[0];
+              var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+
+          	var a = $(innerDoc).find('.' + a)[0]
+
+              var sheets = innerDoc.styleSheets, o = o || [];
+              a.matches = a.matches || a.webkitMatchesSelector || a.mozMatchesSelector || a.msMatchesSelector || a.oMatchesSelector;
+              for (var i in sheets) {
+                if (!sheets[i].href) {
+                  var rules = sheets[i].rules || sheets[i].cssRules;
+                  if (rules) {
+                    for (var r in rules) {
+                      if (a.matches(rules[r].selectorText)) {
+                        if (rules[r].cssText.indexOf('*') > -1 || rules[r].cssText.indexOf('.gjs') > -1) {
+                        	continue;
+                        }
+                        if (o.indexOf(rules[r].cssText) === -1) {
+                        	if (rules[r].cssText[0] == '.' || rules[r].cssText[0] == '#') {
+                     		  o.push(rules[r].cssText);
+                        	}
+                        }
+
+                      }
+                    }
+                  }
+                }
+              }
+              return o;
+          }
+
+          	var result = [];
+          for (var i = 0; i < allClasses.length; i++) {
+          	elem_css(allClasses[i], result);
+          }
+
+          var css = result.join('\n')
 
           $("#NewLayoutForm").submit(function(e) {
               e.preventDefault();
               var formData = new FormData(this);
               formData.set('html', html)
+              formData.set('css', css)
 
               $.ajax({
                   url: base_url + '/save-layout',
                   type: 'POST',
                   data: formData,
                   success: function (data) {
+
+                      var attr = editor.getSelected().getAttributes();
+                      attr['data-layout'] = data.id;
+                      editor.getSelected().setAttributes(attr);
+
+
                       modal.close();
                   },
                   cache: false,
@@ -613,6 +669,7 @@ var template = _.template(assetTemplate);
                 data[pair[0]] = pair[1];
               }
               data.html = html;
+              data.css = css;
 
               $.ajax({
                   url: base_url + '/save-block',
