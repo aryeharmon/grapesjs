@@ -47,6 +47,14 @@ module.exports = Component.extend(
         },
       ],
     },
+
+    // initialize(o, opt) {
+    //   Component.prototype.initialize.apply(this, arguments);
+    //   const components = this.get('components');
+    //   !components.length && components.add({ type: 'tbody' });
+    // }
+  },
+  {
     isComponent(el) {
       let result = '';
 

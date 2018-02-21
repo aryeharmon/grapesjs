@@ -26125,7 +26125,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.19',
+    version: '0.14.44',
 
     /**
      * Initializes an editor based on passed options
@@ -43605,7 +43605,14 @@ module.exports = Component.extend({
       name: 'ng-class'
       // changeProp: 1,
     }]
-  }),
+  })
+
+  // initialize(o, opt) {
+  //   Component.prototype.initialize.apply(this, arguments);
+  //   const components = this.get('components');
+  //   !components.length && components.add({ type: 'tbody' });
+  // }
+}, {
   isComponent: function isComponent(el) {
     var result = '';
 
