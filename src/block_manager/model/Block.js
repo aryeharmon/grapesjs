@@ -2,7 +2,6 @@ var Backbone = require('backbone');
 var Category = require('./Category');
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     label: '',
     content: '',

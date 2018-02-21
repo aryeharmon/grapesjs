@@ -1,4 +1,5 @@
-import {on, off} from 'utils/mixins';
+import { isObject } from 'underscore';
+import { on, off, hasDnd } from 'utils/mixins';
 
 module.exports = Backbone.View.extend({
 

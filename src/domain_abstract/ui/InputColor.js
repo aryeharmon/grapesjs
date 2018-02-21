@@ -3,7 +3,6 @@ const Input = require('./Input');
 const $ = Backbone.$;
 
 module.exports = Input.extend({
-
   template() {
     const ppfx = this.ppfx;
     return `

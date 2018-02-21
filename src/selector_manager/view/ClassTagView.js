@@ -2,7 +2,6 @@ const Selector = require('./../model/Selector');
 const inputProp = 'contentEditable';
 
 module.exports = require('backbone').View.extend({
-
   template() {
     const pfx = this.pfx;
     const ppfx = this.ppfx;
@@ -16,14 +15,12 @@ module.exports = require('backbone').View.extend({
     `;
   },
 
-
   events: {
     'click [data-tag-remove]': 'removeTag',
     'click [data-tag-status]': 'changeStatus',
     'dblclick [data-tag-name]': 'startEditTag',
-    'focusout [data-tag-name]': 'endEditTag',
+    'focusout [data-tag-name]': 'endEditTag'
   },
-
 
   initialize(o) {
     this.config = o.config || {};
@@ -33,7 +30,6 @@ module.exports = require('backbone').View.extend({
     this.target = this.config.em;
     this.listenTo(this.model, 'change:active', this.updateStatus);
   },
-
 
   /**
    * Returns the element which containes the anme of the tag
@@ -47,7 +43,6 @@ module.exports = require('backbone').View.extend({
     return this.inputEl;
   },
 
-
   /**
    * Start editing tag
    * @private
@@ -57,7 +52,6 @@ module.exports = require('backbone').View.extend({
     inputEl[inputProp] = true;
     inputEl.focus();
   },
-
 
   /**
    * End editing tag. If the class typed already exists the
@@ -82,16 +76,13 @@ module.exports = require('backbone').View.extend({
     }
   },
 
-
   /**
    * Update status of the tag
    * @private
    */
   changeStatus() {
     this.model.set('active', !this.model.get('active'));
-    this.target.trigger('targetClassUpdated');
   },
-
 
   /**
    * Remove tag from the selected component
@@ -107,9 +98,7 @@ module.exports = require('backbone').View.extend({
     sel && sel.get & sel.get('classes').remove(model);
     coll && coll.remove(model);
     setTimeout(() => this.remove(), 0);
-    em && em.trigger('targetClassRemoved');
   },
-
 
   /**
    * Update status of the checkbox
@@ -119,18 +108,16 @@ module.exports = require('backbone').View.extend({
     var chkOn = 'fa-check-square-o';
     var chkOff = 'fa-square-o';
 
-    if(!this.$chk)
-      this.$chk = this.$el.find('#' + this.pfx + 'checkbox');
+    if (!this.$chk) this.$chk = this.$el.find('#' + this.pfx + 'checkbox');
 
-    if(this.model.get('active')){
+    if (this.model.get('active')) {
       this.$chk.removeClass(chkOff).addClass(chkOn);
       this.$el.removeClass('opac50');
-    }else{
+    } else {
       this.$chk.removeClass(chkOn).addClass(chkOff);
       this.$el.addClass('opac50');
     }
   },
-
 
   render() {
     const pfx = this.pfx;
@@ -139,6 +126,5 @@ module.exports = require('backbone').View.extend({
     this.$el.attr('class', `${pfx}tag ${ppfx}three-bg`);
     this.updateStatus();
     return this;
-  },
-
+  }
 });

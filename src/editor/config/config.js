@@ -2,8 +2,14 @@ module.exports = {
   // Style prefix
   stylePrefix: 'gjs-',
 
-  //TEMP
+  // HTML string or object of components
   components: '',
+
+  // CSS string or object of rules
+  style: '',
+
+  // If true, will fetch HTML and CSS from selected container
+  fromElement: 0,
 
   // Show an alert before unload the page with unsaved changes
   noticeOnUnload: true,
@@ -59,6 +65,9 @@ module.exports = {
   // Return JS of components inside HTML from 'editor.getHtml()'
   jsInHtml: false,
 
+  // Enable native HTML5 drag and drop
+  nativeDnD: 1,
+
   // Show the wrapper component in the final code, eg. in editor.getHtml()
   exportWrapper: 0,
 
@@ -70,6 +79,16 @@ module.exports = {
   // use of media queries (@media) or even pseudo selectors (eg. :hover).
   // When `avoidInlineStyle` is true all styles are inserted inside the css rule
   avoidInlineStyle: 0,
+
+  // (experimental)
+  // The structure of components is always on the screen but it's not the same
+  // for style rules. When you delete a component you might leave a lot of styles
+  // which will never be used again, therefore they might be removed.
+  // With this option set to true, styles not used from the CSS generator (so in
+  // any case where `CssGenerator.build` is used) will be removed automatically.
+  // But be careful, not always leaving the style not used mean you wouldn't
+  // use it later, but this option comes really handy when deal with big templates.
+  clearStyles: 0,
 
   // Dom element
   el: '',
@@ -115,65 +134,109 @@ module.exports = {
 
   //Configurations for Device Manager
   deviceManager: {
-    devices: [{
+    devices: [
+      {
         name: 'Desktop',
-        width: '',
-      },{
+        width: ''
+      },
+      {
         name: 'Tablet',
         width: '768px',
-        widthMedia: '992px',
-      },{
+        widthMedia: '992px'
+      },
+      {
         name: 'Mobile landscape',
         width: '568px',
-        widthMedia: '768px',
-      },{
+        widthMedia: '768px'
+      },
+      {
         name: 'Mobile portrait',
         width: '320px',
-        widthMedia: '480px',
-    }],
+        widthMedia: '480px'
+      }
+    ]
   },
 
   //Configurations for Style Manager
   styleManager: {
-
-    sectors: [{
+    sectors: [
+      {
         name: 'General',
         open: false,
-        buildProps: ['float', 'display', 'position', 'top', 'right', 'left', 'bottom'],
-      },{
+        buildProps: [
+          'float',
+          'display',
+          'position',
+          'top',
+          'right',
+          'left',
+          'bottom'
+        ]
+      },
+      {
         name: 'Dimension',
         open: false,
-        buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
-      },{
+        buildProps: [
+          'width',
+          'height',
+          'max-width',
+          'min-height',
+          'margin',
+          'padding'
+        ]
+      },
+      {
         name: 'Typography',
         open: false,
-        buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align', 'text-shadow'],
-        properties: [{
+        buildProps: [
+          'font-family',
+          'font-size',
+          'font-weight',
+          'letter-spacing',
+          'color',
+          'line-height',
+          'text-align',
+          'text-shadow'
+        ],
+        properties: [
+          {
             property: 'text-align',
-            list        : [
-                {value: 'left', className: 'fa fa-align-left'},
-                {value: 'center', className: 'fa fa-align-center' },
-                {value: 'right', className: 'fa fa-align-right'},
-                {value: 'justify', className: 'fa fa-align-justify'}
-            ],
-        }]
-      },{
+            list: [
+              { value: 'left', className: 'fa fa-align-left' },
+              { value: 'center', className: 'fa fa-align-center' },
+              { value: 'right', className: 'fa fa-align-right' },
+              { value: 'justify', className: 'fa fa-align-justify' }
+            ]
+          }
+        ]
+      },
+      {
         name: 'Decorations',
         open: false,
-        buildProps: ['border-radius-c', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
-      },{
+        buildProps: [
+          'border-radius-c',
+          'background-color',
+          'border-radius',
+          'border',
+          'box-shadow',
+          'background'
+        ]
+      },
+      {
         name: 'Extra',
         open: false,
-        buildProps: ['transition', 'perspective', 'transform'],
-      }],
-
+        buildProps: ['transition', 'perspective', 'transform']
+      }
+    ]
   },
 
-  //Configurations for Block Manager
+  // Configurations for Block Manager
   blockManager: {},
 
+  // Configurations for Trait Manager
+  traitManager: {},
 
   // Texts
 
-  textViewCode: 'Code',
+  textViewCode: 'Code'
 };
