@@ -84,6 +84,16 @@ module.exports = () => {
       view: require('./view/ComponentLayoutView'),
     },
     {
+      id: 'full-width',
+      model: require('./model/ComponentFullWidth'),
+      view: require('./view/ComponentFullWidthView'),
+    },
+    {
+      id: 'section1050',
+      model: require('./model/ComponentSection1050'),
+      view: require('./view/ComponentSection1050View'),
+    },
+    {
       id: 'link',
       model: require('./model/ComponentLink'),
       view: require('./view/ComponentLinkView')
