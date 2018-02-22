@@ -548,6 +548,37 @@ const Component = Backbone.Model.extend(Styleable).extend(
             command: 'tlb-delete'
           });
         }
+
+        if(model.getName() === 'Group' || model.getName() === 'Layout') {
+          tb.push({
+            attributes: {class: 'fa fa-floppy-o'},
+            command: 'save',
+          });
+        }
+        if(model.getName() === 'Layout') {
+          tb.push({
+            attributes: {class: 'fa fa-unlink'},
+            command: function(editor) {
+              var attr = editor.getSelected().getAttributes();
+              delete attr['data-layout'];
+              editor.getSelected().setAttributes(attr);
+              editor.getSelected().view.$el.removeAttr('data-layout');
+            },
+          });
+        }
+
+        tb.push({
+          attributes: {class: 'fa fa-text-height'},
+          command: function() {
+            editor.getSelected().allow_height = !editor.getSelected().allow_height;
+            if (editor.getSelected().allow_height) {
+              window.toastr.warning('Edit Height Enabled');
+            } else {
+              window.toastr.warning('Edit Height Disabled');
+            }
+          },
+        });
+
         model.set('toolbar', tb);
       }
     },
@@ -640,7 +671,7 @@ const Component = Backbone.Model.extend(Styleable).extend(
     getName() {
       let customName = this.get('name') || this.get('custom-name');
       let tag = this.get('tagName');
-      tag = tag == 'div' ? 'box' : tag;
+      tag = tag == 'div' ? 'group' : tag;
       let name = this.get('type') || tag;
       name = name.charAt(0).toUpperCase() + name.slice(1);
       return customName || name;

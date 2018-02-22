@@ -4,9 +4,17 @@ module.exports = Component.extend({
 
   defaults: _.extend({}, Component.prototype.defaults, {
       type: 'section1050',
-      tagName: 'section',
+      tagName: 'section1050',
+      style: {
+        "max-width": '1050px',
+        "margin": 'auto',
+        "display": 'block',
+        "min-height": '10px',
+      },
   }),
-
+  initialize(o, opt) {
+    Component.prototype.initialize.apply(this, arguments);
+  },
 },{
 
   /**
@@ -17,12 +25,12 @@ module.exports = Component.extend({
    * @return {Object}
    * @private
    */
-  isComponent(el) {
-    var result = '';
-    if ($(el).hasClass('container') ) {
-      result = {type: 'section1050', id: 'section1050'};
-    }
-    return result;
-  },
+   isComponent(el) {
+     var result = '';
+     if (el.tagName == 'SECTION1050' || $(el).hasClass('container')) {
+       result = { type: 'section1050' };
+     }
+     return result;
+   }
 
 });

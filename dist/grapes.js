@@ -4508,6 +4508,37 @@ var Component = Backbone.Model.extend(_Styleable2.default).extend({
           command: 'tlb-delete'
         });
       }
+
+      if (model.getName() === 'Group' || model.getName() === 'Layout') {
+        tb.push({
+          attributes: { class: 'fa fa-floppy-o' },
+          command: 'save'
+        });
+      }
+      if (model.getName() === 'Layout') {
+        tb.push({
+          attributes: { class: 'fa fa-unlink' },
+          command: function command(editor) {
+            var attr = editor.getSelected().getAttributes();
+            delete attr['data-layout'];
+            editor.getSelected().setAttributes(attr);
+            editor.getSelected().view.$el.removeAttr('data-layout');
+          }
+        });
+      }
+
+      tb.push({
+        attributes: { class: 'fa fa-text-height' },
+        command: function command() {
+          editor.getSelected().allow_height = !editor.getSelected().allow_height;
+          if (editor.getSelected().allow_height) {
+            window.toastr.warning('Edit Height Enabled');
+          } else {
+            window.toastr.warning('Edit Height Disabled');
+          }
+        }
+      });
+
       model.set('toolbar', tb);
     }
   },
@@ -4605,7 +4636,7 @@ var Component = Backbone.Model.extend(_Styleable2.default).extend({
   getName: function getName() {
     var customName = this.get('name') || this.get('custom-name');
     var tag = this.get('tagName');
-    tag = tag == 'div' ? 'box' : tag;
+    tag = tag == 'div' ? 'group' : tag;
     var name = this.get('type') || tag;
     name = name.charAt(0).toUpperCase() + name.slice(1);
     return customName || name;
@@ -26125,7 +26156,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.47',
+    version: '0.14.71',
 
     /**
      * Initializes an editor based on passed options
@@ -43964,26 +43995,18 @@ module.exports = ComponentView.extend({
 var Component = __webpack_require__(3);
 
 module.exports = Component.extend({
-
   defaults: _.extend({}, Component.prototype.defaults, {
     type: 'layout',
     tagName: 'div'
-  })
-
+  }),
+  initialize: function initialize(o, opt) {
+    Component.prototype.initialize.apply(this, arguments);
+  }
 }, {
-
-  /**
-   * Detect if the passed element is a valid component.
-   * In case the element is valid an object abstracted
-   * from the element will be returned
-   * @param {HTMLElement}
-   * @return {Object}
-   * @private
-   */
   isComponent: function isComponent(el) {
     var result = '';
-    if (el.tagName == 'DIV' && $(el).attr('data-layout')) {
-      result = { type: 'layout', id: $(el).attr('data-layout') };
+    if ($(el).attr('data-layout')) {
+      result = { type: 'layout' };
     }
     return result;
   }
@@ -44004,8 +44027,20 @@ module.exports = ComponentView.extend({
 
   tagName: 'div',
 
-  events: {}
+  events: {},
 
+  initialize: function initialize(o) {
+    ComponentView.prototype.initialize.apply(this, arguments);
+  },
+  render: function render() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    ComponentView.prototype.render.apply(this, args);
+    this.updateClasses();
+    return this;
+  }
 });
 
 /***/ }),
@@ -44018,14 +44053,20 @@ module.exports = ComponentView.extend({
 var Component = __webpack_require__(3);
 
 module.exports = Component.extend({
-
   defaults: _.extend({}, Component.prototype.defaults, {
     type: 'full-width',
-    tagName: 'section'
-  })
+    tagName: 'full-width',
+    style: {
+      "max-width": '100%',
+      "display": 'block',
+      "min-height": '10px'
+    }
+  }),
 
+  initialize: function initialize(o, opt) {
+    Component.prototype.initialize.apply(this, arguments);
+  }
 }, {
-
   /**
    * Detect if the passed element is a valid component.
    * In case the element is valid an object abstracted
@@ -44036,8 +44077,8 @@ module.exports = Component.extend({
    */
   isComponent: function isComponent(el) {
     var result = '';
-    if ($(el).hasClass('full-width')) {
-      result = { type: 'full-width', id: 'full-width' };
+    if (el.tagName == 'FULL-WIDTH' || $(el).hasClass('full-width')) {
+      result = { type: 'full-width' };
     }
     return result;
   }
@@ -44055,11 +44096,22 @@ var Backbone = __webpack_require__(0);
 var ComponentView = __webpack_require__(2);
 
 module.exports = ComponentView.extend({
+  tagName: 'div',
 
-  tagName: 'section',
+  events: {},
 
-  events: {}
+  initialize: function initialize(o) {
+    ComponentView.prototype.initialize.apply(this, arguments);
+  },
+  render: function render() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
 
+    ComponentView.prototype.render.apply(this, args);
+    this.updateClasses();
+    return this;
+  }
 });
 
 /***/ }),
@@ -44075,9 +44127,17 @@ module.exports = Component.extend({
 
   defaults: _.extend({}, Component.prototype.defaults, {
     type: 'section1050',
-    tagName: 'section'
-  })
-
+    tagName: 'section1050',
+    style: {
+      "max-width": '1050px',
+      "margin": 'auto',
+      "display": 'block',
+      "min-height": '10px'
+    }
+  }),
+  initialize: function initialize(o, opt) {
+    Component.prototype.initialize.apply(this, arguments);
+  }
 }, {
 
   /**
@@ -44090,8 +44150,8 @@ module.exports = Component.extend({
    */
   isComponent: function isComponent(el) {
     var result = '';
-    if ($(el).hasClass('container')) {
-      result = { type: 'section1050', id: 'section1050' };
+    if (el.tagName == 'SECTION1050' || $(el).hasClass('container')) {
+      result = { type: 'section1050' };
     }
     return result;
   }
@@ -44112,8 +44172,20 @@ module.exports = ComponentView.extend({
 
   tagName: 'section',
 
-  events: {}
+  events: {},
 
+  initialize: function initialize(o) {
+    ComponentView.prototype.initialize.apply(this, arguments);
+  },
+  render: function render() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    ComponentView.prototype.render.apply(this, args);
+    this.updateClasses();
+    return this;
+  }
 });
 
 /***/ }),
