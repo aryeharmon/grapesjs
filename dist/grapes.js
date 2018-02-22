@@ -26156,7 +26156,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.71',
+    version: '0.14.84',
 
     /**
      * Initializes an editor based on passed options
@@ -35942,8 +35942,8 @@ module.exports = __webpack_require__(0).Model.extend({
     this.em = em;
     this.compCls = [];
     this.ids = [];
-    var code = this.buildFromModel(model, opts);
-
+    //var code = this.buildFromModel(model, opts);
+    var code = '';
     if (cssc) {
       (function () {
         var rules = cssc.getAll();
@@ -35962,7 +35962,10 @@ module.exports = __webpack_require__(0).Model.extend({
             }
             return;
           }
-
+          var selectorsAdd = rule.get('selectorsAdd');
+          if (selectorsAdd && selectorsAdd.indexOf('#tab') !== -1) {
+            return false;
+          }
           code += _this2.buildFromRule(rule, dump);
         });
 
@@ -35975,14 +35978,13 @@ module.exports = __webpack_require__(0).Model.extend({
           });
 
           if (rulesStr) {
-            code += atRule + '{' + rulesStr + '}';
+            // code += `${atRule}{${rulesStr}}`;
           }
         }
 
         em && em.getConfig('clearStyles') && rules.remove(dump);
       })();
     }
-
     return code;
   },
 
@@ -36010,6 +36012,9 @@ module.exports = __webpack_require__(0).Model.extend({
     });
 
     //if ((selectorStrNoAdd && found) || selectorsAdd || singleAtRule) {
+    if (selectorsAdd && selectorsAdd.indexOf('#tab') !== -1) {
+      return false;
+    }
     var block = rule.getDeclaration();
     block && (result += block);
     //} else {
