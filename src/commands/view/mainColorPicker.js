@@ -45,7 +45,8 @@ module.exports = {
 
       var iframe = window.$('.gjs-frame')[0];
       var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-      innerDoc.documentElement.style.setProperty('--hello', color);
+      // innerDoc.documentElement.style.setProperty('--hello', color);
+      innerDoc.documentElement.style.setProperty(property, color);
     }
 
     $(".colorpicker").each(function() {

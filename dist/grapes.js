@@ -26157,7 +26157,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.95',
+    version: '0.14.97',
 
     /**
      * Initializes an editor based on passed options
@@ -48503,7 +48503,8 @@ module.exports = {
 
       var iframe = window.$('.gjs-frame')[0];
       var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-      innerDoc.documentElement.style.setProperty('--hello', color);
+      // innerDoc.documentElement.style.setProperty('--hello', color);
+      innerDoc.documentElement.style.setProperty(property, color);
     }
 
     $(".colorpicker").each(function () {
