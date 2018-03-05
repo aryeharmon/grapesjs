@@ -26157,7 +26157,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.93',
+    version: '0.14.95',
 
     /**
      * Initializes an editor based on passed options
@@ -44064,7 +44064,7 @@ module.exports = Component.extend({
     tagName: 'full-width',
     style: {
       "max-width": '100%',
-      "display": 'block',
+      // "display": 'block',
       "min-height": '10px'
     }
   }),
@@ -44108,7 +44108,6 @@ module.exports = ComponentView.extend({
 
   initialize: function initialize(o) {
     ComponentView.prototype.initialize.apply(this, arguments);
-    this.classEmpty = this.ppfx + 'plh-map';
   },
   render: function render() {
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -44138,7 +44137,7 @@ module.exports = Component.extend({
     style: {
       "max-width": '1050px',
       "margin": 'auto',
-      "display": 'block',
+      // "display": 'block',
       "min-height": '10px'
     }
   }),

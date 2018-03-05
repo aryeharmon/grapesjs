@@ -7,7 +7,7 @@ module.exports = Component.extend(
       tagName: 'full-width',
       style: {
         "max-width": '100%',
-        "display": 'block',
+        // "display": 'block',
         "min-height": '10px',
       },
     }),

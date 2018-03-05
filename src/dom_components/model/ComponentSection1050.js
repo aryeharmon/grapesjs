@@ -8,7 +8,7 @@ module.exports = Component.extend({
       style: {
         "max-width": '1050px',
         "margin": 'auto',
-        "display": 'block',
+        // "display": 'block',
         "min-height": '10px',
       },
   }),
