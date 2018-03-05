@@ -61,9 +61,11 @@ module.exports = Backbone.Collection.extend({
       !avoidInline &&
       em &&
       em.get &&
-      em.getConfig('forceClass')
+      em.getConfig('forceClass') &&
+      em.view.el.innerHTML !== ''
     ) {
       const name = model.cid;
+
       const rule = em.get('CssComposer').setClassRule(name, style);
       model.setStyle({});
       model.addClass(name);

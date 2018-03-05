@@ -24865,8 +24865,9 @@ module.exports = Backbone.Collection.extend({
     var style = model.getStyle();
     var avoidInline = em && em.getConfig('avoidInlineStyle');
 
-    if (!(0, _underscore.isEmpty)(style) && !avoidInline && em && em.get && em.getConfig('forceClass')) {
+    if (!(0, _underscore.isEmpty)(style) && !avoidInline && em && em.get && em.getConfig('forceClass') && em.view.el.innerHTML !== '') {
       var name = model.cid;
+
       var rule = em.get('CssComposer').setClassRule(name, style);
       model.setStyle({});
       model.addClass(name);
@@ -26156,7 +26157,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.85',
+    version: '0.14.93',
 
     /**
      * Initializes an editor based on passed options
@@ -44107,6 +44108,7 @@ module.exports = ComponentView.extend({
 
   initialize: function initialize(o) {
     ComponentView.prototype.initialize.apply(this, arguments);
+    this.classEmpty = this.ppfx + 'plh-map';
   },
   render: function render() {
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
