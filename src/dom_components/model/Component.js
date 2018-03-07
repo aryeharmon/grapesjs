@@ -111,7 +111,7 @@ const Component = Backbone.Model.extend(Styleable).extend(
       script: '',
 
       // Traits
-      traits: ['id', 'title'],
+      traits: ['id', 'title', 'data-angular', {type: 'text', name: 'ng-repeat', label: 'repeat'}],
 
       // Indicates an array of properties which will be inhereted by
       // all NEW appended children

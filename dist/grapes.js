@@ -4039,7 +4039,7 @@ var Component = Backbone.Model.extend(_Styleable2.default).extend({
     script: '',
 
     // Traits
-    traits: ['id', 'title'],
+    traits: ['id', 'title', 'data-angular', { type: 'text', name: 'ng-repeat', label: 'repeat' }],
 
     // Indicates an array of properties which will be inhereted by
     // all NEW appended children
@@ -26157,7 +26157,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.97',
+    version: '0.14.98',
 
     /**
      * Initializes an editor based on passed options
