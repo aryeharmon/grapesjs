@@ -39,8 +39,8 @@ module.exports = require('backbone').Model.extend({
     this.em = em;
     this.compCls = [];
     this.ids = [];
-    //var code = this.buildFromModel(model, opts);
-    var code = '';
+    var code = this.buildFromModel(model, opts);
+
     if (cssc) {
       const rules = cssc.getAll();
       const atRules = {};
@@ -58,10 +58,7 @@ module.exports = require('backbone').Model.extend({
           }
           return;
         }
-        var selectorsAdd = rule.get('selectorsAdd');
-        if (selectorsAdd && selectorsAdd.indexOf('#tab') !== -1) {
-          return false;
-        }
+
         code += this.buildFromRule(rule, dump);
       });
 
@@ -72,12 +69,13 @@ module.exports = require('backbone').Model.extend({
         mRules.forEach(rule => (rulesStr += this.buildFromRule(rule, dump)));
 
         if (rulesStr) {
-          // code += `${atRule}{${rulesStr}}`;
+          code += `${atRule}{${rulesStr}}`;
         }
       }
 
       em && em.getConfig('clearStyles') && rules.remove(dump);
     }
+
     return code;
   },
 
@@ -93,6 +91,11 @@ module.exports = require('backbone').Model.extend({
     const singleAtRule = rule.get('singleAtRule');
     let found;
 
+    if (selectorsAdd && selectorsAdd.indexOf('#tab') !== -1) {
+      return false;
+    }
+
+
     // This will not render a rule if there is no its component
     rule.get('selectors').each(selector => {
       const name = selector.getFullName();
@@ -101,17 +104,13 @@ module.exports = require('backbone').Model.extend({
       }
     });
 
-    //if ((selectorStrNoAdd && found) || selectorsAdd || singleAtRule) {
-    if (selectorsAdd && selectorsAdd.indexOf('#tab') !== -1) {
-      return false;
-    }
+    // if ((selectorStrNoAdd && found) || selectorsAdd || singleAtRule) {
       const block = rule.getDeclaration();
       block && (result += block);
-    //} else {
-      //dump.push(rule);
-    //}
+    // } else {
+      // dump.push(rule);
+    // }
 
     return result;
-  },
-
+  }
 });
