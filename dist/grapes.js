@@ -26151,7 +26151,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.10',
+    version: '0.14.19',
 
     /**
      * Initializes an editor based on passed options
@@ -48525,7 +48525,7 @@ var parse_str = __webpack_require__(60);
 __webpack_require__(34);
 
 module.exports = {
-  template: '\n    <% _(styles).each(function(style, property) { %>\n      <div>\n        <label><strong><%= property %></strong></label> <input class=\'colorpicker\' data-property=\'<%= property %>\' data-color="<%= style %>" name="<%= property %>"/>\n      </div>\n    <% }) %>\n    <div>\n      <label><strong>Add Color</strong></label> <input type="text" class="new-color" name="new_color"/> <button class="new-color-submit">Add Color</button>\n    </div>\n  ',
+  template: '\n    <% _(styles).each(function(style, property) { %>\n      <div>\n        <label><strong><%= property %></strong></label> <input class=\'colorpicker\' data-property=\'<%= property %>\' data-color="<%= style %>" name="<%= property %>"/>\n        <textarea onchange="editor_settings.colors[\'<%= property %>\'] = $(this).val()" id="Comment<%= property %>"><% if(editor_settings && editor_settings.colors && editor_settings.colors[property]) { %><%= editor_settings.colors[property] %><% } %></textarea>\n      </div>\n    <% }) %>\n    <div>\n      <label><strong>Add Color</strong></label> <input type="text" class="new-color" name="new_color"/> <button class="new-color-submit">Add Color</button>\n    </div>\n  ',
   run: function run(editor, sender) {
     var that = this;
 
@@ -48535,6 +48535,8 @@ module.exports = {
   },
   render: function render(editor) {
     var that = this;
+
+    window.editor_settings.colors = window.editor_settings.colors || {};
 
     var template = _.template(that.template);
 
@@ -48548,7 +48550,8 @@ module.exports = {
     this.modal.setTitle('Color Manager');
 
     this.modal.setContent(template({
-      styles: root_style.attributes.style
+      styles: root_style.attributes.style,
+      editor_settings: editor_settings
     }));
 
     function setValue(that, color) {

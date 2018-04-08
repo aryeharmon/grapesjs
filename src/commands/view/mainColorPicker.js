@@ -6,6 +6,7 @@ module.exports = {
     <% _(styles).each(function(style, property) { %>
       <div>
         <label><strong><%= property %></strong></label> <input class='colorpicker' data-property='<%= property %>' data-color="<%= style %>" name="<%= property %>"/>
+        <textarea onchange="editor_settings.colors['<%= property %>'] = $(this).val()" id="Comment<%= property %>"><% if(editor_settings && editor_settings.colors && editor_settings.colors[property]) { %><%= editor_settings.colors[property] %><% } %></textarea>
       </div>
     <% }) %>
     <div>
@@ -22,6 +23,8 @@ module.exports = {
   render(editor) {
     var that = this;
 
+    window.editor_settings.colors = window.editor_settings.colors || {};
+
     var template = _.template(that.template);
 
     for (var i = 0; i < editor.CssComposer.getAll().models.length; i++) {
@@ -35,6 +38,7 @@ module.exports = {
 
     this.modal.setContent(template({
       styles: root_style.attributes.style,
+      editor_settings: editor_settings,
     }));
 
     function setValue(that, color) {
