@@ -24857,7 +24857,7 @@ module.exports = Backbone.Collection.extend({
     var style = model.getStyle();
     var avoidInline = em && em.getConfig('avoidInlineStyle');
 
-    if (!(0, _underscore.isEmpty)(style) && !avoidInline && em && em.get && em.getConfig('forceClass') && em.view.el.innerHTML !== '') {
+    if (!(0, _underscore.isEmpty)(style) && !avoidInline && em && em.get && em.getConfig('forceClass') && em.view.el.innerHTML !== '' && model.attributes.classes.length === 0) {
       var name = model.cid;
 
       var rule = em.get('CssComposer').setClassRule(name, style);
@@ -26151,7 +26151,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.19',
+    version: '0.14.24',
 
     /**
      * Initializes an editor based on passed options

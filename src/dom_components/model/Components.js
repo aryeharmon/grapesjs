@@ -61,7 +61,8 @@ module.exports = Backbone.Collection.extend({
       em &&
       em.get &&
       em.getConfig('forceClass') &&
-      em.view.el.innerHTML !== ''
+      em.view.el.innerHTML !== '' &&
+      model.attributes.classes.length === 0
     ) {
       const name = model.cid;
 
