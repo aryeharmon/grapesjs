@@ -66,6 +66,16 @@ module.exports = require('backbone')
         }
       },
       {
+        id: 'selectAnimation',
+        model: require('./PropertySelectAnimation'),
+        view: require('./../view/PropertySelectAnimationView'),
+        isType(value) {
+          if (value && value.type == 'select') {
+            return value;
+          }
+        }
+      },
+      {
         id: 'radio',
         model: require('./PropertyRadio'),
         view: require('./../view/PropertyRadioView'),

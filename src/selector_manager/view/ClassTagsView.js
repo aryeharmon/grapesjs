@@ -206,7 +206,9 @@ module.exports = Backbone.View.extend({
       validSelectors = target.get('classes').getValid();
     }
 
-    this.collection.reset(validSelectors);
+    this.collection.reset(validSelectors.filter(function(item){
+    	return ['animated', 'bounce','flash','pulse','rubberBand','shake','swing','tada','wobble','jello','bounceIn','bounceInDown','bounceInLeft','bounceInRight','bounceInUp','bounceOut','bounceOutDown','bounceOutLeft','bounceOutRight','bounceOutUp','fadeIn','fadeInDown','fadeInDownBig','fadeInLeft','fadeInLeftBig','fadeInRight','fadeInRightBig','fadeInUp','fadeInUpBig','fadeOut','fadeOutDown','fadeOutDownBig','fadeOutLeft','fadeOutLeftBig','fadeOutRight','fadeOutRightBig','fadeOutUp','fadeOutUpBig','flip','flipInX','flipInY','flipOutX','flipOutY','lightSpeedIn','lightSpeedOut','rotateIn','rotateInDownLeft','rotateInDownRight','rotateInUpLeft','rotateInUpRight','rotateOut','rotateOutDownLeft','rotateOutDownRight','rotateOutUpLeft','rotateOutUpRight','slideInUp','slideInDown','slideInLeft','slideInRight','slideOutUp','slideOutDown','slideOutLeft','slideOutRight','zoomIn','zoomInDown','zoomInLeft','zoomInRight','zoomInUp','zoomOut','zoomOutDown','zoomOutLeft','zoomOutRight','zoomOutUp','hinge','jackInTheBox','rollIn','rollOut'].indexOf(item.get('label')) === -1;
+    }));
     this.updateStateVis();
   },
 
@@ -298,6 +300,8 @@ module.exports = Backbone.View.extend({
   addToClasses(model, fragmentEl) {
     var fragment = fragmentEl || null;
 
+
+
     var view = new ClassTagView({
       model,
       config: this.config,
@@ -318,9 +322,13 @@ module.exports = Backbone.View.extend({
    */
   renderClasses() {
     var fragment = document.createDocumentFragment();
-
+    window.aryeh = this.collection;
     this.collection.each(function(model) {
-      this.addToClasses(model, fragment);
+      if (model && ['animated', 'bounce','flash','pulse','rubberBand','shake','swing','tada','wobble','jello','bounceIn','bounceInDown','bounceInLeft','bounceInRight','bounceInUp','bounceOut','bounceOutDown','bounceOutLeft','bounceOutRight','bounceOutUp','fadeIn','fadeInDown','fadeInDownBig','fadeInLeft','fadeInLeftBig','fadeInRight','fadeInRightBig','fadeInUp','fadeInUpBig','fadeOut','fadeOutDown','fadeOutDownBig','fadeOutLeft','fadeOutLeftBig','fadeOutRight','fadeOutRightBig','fadeOutUp','fadeOutUpBig','flip','flipInX','flipInY','flipOutX','flipOutY','lightSpeedIn','lightSpeedOut','rotateIn','rotateInDownLeft','rotateInDownRight','rotateInUpLeft','rotateInUpRight','rotateOut','rotateOutDownLeft','rotateOutDownRight','rotateOutUpLeft','rotateOutUpRight','slideInUp','slideInDown','slideInLeft','slideInRight','slideOutUp','slideOutDown','slideOutLeft','slideOutRight','zoomIn','zoomInDown','zoomInLeft','zoomInRight','zoomInUp','zoomOut','zoomOutDown','zoomOutLeft','zoomOutRight','zoomOutUp','hinge','jackInTheBox','rollIn','rollOut'].indexOf(model.get('label')) === -1) {
+        this.addToClasses(model, fragment);
+      } else {
+        // this.collection.remove(model);
+      }
     }, this);
 
     if (this.getClasses())

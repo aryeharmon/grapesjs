@@ -3941,9 +3941,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var Backbone = __webpack_require__(0);
 var Components = __webpack_require__(51);
-var Selector = __webpack_require__(7);
+var Selector = __webpack_require__(8);
 var Selectors = __webpack_require__(13);
-var Traits = __webpack_require__(155);
+var Traits = __webpack_require__(157);
 var componentList = {};
 var componentIndex = 0;
 
@@ -15137,92 +15137,6 @@ return CodeMirror$1;
 "use strict";
 
 
-var Backbone = __webpack_require__(0);
-
-var TYPE_CLASS = 1;
-var TYPE_ID = 2;
-
-var Selector = Backbone.Model.extend({
-  idAttribute: 'name',
-
-  defaults: {
-    name: '',
-
-    label: '',
-
-    // Type of the selector
-    type: TYPE_CLASS,
-
-    // If not active it's not selectable by the style manager (uncheckboxed)
-    active: true,
-
-    // Can't be seen by the style manager, therefore even by the user
-    // Will be rendered only in export code
-    private: false,
-
-    // If true, can't be removed from the attacched element
-    protected: false
-  },
-
-  initialize: function initialize() {
-    var name = this.get('name');
-    var label = this.get('label');
-
-    if (!name) {
-      this.set('name', label);
-    } else if (!label) {
-      this.set('label', name);
-    }
-
-    this.set('name', Selector.escapeName(this.get('name')));
-  },
-
-
-  /**
-   * Get full selector name
-   * @return {string}
-   */
-  getFullName: function getFullName() {
-    var init = '';
-
-    switch (this.get('type')) {
-      case TYPE_CLASS:
-        init = '.';
-        break;
-      case TYPE_ID:
-        init = '#';
-        break;
-    }
-
-    return init + this.get('name');
-  }
-}, {
-  // All type selectors: https://developer.mozilla.org/it/docs/Web/CSS/CSS_Selectors
-  // Here I define only what I need
-  TYPE_CLASS: TYPE_CLASS,
-
-  TYPE_ID: TYPE_ID,
-
-  /**
-   * Escape string
-   * @param {string} name
-   * @return {string}
-   * @private
-   */
-  escapeName: function escapeName(name) {
-    return ('' + name).trim().replace(/([^a-z0-9\w-]+)/gi, '-');
-  }
-});
-
-module.exports = Selector;
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _underscore = __webpack_require__(1);
@@ -15374,6 +15288,92 @@ module.exports = __webpack_require__(0).Model.extend({
     return value || '';
   }
 });
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Backbone = __webpack_require__(0);
+
+var TYPE_CLASS = 1;
+var TYPE_ID = 2;
+
+var Selector = Backbone.Model.extend({
+  idAttribute: 'name',
+
+  defaults: {
+    name: '',
+
+    label: '',
+
+    // Type of the selector
+    type: TYPE_CLASS,
+
+    // If not active it's not selectable by the style manager (uncheckboxed)
+    active: true,
+
+    // Can't be seen by the style manager, therefore even by the user
+    // Will be rendered only in export code
+    private: false,
+
+    // If true, can't be removed from the attacched element
+    protected: false
+  },
+
+  initialize: function initialize() {
+    var name = this.get('name');
+    var label = this.get('label');
+
+    if (!name) {
+      this.set('name', label);
+    } else if (!label) {
+      this.set('label', name);
+    }
+
+    this.set('name', Selector.escapeName(this.get('name')));
+  },
+
+
+  /**
+   * Get full selector name
+   * @return {string}
+   */
+  getFullName: function getFullName() {
+    var init = '';
+
+    switch (this.get('type')) {
+      case TYPE_CLASS:
+        init = '.';
+        break;
+      case TYPE_ID:
+        init = '#';
+        break;
+    }
+
+    return init + this.get('name');
+  }
+}, {
+  // All type selectors: https://developer.mozilla.org/it/docs/Web/CSS/CSS_Selectors
+  // Here I define only what I need
+  TYPE_CLASS: TYPE_CLASS,
+
+  TYPE_ID: TYPE_ID,
+
+  /**
+   * Escape string
+   * @param {string} name
+   * @return {string}
+   * @private
+   */
+  escapeName: function escapeName(name) {
+    return ('' + name).trim().replace(/([^a-z0-9\w-]+)/gi, '-');
+  }
+});
+
+module.exports = Selector;
 
 /***/ }),
 /* 9 */
@@ -16590,7 +16590,7 @@ module.exports = g;
 
 var _underscore = __webpack_require__(1);
 
-var Selector = __webpack_require__(7);
+var Selector = __webpack_require__(8);
 
 module.exports = __webpack_require__(0).Collection.extend({
   model: Selector,
@@ -16630,7 +16630,7 @@ var _TypeableCollection2 = _interopRequireDefault(_TypeableCollection);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Property = __webpack_require__(8);
+var Property = __webpack_require__(7);
 
 module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.default).extend({
   types: [{
@@ -16688,6 +16688,15 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
       }
     }
   }, {
+    id: 'selectAnimation',
+    model: __webpack_require__(128),
+    view: __webpack_require__(129),
+    isType: function isType(value) {
+      if (value && value.type == 'select') {
+        return value;
+      }
+    }
+  }, {
     id: 'radio',
     model: __webpack_require__(42),
     view: __webpack_require__(38),
@@ -16698,8 +16707,8 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
     }
   }, {
     id: 'slider',
-    model: __webpack_require__(128),
-    view: __webpack_require__(129),
+    model: __webpack_require__(130),
+    view: __webpack_require__(131),
     isType: function isType(value) {
       if (value && value.type == 'slider') {
         return value;
@@ -16724,8 +16733,8 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
     }
   }, {
     id: 'radio-position',
-    model: __webpack_require__(130),
-    view: __webpack_require__(131), // 1. copy these js files and create them. ok let me know when done and i will continue helping you, ok
+    model: __webpack_require__(132),
+    view: __webpack_require__(133), // 1. copy these js files and create them. ok let me know when done and i will continue helping you, ok
     isType: function isType(value) {
       if (value && value.type == 'radio-position') {
         return value;
@@ -17733,8 +17742,8 @@ var _underscore = __webpack_require__(1);
 
 var _mixins = __webpack_require__(4);
 
-var ToolbarView = __webpack_require__(201);
-var Toolbar = __webpack_require__(203);
+var ToolbarView = __webpack_require__(203);
+var Toolbar = __webpack_require__(205);
 var key = __webpack_require__(24);
 var $ = __webpack_require__(0).$;
 var showOffsets = void 0;
@@ -20373,7 +20382,7 @@ module.exports = function () {
       defaults = __webpack_require__(119),
       Sectors = __webpack_require__(120),
       Properties = __webpack_require__(14),
-      SectorsView = __webpack_require__(133);
+      SectorsView = __webpack_require__(135);
   var properties = void 0;
   var sectors, SectView;
 
@@ -23205,7 +23214,7 @@ module.exports = Backbone.View.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Property = __webpack_require__(8);
+var Property = __webpack_require__(7);
 
 module.exports = Property.extend({
   defaults: _extends({}, Property.prototype.defaults, {
@@ -23767,7 +23776,7 @@ module.exports = PropertyView.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Property = __webpack_require__(8);
+var Property = __webpack_require__(7);
 
 module.exports = Property.extend({
   defaults: _extends({}, Property.prototype.defaults, {
@@ -23787,7 +23796,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var Property = __webpack_require__(8);
+var Property = __webpack_require__(7);
 var InputNumber = __webpack_require__(18);
 
 module.exports = Property.extend({
@@ -25160,7 +25169,7 @@ module.exports = ComponentView.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _config = __webpack_require__(189);
+var _config = __webpack_require__(191);
 
 var _config2 = _interopRequireDefault(_config);
 
@@ -26117,11 +26126,11 @@ var _editor2 = _interopRequireDefault(_editor);
 
 var _underscore = __webpack_require__(1);
 
-var _polyfills = __webpack_require__(235);
+var _polyfills = __webpack_require__(237);
 
 var _polyfills2 = _interopRequireDefault(_polyfills);
 
-var _plugin_manager = __webpack_require__(236);
+var _plugin_manager = __webpack_require__(238);
 
 var _plugin_manager2 = _interopRequireDefault(_plugin_manager);
 
@@ -26151,7 +26160,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.24',
+    version: '0.14.51',
 
     /**
      * Initializes an editor based on passed options
@@ -26217,7 +26226,7 @@ module.exports = function (config) {
   var c = config || {},
       defaults = __webpack_require__(64),
       EditorModel = __webpack_require__(65),
-      EditorView = __webpack_require__(234);
+      EditorView = __webpack_require__(236);
 
   for (var name in defaults) {
     if (!(name in c)) c[name] = defaults[name];
@@ -27050,12 +27059,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var deps = [__webpack_require__(66), __webpack_require__(70), __webpack_require__(71), __webpack_require__(74), __webpack_require__(82), __webpack_require__(87), __webpack_require__(90), __webpack_require__(94), __webpack_require__(98), __webpack_require__(110), __webpack_require__(116), __webpack_require__(32), __webpack_require__(135), __webpack_require__(141), __webpack_require__(146), __webpack_require__(153), __webpack_require__(55), __webpack_require__(190), __webpack_require__(197), __webpack_require__(225)];
+var deps = [__webpack_require__(66), __webpack_require__(70), __webpack_require__(71), __webpack_require__(74), __webpack_require__(82), __webpack_require__(87), __webpack_require__(90), __webpack_require__(94), __webpack_require__(98), __webpack_require__(110), __webpack_require__(116), __webpack_require__(32), __webpack_require__(137), __webpack_require__(143), __webpack_require__(148), __webpack_require__(155), __webpack_require__(55), __webpack_require__(192), __webpack_require__(199), __webpack_require__(227)];
 
 var Backbone = __webpack_require__(0);
 var timedInterval = void 0;
 
-__webpack_require__(233)({
+__webpack_require__(235)({
   Backbone: Backbone,
   $: Backbone.$
 });
@@ -34630,7 +34639,7 @@ module.exports = function (config) {
 
   var c = config || {},
       defaults = __webpack_require__(91),
-      Selector = __webpack_require__(7),
+      Selector = __webpack_require__(8),
       Selectors = __webpack_require__(13),
       ClassTagsView = __webpack_require__(92);
   var selectors, selectorTags;
@@ -34958,7 +34967,9 @@ module.exports = Backbone.View.extend({
       validSelectors = target.get('classes').getValid();
     }
 
-    this.collection.reset(validSelectors);
+    this.collection.reset(validSelectors.filter(function (item) {
+      return ['animated', 'bounce', 'flash', 'pulse', 'rubberBand', 'shake', 'swing', 'tada', 'wobble', 'jello', 'bounceIn', 'bounceInDown', 'bounceInLeft', 'bounceInRight', 'bounceInUp', 'bounceOut', 'bounceOutDown', 'bounceOutLeft', 'bounceOutRight', 'bounceOutUp', 'fadeIn', 'fadeInDown', 'fadeInDownBig', 'fadeInLeft', 'fadeInLeftBig', 'fadeInRight', 'fadeInRightBig', 'fadeInUp', 'fadeInUpBig', 'fadeOut', 'fadeOutDown', 'fadeOutDownBig', 'fadeOutLeft', 'fadeOutLeftBig', 'fadeOutRight', 'fadeOutRightBig', 'fadeOutUp', 'fadeOutUpBig', 'flip', 'flipInX', 'flipInY', 'flipOutX', 'flipOutY', 'lightSpeedIn', 'lightSpeedOut', 'rotateIn', 'rotateInDownLeft', 'rotateInDownRight', 'rotateInUpLeft', 'rotateInUpRight', 'rotateOut', 'rotateOutDownLeft', 'rotateOutDownRight', 'rotateOutUpLeft', 'rotateOutUpRight', 'slideInUp', 'slideInDown', 'slideInLeft', 'slideInRight', 'slideOutUp', 'slideOutDown', 'slideOutLeft', 'slideOutRight', 'zoomIn', 'zoomInDown', 'zoomInLeft', 'zoomInRight', 'zoomInUp', 'zoomOut', 'zoomOutDown', 'zoomOutLeft', 'zoomOutRight', 'zoomOutUp', 'hinge', 'jackInTheBox', 'rollIn', 'rollOut'].indexOf(item.get('label')) === -1;
+    }));
     this.updateStateVis();
   },
 
@@ -35073,9 +35084,13 @@ module.exports = Backbone.View.extend({
    */
   renderClasses: function renderClasses() {
     var fragment = document.createDocumentFragment();
-
+    window.aryeh = this.collection;
     this.collection.each(function (model) {
-      this.addToClasses(model, fragment);
+      if (model && ['animated', 'bounce', 'flash', 'pulse', 'rubberBand', 'shake', 'swing', 'tada', 'wobble', 'jello', 'bounceIn', 'bounceInDown', 'bounceInLeft', 'bounceInRight', 'bounceInUp', 'bounceOut', 'bounceOutDown', 'bounceOutLeft', 'bounceOutRight', 'bounceOutUp', 'fadeIn', 'fadeInDown', 'fadeInDownBig', 'fadeInLeft', 'fadeInLeftBig', 'fadeInRight', 'fadeInRightBig', 'fadeInUp', 'fadeInUpBig', 'fadeOut', 'fadeOutDown', 'fadeOutDownBig', 'fadeOutLeft', 'fadeOutLeftBig', 'fadeOutRight', 'fadeOutRightBig', 'fadeOutUp', 'fadeOutUpBig', 'flip', 'flipInX', 'flipInY', 'flipOutX', 'flipOutY', 'lightSpeedIn', 'lightSpeedOut', 'rotateIn', 'rotateInDownLeft', 'rotateInDownRight', 'rotateInUpLeft', 'rotateInUpRight', 'rotateOut', 'rotateOutDownLeft', 'rotateOutDownRight', 'rotateOutUpLeft', 'rotateOutUpRight', 'slideInUp', 'slideInDown', 'slideInLeft', 'slideInRight', 'slideOutUp', 'slideOutDown', 'slideOutLeft', 'slideOutRight', 'zoomIn', 'zoomInDown', 'zoomInLeft', 'zoomInRight', 'zoomInUp', 'zoomOut', 'zoomOutDown', 'zoomOutLeft', 'zoomOutRight', 'zoomOutUp', 'hinge', 'jackInTheBox', 'rollIn', 'rollOut'].indexOf(model.get('label')) === -1) {
+        this.addToClasses(model, fragment);
+      } else {
+        // this.collection.remove(model);
+      }
     }, this);
 
     if (this.getClasses()) this.getClasses().empty().append(fragment);
@@ -35146,7 +35161,7 @@ module.exports = Backbone.View.extend({
 "use strict";
 
 
-var Selector = __webpack_require__(7);
+var Selector = __webpack_require__(8);
 var inputProp = 'contentEditable';
 
 module.exports = __webpack_require__(0).View.extend({
@@ -39335,7 +39350,7 @@ var _underscore = __webpack_require__(1);
 
 var Backbone = __webpack_require__(0);
 var Properties = __webpack_require__(14);
-var PropertyFactory = __webpack_require__(132);
+var PropertyFactory = __webpack_require__(134);
 
 module.exports = Backbone.Model.extend({
   defaults: {
@@ -40011,6 +40026,78 @@ module.exports = Backbone.View.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var Property = __webpack_require__(7);
+
+module.exports = Property.extend({
+  defaults: _extends({}, Property.prototype.defaults, {
+    // Array of options, eg. [{name: 'Label ', value: '100'}]
+    options: []
+  })
+});
+
+/***/ }),
+/* 129 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Backbone) {
+
+var $ = Backbone.$;
+
+module.exports = __webpack_require__(5).extend({
+  templateInput: function templateInput() {
+    var pfx = this.pfx;
+    var ppfx = this.ppfx;
+    return '\n      <div class="' + ppfx + 'field ' + ppfx + 'select">\n        <span id="' + pfx + 'input-holder"></span>\n        <div class="' + ppfx + 'sel-arrow">\n          <div class="' + ppfx + 'd-s-arrow"></div>\n        </div>\n      </div>\n    ';
+  },
+  onRender: function onRender() {
+    var pfx = this.pfx;
+    var model = this.model;
+    var options = model.get('list') || model.get('options') || [];
+
+    if (!this.input) {
+      var optionsStr = '';
+
+      options.forEach(function (option) {
+        var name = option.name || option.value;
+        var style = option.style ? option.style.replace(/"/g, '&quot;') : '';
+        var styleAttr = style ? 'style="' + style + '"' : '';
+        var value = option.value.replace(/"/g, '&quot;');
+        optionsStr += '<option value="' + value + '" ' + styleAttr + '>' + name + '</option>';
+      });
+
+      var inputH = this.el.querySelector('#' + pfx + 'input-holder');
+      inputH.innerHTML = '<select class="animation-select">' + optionsStr + '</select>';
+      this.input = inputH.firstChild;
+    }
+
+    this.onChange = function (target, that, opt) {
+      var value = $('.animation-select').val();
+      if (!value) {
+        return;
+      }
+      var selected = window.editor.getSelected();
+
+      selected.removeClass(['animated'].concat(options.map(function (o) {
+        return o.value;
+      })));
+
+      // alert(value);
+      selected.addClass(['animated', value]);
+    };
+  }
+});
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 130 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var Property = __webpack_require__(43);
 
 module.exports = Property.extend({
@@ -40020,7 +40107,7 @@ module.exports = Property.extend({
 });
 
 /***/ }),
-/* 129 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40076,13 +40163,13 @@ module.exports = Property.extend({
 });
 
 /***/ }),
-/* 130 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Property = __webpack_require__(8);
+var Property = __webpack_require__(7);
 
 module.exports = Property.extend({
 
@@ -40094,7 +40181,7 @@ module.exports = Property.extend({
 });
 
 /***/ }),
-/* 131 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40217,7 +40304,7 @@ module.exports = __webpack_require__(5).extend({
 });
 
 /***/ }),
-/* 132 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40708,7 +40795,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 133 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40718,7 +40805,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _underscore = __webpack_require__(1);
 
-var SectorView = __webpack_require__(134);
+var SectorView = __webpack_require__(136);
 
 module.exports = Backbone.View.extend({
   initialize: function initialize() {
@@ -40860,7 +40947,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 134 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40970,7 +41057,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 135 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41018,9 +41105,9 @@ module.exports = Backbone.View.extend({
 
 module.exports = function () {
   var c = {};
-  var defaults = __webpack_require__(136);
-  var Assets = __webpack_require__(137);
-  var AssetsView = __webpack_require__(140);
+  var defaults = __webpack_require__(138);
+  var Assets = __webpack_require__(139);
+  var AssetsView = __webpack_require__(142);
   var FileUpload = __webpack_require__(46);
   var assets = void 0,
       am = void 0,
@@ -41360,7 +41447,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 136 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41452,7 +41539,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 137 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41467,7 +41554,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.default).extend({
   types: [{
     id: 'image',
-    model: __webpack_require__(138),
+    model: __webpack_require__(140),
     view: __webpack_require__(44),
     isType: function isType(value) {
       if (typeof value == 'string') {
@@ -41482,7 +41569,7 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
 });
 
 /***/ }),
-/* 138 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41490,7 +41577,7 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Asset = __webpack_require__(139);
+var Asset = __webpack_require__(141);
 
 module.exports = Asset.extend({
   defaults: _extends({}, Asset.prototype.defaults, {
@@ -41502,7 +41589,7 @@ module.exports = Asset.extend({
 });
 
 /***/ }),
-/* 139 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41537,7 +41624,7 @@ module.exports = __webpack_require__(0).Model.extend({
 });
 
 /***/ }),
-/* 140 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41725,7 +41812,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 141 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41754,12 +41841,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 module.exports = function () {
   var em = void 0;
   var c = {},
-      defaults = __webpack_require__(142),
+      defaults = __webpack_require__(144),
       CssRule = __webpack_require__(47),
-      CssRules = __webpack_require__(143),
-      CssRulesView = __webpack_require__(144);
+      CssRules = __webpack_require__(145),
+      CssRulesView = __webpack_require__(146);
   var Selectors = __webpack_require__(13);
-  var Selector = __webpack_require__(7);
+  var Selector = __webpack_require__(8);
 
   var rules, rulesView;
 
@@ -42144,7 +42231,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 142 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42162,7 +42249,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 143 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42202,14 +42289,14 @@ module.exports = Backbone.Collection.extend({
 });
 
 /***/ }),
-/* 144 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var CssRuleView = __webpack_require__(49);
-var CssGroupRuleView = __webpack_require__(145);
+var CssGroupRuleView = __webpack_require__(147);
 
 module.exports = __webpack_require__(0).View.extend({
   initialize: function initialize(o) {
@@ -42297,7 +42384,7 @@ module.exports = __webpack_require__(0).View.extend({
 });
 
 /***/ }),
-/* 145 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42317,7 +42404,7 @@ module.exports = __webpack_require__(49).extend({
 });
 
 /***/ }),
-/* 146 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42325,8 +42412,8 @@ module.exports = __webpack_require__(49).extend({
 
 var _underscore = __webpack_require__(1);
 
-var defaultOpts = __webpack_require__(147);
-var TraitsView = __webpack_require__(148);
+var defaultOpts = __webpack_require__(149);
+var TraitsView = __webpack_require__(150);
 
 module.exports = function () {
   var c = {};
@@ -42416,7 +42503,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 147 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42445,7 +42532,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 148 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42453,10 +42540,10 @@ module.exports = {
 
 var DomainViews = __webpack_require__(50);
 var TraitView = __webpack_require__(10);
-var TraitSelectView = __webpack_require__(149);
-var TraitCheckboxView = __webpack_require__(150);
-var TraitNumberView = __webpack_require__(151);
-var TraitColorView = __webpack_require__(152);
+var TraitSelectView = __webpack_require__(151);
+var TraitCheckboxView = __webpack_require__(152);
+var TraitNumberView = __webpack_require__(153);
+var TraitColorView = __webpack_require__(154);
 
 module.exports = DomainViews.extend({
   itemView: TraitView,
@@ -42499,7 +42586,7 @@ module.exports = DomainViews.extend({
 });
 
 /***/ }),
-/* 149 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42568,7 +42655,7 @@ module.exports = TraitView.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 150 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42623,7 +42710,7 @@ module.exports = TraitView.extend({
 });
 
 /***/ }),
-/* 151 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42678,7 +42765,7 @@ module.exports = TraitView.extend({
 });
 
 /***/ }),
-/* 152 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42725,7 +42812,7 @@ module.exports = TraitView.extend({
 });
 
 /***/ }),
-/* 153 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42770,7 +42857,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 module.exports = function () {
   var c = {};
   var em = void 0;
-  var defaults = __webpack_require__(154);
+  var defaults = __webpack_require__(156);
   var Component = __webpack_require__(3);
   var ComponentView = __webpack_require__(2);
   var Components = __webpack_require__(51);
@@ -42779,72 +42866,72 @@ module.exports = function () {
   var component, componentView;
   var componentTypes = [{
     id: 'cell',
-    model: __webpack_require__(158),
-    view: __webpack_require__(159)
-  }, {
-    id: 'row',
     model: __webpack_require__(160),
     view: __webpack_require__(161)
   }, {
-    id: 'table',
+    id: 'row',
     model: __webpack_require__(162),
     view: __webpack_require__(163)
   }, {
-    id: 'thead',
+    id: 'table',
     model: __webpack_require__(164),
     view: __webpack_require__(165)
   }, {
+    id: 'thead',
+    model: __webpack_require__(166),
+    view: __webpack_require__(167)
+  }, {
     id: 'tbody',
     model: __webpack_require__(20),
-    view: __webpack_require__(166)
-  }, {
-    id: 'tfoot',
-    model: __webpack_require__(167),
     view: __webpack_require__(168)
   }, {
-    id: 'map',
+    id: 'tfoot',
     model: __webpack_require__(169),
     view: __webpack_require__(170)
   }, {
-    id: 'layout',
+    id: 'map',
     model: __webpack_require__(171),
     view: __webpack_require__(172)
   }, {
-    id: 'full-width',
+    id: 'layout',
     model: __webpack_require__(173),
     view: __webpack_require__(174)
   }, {
-    id: 'section1050',
+    id: 'full-width',
     model: __webpack_require__(175),
     view: __webpack_require__(176)
   }, {
-    id: 'link',
+    id: 'section1050',
     model: __webpack_require__(177),
     view: __webpack_require__(178)
   }, {
-    id: 'video',
+    id: 'link',
     model: __webpack_require__(179),
     view: __webpack_require__(180)
+  }, {
+    id: 'video',
+    model: __webpack_require__(181),
+    view: __webpack_require__(182)
   }, {
     id: 'image',
     model: __webpack_require__(21),
     view: __webpack_require__(16)
   }, {
     id: 'region',
-    model: __webpack_require__(181),
-    view: __webpack_require__(182)
-  }, {
-    id: 'script',
     model: __webpack_require__(183),
     view: __webpack_require__(184)
   }, {
-    id: 'svg',
+    id: 'script',
     model: __webpack_require__(185),
     view: __webpack_require__(186)
   }, {
-    id: 'textnode',
+    id: 'svg',
     model: __webpack_require__(187),
     view: __webpack_require__(188)
+  }, {
+    id: 'textnode',
+    model: __webpack_require__(189),
+    view: __webpack_require__(190)
   }, {
     id: 'text',
     model: __webpack_require__(53),
@@ -43276,7 +43363,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 154 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43319,7 +43406,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 155 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43328,8 +43415,8 @@ module.exports = {
 var _underscore = __webpack_require__(1);
 
 var Backbone = __webpack_require__(0);
-var Trait = __webpack_require__(156);
-var TraitFactory = __webpack_require__(157);
+var Trait = __webpack_require__(158);
+var TraitFactory = __webpack_require__(159);
 
 module.exports = Backbone.Collection.extend({
   model: Trait,
@@ -43368,7 +43455,7 @@ module.exports = Backbone.Collection.extend({
 });
 
 /***/ }),
-/* 156 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43464,7 +43551,7 @@ module.exports = __webpack_require__(0).Model.extend({
 });
 
 /***/ }),
-/* 157 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43523,7 +43610,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 158 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43556,7 +43643,7 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 159 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43568,7 +43655,7 @@ var ComponentView = __webpack_require__(2);
 module.exports = ComponentView.extend({});
 
 /***/ }),
-/* 160 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43610,7 +43697,7 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 161 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43622,7 +43709,7 @@ var ComponentView = __webpack_require__(2);
 module.exports = ComponentView.extend({});
 
 /***/ }),
-/* 162 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43688,7 +43775,7 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 163 */
+/* 165 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43764,7 +43851,7 @@ module.exports = ComponentView.extend({
 );
 
 /***/ }),
-/* 164 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43792,31 +43879,31 @@ module.exports = ComponentTableBody.extend({
 });
 
 /***/ }),
-/* 165 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
-
-module.exports = ComponentView.extend({});
-
-/***/ }),
-/* 166 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Backbone = __webpack_require__(0);
-var ComponentView = __webpack_require__(2);
-
-module.exports = ComponentView.extend({});
-
-/***/ }),
 /* 167 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Backbone = __webpack_require__(0);
+var ComponentView = __webpack_require__(2);
+
+module.exports = ComponentView.extend({});
+
+/***/ }),
+/* 168 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Backbone = __webpack_require__(0);
+var ComponentView = __webpack_require__(2);
+
+module.exports = ComponentView.extend({});
+
+/***/ }),
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43844,7 +43931,7 @@ module.exports = ComponentTableBody.extend({
 });
 
 /***/ }),
-/* 168 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43856,7 +43943,7 @@ var ComponentView = __webpack_require__(2);
 module.exports = ComponentView.extend({});
 
 /***/ }),
-/* 169 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43958,7 +44045,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 170 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44010,7 +44097,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 171 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44038,7 +44125,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 172 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44068,7 +44155,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 173 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44110,7 +44197,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 174 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44139,7 +44226,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 175 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44183,7 +44270,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 176 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44213,7 +44300,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 177 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44276,7 +44363,7 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 178 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44302,7 +44389,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 179 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44618,7 +44705,7 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 180 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44746,7 +44833,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 181 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44866,7 +44953,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 182 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44943,7 +45030,7 @@ module.exports = ComponentView.extend({
 );
 
 /***/ }),
-/* 183 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44975,7 +45062,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 184 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45015,7 +45102,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 185 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45054,7 +45141,7 @@ module.exports = Component.extend({
 });
 
 /***/ }),
-/* 186 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45069,7 +45156,7 @@ module.exports = ComponentView.extend({
 });
 
 /***/ }),
-/* 187 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45101,7 +45188,7 @@ module.exports = Component.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 188 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45110,7 +45197,7 @@ module.exports = Component.extend({
 module.exports = __webpack_require__(0).View.extend({});
 
 /***/ }),
-/* 189 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45137,7 +45224,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 190 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45145,7 +45232,7 @@ module.exports = {
 
 var _mixins = __webpack_require__(4);
 
-var _Droppable = __webpack_require__(191);
+var _Droppable = __webpack_require__(193);
 
 var _Droppable2 = _interopRequireDefault(_Droppable);
 
@@ -45153,9 +45240,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(192),
-      Canvas = __webpack_require__(193),
-      CanvasView = __webpack_require__(195);
+      defaults = __webpack_require__(194),
+      Canvas = __webpack_require__(195),
+      CanvasView = __webpack_require__(197);
   var canvas;
   var frameRect;
 
@@ -45588,7 +45675,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 191 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45772,7 +45859,7 @@ var Droppable = function () {
 exports.default = Droppable;
 
 /***/ }),
-/* 192 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45814,14 +45901,14 @@ module.exports = {
 };
 
 /***/ }),
-/* 193 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var Frame = __webpack_require__(194);
+var Frame = __webpack_require__(196);
 
 module.exports = Backbone.Model.extend({
   defaults: {
@@ -45837,7 +45924,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 194 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45855,7 +45942,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 195 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -45863,7 +45950,7 @@ module.exports = Backbone.Model.extend({
 
 var _mixins = __webpack_require__(4);
 
-var FrameView = __webpack_require__(196);
+var FrameView = __webpack_require__(198);
 var $ = Backbone.$;
 
 module.exports = Backbone.View.extend({
@@ -46183,7 +46270,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 196 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46250,7 +46337,7 @@ module.exports = __webpack_require__(0).View.extend({
 });
 
 /***/ }),
-/* 197 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46263,8 +46350,8 @@ module.exports = function () {
   var c = {},
       commands = {},
       defaultCommands = {},
-      defaults = __webpack_require__(198),
-      AbsCommands = __webpack_require__(199);
+      defaults = __webpack_require__(200),
+      AbsCommands = __webpack_require__(201);
 
   // Need it here as it would be used below
   var add = function add(id, obj) {
@@ -46305,32 +46392,32 @@ module.exports = function () {
         if (obj.id) this.add(obj.id, obj);
       }
 
-      var ViewCode = __webpack_require__(200);
+      var ViewCode = __webpack_require__(202);
       defaultCommands['select-comp'] = __webpack_require__(22);
       defaultCommands['create-comp'] = __webpack_require__(23);
-      defaultCommands['delete-comp'] = __webpack_require__(205);
-      defaultCommands['image-comp'] = __webpack_require__(206);
-      defaultCommands['move-comp'] = __webpack_require__(207);
-      defaultCommands['text-comp'] = __webpack_require__(208);
+      defaultCommands['delete-comp'] = __webpack_require__(207);
+      defaultCommands['image-comp'] = __webpack_require__(208);
+      defaultCommands['move-comp'] = __webpack_require__(209);
+      defaultCommands['text-comp'] = __webpack_require__(210);
       defaultCommands['insert-custom'] = __webpack_require__(59);
       defaultCommands['export-template'] = ViewCode;
-      defaultCommands['sw-visibility'] = __webpack_require__(209);
-      defaultCommands['open-layers'] = __webpack_require__(210);
-      defaultCommands['open-sm'] = __webpack_require__(211);
-      defaultCommands['open-tm'] = __webpack_require__(212);
-      defaultCommands['open-blocks'] = __webpack_require__(213);
-      defaultCommands['open-assets'] = __webpack_require__(214);
-      defaultCommands['show-offset'] = __webpack_require__(215);
-      defaultCommands['select-parent'] = __webpack_require__(216);
-      defaultCommands.fullscreen = __webpack_require__(217);
-      defaultCommands.preview = __webpack_require__(218);
-      defaultCommands.resize = __webpack_require__(219);
-      defaultCommands.drag = __webpack_require__(220);
+      defaultCommands['sw-visibility'] = __webpack_require__(211);
+      defaultCommands['open-layers'] = __webpack_require__(212);
+      defaultCommands['open-sm'] = __webpack_require__(213);
+      defaultCommands['open-tm'] = __webpack_require__(214);
+      defaultCommands['open-blocks'] = __webpack_require__(215);
+      defaultCommands['open-assets'] = __webpack_require__(216);
+      defaultCommands['show-offset'] = __webpack_require__(217);
+      defaultCommands['select-parent'] = __webpack_require__(218);
+      defaultCommands.fullscreen = __webpack_require__(219);
+      defaultCommands.preview = __webpack_require__(220);
+      defaultCommands.resize = __webpack_require__(221);
+      defaultCommands.drag = __webpack_require__(222);
 
       //custom
-      defaultCommands['build-component'] = __webpack_require__(221);
-      defaultCommands['open-table-editor'] = __webpack_require__(222);
-      defaultCommands['open-region-editor'] = __webpack_require__(223);
+      defaultCommands['build-component'] = __webpack_require__(223);
+      defaultCommands['open-table-editor'] = __webpack_require__(224);
+      defaultCommands['open-region-editor'] = __webpack_require__(225);
 
       defaultCommands['tlb-delete'] = {
         run: function run(ed) {
@@ -46346,7 +46433,7 @@ module.exports = function () {
         }
       };
 
-      defaultCommands['maincolor'] = __webpack_require__(224);
+      defaultCommands['maincolor'] = __webpack_require__(226);
 
       defaultCommands['save'] = {
         run: function run(editor) {
@@ -46722,7 +46809,7 @@ module.exports = function () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 198 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46752,7 +46839,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 199 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46878,7 +46965,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 200 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46940,7 +47027,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 201 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -46948,7 +47035,7 @@ module.exports = {
 
 var Backbone = __webpack_require__(0);
 var DomainViews = __webpack_require__(50);
-var ToolbarButtonView = __webpack_require__(202);
+var ToolbarButtonView = __webpack_require__(204);
 
 module.exports = DomainViews.extend({
   itemView: ToolbarButtonView,
@@ -46960,7 +47047,7 @@ module.exports = DomainViews.extend({
 });
 
 /***/ }),
-/* 202 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47006,19 +47093,19 @@ module.exports = Backbone.View.extend({
 });
 
 /***/ }),
-/* 203 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var ToolbarButton = __webpack_require__(204);
+var ToolbarButton = __webpack_require__(206);
 
 module.exports = Backbone.Collection.extend({ model: ToolbarButton });
 
 /***/ }),
-/* 204 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47034,7 +47121,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 205 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47117,7 +47204,7 @@ module.exports = _.extend({}, SelectComponent, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 206 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47157,7 +47244,7 @@ module.exports = _.extend({}, InsertCustom, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 207 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47324,7 +47411,7 @@ module.exports = _.extend({}, SelectPosition, SelectComponent, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 208 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47360,7 +47447,7 @@ module.exports = _.extend({}, CreateComponent, {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 209 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47376,7 +47463,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 210 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47409,7 +47496,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 211 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47488,7 +47575,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 212 */
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47552,7 +47639,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 213 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47582,7 +47669,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 214 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47616,7 +47703,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 215 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47771,7 +47858,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 216 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47792,7 +47879,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 217 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47865,7 +47952,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 218 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47934,7 +48021,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 219 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47971,7 +48058,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 220 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48009,7 +48096,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 221 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48316,7 +48403,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 222 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48477,7 +48564,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 223 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48515,7 +48602,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 224 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48604,7 +48691,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 225 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48614,10 +48701,10 @@ var _underscore = __webpack_require__(1);
 
 module.exports = function () {
   var c = {},
-      defaults = __webpack_require__(226),
-      Blocks = __webpack_require__(227),
-      BlockCategories = __webpack_require__(229),
-      BlocksView = __webpack_require__(230);
+      defaults = __webpack_require__(228),
+      Blocks = __webpack_require__(229),
+      BlockCategories = __webpack_require__(231),
+      BlocksView = __webpack_require__(232);
   var blocks, blocksVisible, blocksView;
   var categories = [];
 
@@ -48859,7 +48946,7 @@ module.exports = function () {
     */
 
 /***/ }),
-/* 226 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48877,21 +48964,21 @@ module.exports = _defineProperty({
 }, 'appendTo', '');
 
 /***/ }),
-/* 227 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var Backbone = __webpack_require__(0);
-var Block = __webpack_require__(228);
+var Block = __webpack_require__(230);
 
 module.exports = Backbone.Collection.extend({
   model: Block
 });
 
 /***/ }),
-/* 228 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48926,7 +49013,7 @@ module.exports = Backbone.Model.extend({
 });
 
 /***/ }),
-/* 229 */
+/* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48939,7 +49026,7 @@ module.exports = Backbone.Collection.extend({
 });
 
 /***/ }),
-/* 230 */
+/* 232 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48947,8 +49034,8 @@ module.exports = Backbone.Collection.extend({
 
 var _underscore = __webpack_require__(1);
 
-var BlockView = __webpack_require__(231);
-var CategoryView = __webpack_require__(232);
+var BlockView = __webpack_require__(233);
+var CategoryView = __webpack_require__(234);
 
 module.exports = __webpack_require__(0).View.extend({
   initialize: function initialize(opts, config) {
@@ -49133,7 +49220,7 @@ module.exports = __webpack_require__(0).View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 231 */
+/* 233 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49234,7 +49321,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(1)))
 
 /***/ }),
-/* 232 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49311,7 +49398,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 233 */
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49631,7 +49718,7 @@ module.exports = function (_ref) {
 };
 
 /***/ }),
-/* 234 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49679,7 +49766,7 @@ module.exports = Backbone.View.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 235 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49723,7 +49810,7 @@ exports.default = function () {
 };
 
 /***/ }),
-/* 236 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49731,7 +49818,7 @@ exports.default = function () {
 
 module.exports = function (config) {
   var c = config || {},
-      defaults = __webpack_require__(237);
+      defaults = __webpack_require__(239);
 
   // Set default options
   for (var name in defaults) {
@@ -49789,7 +49876,7 @@ module.exports = function (config) {
 };
 
 /***/ }),
-/* 237 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
