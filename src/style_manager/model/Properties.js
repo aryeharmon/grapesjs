@@ -5,16 +5,16 @@ module.exports = require('backbone')
   .Collection.extend(TypeableCollection)
   .extend({
     types: [
-    {
-      id: 'main-color',
-      model: Property,
-      view: require('./../view/PropertyMainColorView'),
-      isType(value) {
-        if (value && value.type == 'main-color') {
-          return value;
+      {
+        id: 'main-color',
+        model: Property,
+        view: require('./../view/PropertyMainColorView'),
+        isType(value) {
+          if (value && value.type == 'main-color') {
+            return value;
+          }
         }
-      }
-    },
+      },
       {
         id: 'stack',
         model: require('./PropertyStack'),
@@ -70,7 +70,7 @@ module.exports = require('backbone')
         model: require('./PropertySelectAnimation'),
         view: require('./../view/PropertySelectAnimationView'),
         isType(value) {
-          if (value && value.type == 'select') {
+          if (value && value.type == 'selectAnimation') {
             return value;
           }
         }
@@ -120,10 +120,10 @@ module.exports = require('backbone')
         view: require('./../view/PropertyRadioPositionView'), // 1. copy these js files and create them. ok let me know when done and i will continue helping you, ok
         isType(value) {
           if (value && value.type == 'radio-position') {
-              return value;
+            return value;
           }
         }
-      },
+      }
     ],
 
     deepClone() {

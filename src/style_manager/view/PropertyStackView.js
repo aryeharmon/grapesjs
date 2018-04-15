@@ -41,8 +41,6 @@ module.exports = PropertyCompositeView.extend({
     } else {
       this.checkVisibility();
     }
-
-    this.refreshLayers();
   },
 
   /**

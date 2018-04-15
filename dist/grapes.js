@@ -93,7 +93,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
   // Set up Backbone appropriately for the environment. Start with AMD.
   if (true) {
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(11), exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function(_, $, exports) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(12), exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function(_, $, exports) {
       // Export global even in AMD case in case this script is loaded with
       // others that may still expect a global Backbone.
       root.Backbone = factory(root, exports, _, $);
@@ -1999,7 +1999,7 @@ return /******/ (function(modules) { // webpackBootstrap
   return Backbone;
 });
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
 /* 1 */
@@ -3941,7 +3941,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var Backbone = __webpack_require__(0);
 var Components = __webpack_require__(51);
-var Selector = __webpack_require__(8);
+var Selector = __webpack_require__(9);
 var Selectors = __webpack_require__(13);
 var Traits = __webpack_require__(157);
 var componentList = {};
@@ -4103,7 +4103,7 @@ var Component = Backbone.Model.extend(_Styleable2.default).extend({
     this.opt = opt;
     this.em = em;
     this.config = opt.config || {};
-    this.ccid = Component.createId(this);
+    // this.ccid = Component.createId(this);
     this.set('attributes', this.get('attributes') || {});
     this.on('remove', this.handleRemove);
     this.listenTo(this, 'change:script', this.scriptUpdated);
@@ -4301,7 +4301,7 @@ var Component = Backbone.Model.extend(_Styleable2.default).extend({
 
     // If style is not empty I need an ID attached to the component
     if (!(0, _underscore.isEmpty)(this.getStyle()) && !(0, _underscore.has)(attributes, 'id')) {
-      attributes.id = this.getId();
+      // attributes.id = this.getId();
     }
 
     return attributes;
@@ -4813,7 +4813,7 @@ var Component = Backbone.Model.extend(_Styleable2.default).extend({
     // Testing 1000000 components with `+ 2` returns 0 collisions
     var ilen = componentIndex.toString().length + 2;
     var uid = (Math.random() + 1.1).toString(36).slice(-ilen);
-    var nextId = 'i' + uid;
+    var nextId = 'ddddi' + uid;
     componentList[nextId] = model;
     return nextId;
   },
@@ -10683,8 +10683,7 @@ function makeChangeInner(doc, change) {
 
 // Revert a change stored in a document's history.
 function makeChangeFromHistory(doc, type, allowSelectionOnly) {
-  var suppress = doc.cm && doc.cm.state.suppressEdits;
-  if (suppress && !allowSelectionOnly) { return }
+  if (doc.cm && doc.cm.state.suppressEdits && !allowSelectionOnly) { return }
 
   var hist = doc.history, event, selAfter = doc.sel;
   var source = type == "undo" ? hist.done : hist.undone, dest = type == "undo" ? hist.undone : hist.done;
@@ -10709,10 +10708,8 @@ function makeChangeFromHistory(doc, type, allowSelectionOnly) {
         return
       }
       selAfter = event;
-    } else if (suppress) {
-      source.push(event);
-      return
-    } else { break }
+    }
+    else { break }
   }
 
   // Build up a reverse change object to add to the opposite history
@@ -11188,7 +11185,7 @@ function addLineWidget(doc, handle, node, options) {
     }
     return true
   });
-  if (cm) { signalLater(cm, "lineWidgetAdded", cm, widget, typeof handle == "number" ? handle : lineNo(handle)); }
+  signalLater(cm, "lineWidgetAdded", cm, widget, typeof handle == "number" ? handle : lineNo(handle));
   return widget
 }
 
@@ -15123,7 +15120,7 @@ CodeMirror$1.fromTextArea = fromTextArea;
 
 addLegacyProps(CodeMirror$1);
 
-CodeMirror$1.version = "5.35.0";
+CodeMirror$1.version = "5.34.0";
 
 return CodeMirror$1;
 
@@ -15291,6 +15288,33 @@ module.exports = __webpack_require__(0).Model.extend({
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15376,7 +15400,7 @@ var Selector = Backbone.Model.extend({
 module.exports = Selector;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15421,7 +15445,7 @@ module.exports = PropertyView.extend({
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15587,7 +15611,7 @@ module.exports = Backbone.View.extend({
 });
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16555,33 +16579,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;
 });
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16590,7 +16587,7 @@ module.exports = g;
 
 var _underscore = __webpack_require__(1);
 
-var Selector = __webpack_require__(8);
+var Selector = __webpack_require__(9);
 
 module.exports = __webpack_require__(0).Collection.extend({
   model: Selector,
@@ -16692,7 +16689,7 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
     model: __webpack_require__(128),
     view: __webpack_require__(129),
     isType: function isType(value) {
-      if (value && value.type == 'select') {
+      if (value && value.type == 'selectAnimation') {
         return value;
       }
     }
@@ -16717,7 +16714,7 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
   }, {
     id: 'integer',
     model: __webpack_require__(43),
-    view: __webpack_require__(9),
+    view: __webpack_require__(10),
     isType: function isType(value) {
       if (value && value.type == 'integer') {
         return value;
@@ -16787,7 +16784,7 @@ module.exports = __webpack_require__(0).Collection.extend(_TypeableCollection2.d
 /* WEBPACK VAR INJECTION */(function(Backbone) {
 
 var PropertyView = __webpack_require__(5);
-var PropertyIntegerView = __webpack_require__(9);
+var PropertyIntegerView = __webpack_require__(10);
 var PropertyRadioView = __webpack_require__(38);
 var PropertySelectView = __webpack_require__(39);
 var PropertyColorView = __webpack_require__(40);
@@ -17055,7 +17052,7 @@ module.exports = Input.extend({
                   var prop = css[i].split(':');
                   if (prop.length == 2 && prop[0].indexOf('--') == 1) {
                     palette.push(prop[1]);
-                    window.css_map[prop[1]] = prop[0];
+                    window.css_map[prop[1].replace(/\s/g, '')] = prop[0];
                   }
                 }
               }
@@ -17078,13 +17075,15 @@ module.exports = Input.extend({
         move: function move(color) {
           var cl = getColor(color);
           cpStyle.backgroundColor = cl;
-          model.setValueFromInput(window.css_map[cl] ? 'var(' + window.css_map[cl] + ')' : cl, 0);
+
+          model.setValueFromInput(window.css_map[cl.replace(/\s/g, '')] ? 'var(' + window.css_map[cl.replace(/\s/g, '')] + ')' : cl, 0);
         },
         change: function change(color) {
           changed = 1;
           var cl = getColor(color);
+
           cpStyle.backgroundColor = cl;
-          model.setValueFromInput(window.css_map[cl] ? 'var(' + window.css_map[cl] + ')' : cl);
+          model.setValueFromInput(window.css_map[cl.replace(/\s/g, '')] ? 'var(' + window.css_map[cl.replace(/\s/g, '')] + ')' : cl);
           self.noneColor = 0;
         },
         show: function show(color) {
@@ -23351,8 +23350,6 @@ module.exports = PropertyCompositeView.extend({
     } else {
       this.checkVisibility();
     }
-
-    this.refreshLayers();
   },
 
 
@@ -23608,7 +23605,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var InputColor = __webpack_require__(17);
 
-module.exports = __webpack_require__(9).extend({
+module.exports = __webpack_require__(10).extend({
   setValue: function setValue(value) {
     var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -26087,7 +26084,7 @@ module.exports = function parse_str(str, array) {
   }
 };
 //# sourceMappingURL=parse_str.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
 /* 61 */
@@ -26116,7 +26113,7 @@ module.exports = Backbone.Model.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _cashDom = __webpack_require__(11);
+var _cashDom = __webpack_require__(12);
 
 var _cashDom2 = _interopRequireDefault(_cashDom);
 
@@ -26160,7 +26157,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.51',
+    version: '0.14.108',
 
     /**
      * Initializes an editor based on passed options
@@ -26216,7 +26213,7 @@ module.exports = function () {
 "use strict";
 
 
-var _cashDom = __webpack_require__(11);
+var _cashDom = __webpack_require__(12);
 
 var _cashDom2 = _interopRequireDefault(_cashDom);
 
@@ -30915,7 +30912,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
   // Set up Backbone appropriately for the environment. Start with AMD.
   if (true) {
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(11), exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function(_, $, exports) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(12), exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function(_, $, exports) {
       // Export global even in AMD case in case this script is loaded with
       // others that may still expect a global Backbone.
       root.Backbone = factory(root, exports, _, $);
@@ -32774,7 +32771,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 }));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
 /* 74 */
@@ -33572,7 +33569,7 @@ module.exports = __webpack_require__(0).Model.extend({
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var apply = Function.prototype.apply;
+/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
 
 // DOM APIs, for completeness
 
@@ -33623,9 +33620,17 @@ exports._unrefActive = exports.active = function(item) {
 
 // setimmediate attaches itself to the global object
 __webpack_require__(80);
-exports.setImmediate = setImmediate;
-exports.clearImmediate = clearImmediate;
+// On some exotic environments, it's not clear which object `setimmeidate` was
+// able to install onto.  Search each possibility in the same order as the
+// `setimmediate` library.
+exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+                       (typeof global !== "undefined" && global.setImmediate) ||
+                       (this && this.setImmediate);
+exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+                         (typeof global !== "undefined" && global.clearImmediate) ||
+                         (this && this.clearImmediate);
 
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
 /* 80 */
@@ -33818,7 +33823,7 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(81)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(81)))
 
 /***/ }),
 /* 81 */
@@ -34639,7 +34644,7 @@ module.exports = function (config) {
 
   var c = config || {},
       defaults = __webpack_require__(91),
-      Selector = __webpack_require__(8),
+      Selector = __webpack_require__(9),
       Selectors = __webpack_require__(13),
       ClassTagsView = __webpack_require__(92);
   var selectors, selectorTags;
@@ -35161,7 +35166,7 @@ module.exports = Backbone.View.extend({
 "use strict";
 
 
-var Selector = __webpack_require__(8);
+var Selector = __webpack_require__(9);
 var inputProp = 'contentEditable';
 
 module.exports = __webpack_require__(0).View.extend({
@@ -37179,7 +37184,6 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
     if (type == "{") return contCommasep(objprop, "}", null, maybeop);
     if (type == "quasi") return pass(quasi, maybeop);
     if (type == "new") return cont(maybeTarget(noComma));
-    if (type == "import") return cont(expression);
     return cont();
   }
   function maybeexpression(type) {
@@ -37374,7 +37378,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   }
   function afterType(type, value) {
     if (value == "<") return cont(pushlex(">"), commasep(typeexpr, ">"), poplex, afterType)
-    if (value == "|" || type == "." || value == "&") return cont(typeexpr)
+    if (value == "|" || type == ".") return cont(typeexpr)
     if (type == "[") return cont(expect("]"), afterType)
     if (value == "extends" || value == "implements") { cx.marked = "keyword"; return cont(typeexpr) }
   }
@@ -37417,8 +37421,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   function maybeelse(type, value) {
     if (type == "keyword b" && value == "else") return cont(pushlex("form", "else"), statement, poplex);
   }
-  function forspec(type, value) {
-    if (value == "await") return cont(forspec);
+  function forspec(type) {
     if (type == "(") return cont(pushlex(")"), forspec1, expect(")"), poplex);
   }
   function forspec1(type) {
@@ -37507,7 +37510,6 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   }
   function afterImport(type) {
     if (type == "string") return cont();
-    if (type == "(") return pass(expression);
     return pass(importSpec, maybeMoreImports, maybeFrom);
   }
   function importSpec(type, value) {
@@ -39449,7 +39451,25 @@ module.exports = Backbone.Model.extend({
 var Backbone = __webpack_require__(0);
 var InputColor = __webpack_require__(17);
 
-module.exports = __webpack_require__(9).extend({
+module.exports = __webpack_require__(10).extend({
+  targetUpdated: function targetUpdated(value) {
+    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    var that = this;
+    var em = this.em;
+    var editor = em ? em.get('Editor') : '';
+
+    opts = Object.assign({}, opts, { silent: 1 });
+
+    for (var i = 0; i < editor.CssComposer.getAll().models.length; i++) {
+      if (editor.CssComposer.getAll().models[i].attributes.selectorsAdd === ':root') {
+        var root_style = editor.CssComposer.getAll().models[i];
+      }
+    }
+    if (root_style) {
+      this.inputInst.setValue(root_style.attributes.style[this.property], opts);
+    }
+  },
   setValue: function setValue(value) {
     var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -40032,7 +40052,27 @@ module.exports = Property.extend({
   defaults: _extends({}, Property.prototype.defaults, {
     // Array of options, eg. [{name: 'Label ', value: '100'}]
     options: []
-  })
+  }),
+  init: function init() {
+    // bounceOut
+  },
+  // init
+  clearValue: function clearValue(opts) {
+    $('.animation-select').val('');
+    var selected = window.editor.getSelected();
+
+    selected.removeClass(['animated']);
+
+    window.aryeh = this;
+    if (this.get('value')) {
+      selected.removeClass([this.get('value')]);
+    }
+
+    this.set({ value: undefined }, opts);
+    this.targetUpdated();
+  }
+
+  // getFullValue
 });
 
 /***/ }),
@@ -40045,6 +40085,27 @@ module.exports = Property.extend({
 var $ = Backbone.$;
 
 module.exports = __webpack_require__(5).extend({
+  targetUpdated: function targetUpdated() {
+
+    var values = ['bounce', 'flash', 'pulse', 'rubberBand', 'shake', 'swing', 'tada', 'wobble', 'jello', 'bounceIn', 'bounceInDown', 'bounceInLeft', 'bounceInRight', 'bounceInUp', 'bounceOut', 'bounceOutDown', 'bounceOutLeft', 'bounceOutRight', 'bounceOutUp', 'fadeIn', 'fadeInDown', 'fadeInDownBig', 'fadeInLeft', 'fadeInLeftBig', 'fadeInRight', 'fadeInRightBig', 'fadeInUp', 'fadeInUpBig', 'fadeOut', 'fadeOutDown', 'fadeOutDownBig', 'fadeOutLeft', 'fadeOutLeftBig', 'fadeOutRight', 'fadeOutRightBig', 'fadeOutUp', 'fadeOutUpBig', 'flip', 'flipInX', 'flipInY', 'flipOutX', 'flipOutY', 'lightSpeedIn', 'lightSpeedOut', 'rotateIn', 'rotateInDownLeft', 'rotateInDownRight', 'rotateInUpLeft', 'rotateInUpRight', 'rotateOut', 'rotateOutDownLeft', 'rotateOutDownRight', 'rotateOutUpLeft', 'rotateOutUpRight', 'slideInUp', 'slideInDown', 'slideInLeft', 'slideInRight', 'slideOutUp', 'slideOutDown', 'slideOutLeft', 'slideOutRight', 'zoomIn', 'zoomInDown', 'zoomInLeft', 'zoomInRight', 'zoomInUp', 'zoomOut', 'zoomOutDown', 'zoomOutLeft', 'zoomOutRight', 'zoomOutUp', 'hinge', 'jackInTheBox', 'rollIn', 'rollOut'];
+
+    if (window.editor) {
+      // alert(window.editor.getSelected().view.$el.attr('class'))
+      for (var n = 0; n < values.length; n++) {
+        if (window.editor.getSelected().view.$el.is('.' + values[n])) {
+          // $('.animation-select').val(values[n]);
+          window.aryeh = this.model;
+          this.model.set('value', values[n], {});
+          // this.refreshLayers();
+          return;
+        }
+      }
+    }
+
+    // this.refreshLayers();
+
+    // alert(333);
+  },
   templateInput: function templateInput() {
     var pfx = this.pfx;
     var ppfx = this.ppfx;
@@ -40054,6 +40115,8 @@ module.exports = __webpack_require__(5).extend({
     var pfx = this.pfx;
     var model = this.model;
     var options = model.get('list') || model.get('options') || [];
+
+    // $('.animation-select').val('bounceOutLeft');
 
     if (!this.input) {
       var optionsStr = '';
@@ -40115,7 +40178,7 @@ module.exports = Property.extend({
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var Property = __webpack_require__(9);
+var Property = __webpack_require__(10);
 
 module.exports = Property.extend({
   events: function events() {
@@ -41846,7 +41909,7 @@ module.exports = function () {
       CssRules = __webpack_require__(145),
       CssRulesView = __webpack_require__(146);
   var Selectors = __webpack_require__(13);
-  var Selector = __webpack_require__(8);
+  var Selector = __webpack_require__(9);
 
   var rules, rulesView;
 
@@ -42539,7 +42602,7 @@ module.exports = {
 
 
 var DomainViews = __webpack_require__(50);
-var TraitView = __webpack_require__(10);
+var TraitView = __webpack_require__(11);
 var TraitSelectView = __webpack_require__(151);
 var TraitCheckboxView = __webpack_require__(152);
 var TraitNumberView = __webpack_require__(153);
@@ -42592,7 +42655,7 @@ module.exports = DomainViews.extend({
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Backbone, _) {
 
-var TraitView = __webpack_require__(10);
+var TraitView = __webpack_require__(11);
 var $ = Backbone.$;
 
 module.exports = TraitView.extend({
@@ -42661,7 +42724,7 @@ module.exports = TraitView.extend({
 "use strict";
 
 
-var TraitView = __webpack_require__(10);
+var TraitView = __webpack_require__(11);
 
 module.exports = TraitView.extend({
   initialize: function initialize(o) {
@@ -42716,7 +42779,7 @@ module.exports = TraitView.extend({
 "use strict";
 
 
-var TraitView = __webpack_require__(10);
+var TraitView = __webpack_require__(11);
 var InputNumber = __webpack_require__(18);
 
 module.exports = TraitView.extend({
@@ -42771,7 +42834,7 @@ module.exports = TraitView.extend({
 "use strict";
 
 
-var TraitView = __webpack_require__(10);
+var TraitView = __webpack_require__(11);
 var InputColor = __webpack_require__(17);
 
 module.exports = TraitView.extend({
@@ -43514,6 +43577,7 @@ module.exports = __webpack_require__(0).Model.extend({
     } else {
       var attrs = _extends({}, target.get('attributes'));
       attrs[name] = value;
+      alert(123);
       target.set('attributes', attrs);
     }
   },
@@ -48660,6 +48724,7 @@ module.exports = {
         color: $(this).data('color'),
         preferredFormat: "hex",
         showInput: true,
+        showAlpha: true,
         showPalette: true,
         move: function move(color) {
           setValue(that, color);

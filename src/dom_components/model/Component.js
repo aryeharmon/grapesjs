@@ -112,7 +112,12 @@ const Component = Backbone.Model.extend(Styleable).extend(
       script: '',
 
       // Traits
-      traits: ['id', 'title', 'data-angular', {type: 'text', name: 'ng-repeat', label: 'repeat'}],
+      traits: [
+        'id',
+        'title',
+        'data-angular',
+        { type: 'text', name: 'ng-repeat', label: 'repeat' }
+      ],
 
       // Indicates an array of properties which will be inhereted by
       // all NEW appended children
@@ -174,7 +179,7 @@ const Component = Backbone.Model.extend(Styleable).extend(
       this.opt = opt;
       this.em = em;
       this.config = opt.config || {};
-      this.ccid = Component.createId(this);
+      // this.ccid = Component.createId(this);
       this.set('attributes', this.get('attributes') || {});
       this.on('remove', this.handleRemove);
       this.listenTo(this, 'change:script', this.scriptUpdated);
@@ -352,7 +357,7 @@ const Component = Backbone.Model.extend(Styleable).extend(
 
       // If style is not empty I need an ID attached to the component
       if (!isEmpty(this.getStyle()) && !has(attributes, 'id')) {
-        attributes.id = this.getId();
+        // attributes.id = this.getId();
       }
 
       return attributes;
@@ -552,34 +557,35 @@ const Component = Backbone.Model.extend(Styleable).extend(
           });
         }
 
-        if(model.getName() === 'Group' || model.getName() === 'Layout') {
+        if (model.getName() === 'Group' || model.getName() === 'Layout') {
           tb.push({
-            attributes: {class: 'fa fa-floppy-o'},
-            command: 'save',
+            attributes: { class: 'fa fa-floppy-o' },
+            command: 'save'
           });
         }
-        if(model.getName() === 'Layout') {
+        if (model.getName() === 'Layout') {
           tb.push({
-            attributes: {class: 'fa fa-unlink'},
+            attributes: { class: 'fa fa-unlink' },
             command: function(editor) {
               var attr = editor.getSelected().getAttributes();
               delete attr['data-layout'];
               editor.getSelected().setAttributes(attr);
               editor.getSelected().view.$el.removeAttr('data-layout');
-            },
+            }
           });
         }
 
         tb.push({
-          attributes: {class: 'fa fa-text-height'},
+          attributes: { class: 'fa fa-text-height' },
           command: function() {
-            editor.getSelected().allow_height = !editor.getSelected().allow_height;
+            editor.getSelected().allow_height = !editor.getSelected()
+              .allow_height;
             if (editor.getSelected().allow_height) {
               window.toastr.warning('Edit Height Enabled');
             } else {
               window.toastr.warning('Edit Height Disabled');
             }
-          },
+          }
         });
 
         model.set('toolbar', tb);
@@ -839,7 +845,7 @@ const Component = Backbone.Model.extend(Styleable).extend(
       // Testing 1000000 components with `+ 2` returns 0 collisions
       const ilen = componentIndex.toString().length + 2;
       const uid = (Math.random() + 1.1).toString(36).slice(-ilen);
-      const nextId = 'i' + uid;
+      const nextId = 'ddddi' + uid;
       componentList[nextId] = model;
       return nextId;
     },

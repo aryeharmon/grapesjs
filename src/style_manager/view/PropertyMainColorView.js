@@ -2,18 +2,40 @@ var Backbone = require('backbone');
 var InputColor = require('domain_abstract/ui/InputColor');
 
 module.exports = require('./PropertyIntegerView').extend({
+  targetUpdated(value, opts = {}) {
+    var that = this;
+    var em = this.em;
+    var editor = em ? em.get('Editor') : '';
+
+    opts = Object.assign({}, opts, { silent: 1 });
+
+    for (var i = 0; i < editor.CssComposer.getAll().models.length; i++) {
+      if (
+        editor.CssComposer.getAll().models[i].attributes.selectorsAdd ===
+        ':root'
+      ) {
+        var root_style = editor.CssComposer.getAll().models[i];
+      }
+    }
+    if (root_style) {
+      this.inputInst.setValue(root_style.attributes.style[this.property], opts);
+    }
+  },
 
   setValue(value, opts = {}) {
     var that = this;
     var em = this.em;
     var editor = em ? em.get('Editor') : '';
 
-    opts = Object.assign({}, opts, {silent: 1});
+    opts = Object.assign({}, opts, { silent: 1 });
 
     for (var i = 0; i < editor.CssComposer.getAll().models.length; i++) {
-        if (editor.CssComposer.getAll().models[i].attributes.selectorsAdd === ':root') {
-            var root_style = editor.CssComposer.getAll().models[i];
-        }
+      if (
+        editor.CssComposer.getAll().models[i].attributes.selectorsAdd ===
+        ':root'
+      ) {
+        var root_style = editor.CssComposer.getAll().models[i];
+      }
     }
     if (root_style) {
       this.inputInst.setValue(root_style.attributes.style[this.property], opts);
@@ -25,25 +47,29 @@ module.exports = require('./PropertyIntegerView').extend({
     var editor = em ? em.get('Editor') : '';
 
     this.onChange = function(target, that, opt, value) {
-
-        for (var i = 0; i < editor.CssComposer.getAll().models.length; i++) {
-            if (editor.CssComposer.getAll().models[i].attributes.selectorsAdd === ':root') {
-                var root_style = editor.CssComposer.getAll().models[i];
-            }
+      for (var i = 0; i < editor.CssComposer.getAll().models.length; i++) {
+        if (
+          editor.CssComposer.getAll().models[i].attributes.selectorsAdd ===
+          ':root'
+        ) {
+          var root_style = editor.CssComposer.getAll().models[i];
         }
+      }
 
-        if (!that.input.value) {
-          return;
-        }
+      if (!that.input.value) {
+        return;
+      }
 
-        root_style.attributes.style[that.property] = that.input.value;
-        root_style.setStyle(root_style.attributes.style, opt); // update css composer
+      root_style.attributes.style[that.property] = that.input.value;
+      root_style.setStyle(root_style.attributes.style, opt); // update css composer
 
-        var iframe = window.$('.gjs-frame')[0];
-        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-        
-        window.$(innerDoc).find(':root').css(that.property, that.input.value);
+      var iframe = window.$('.gjs-frame')[0];
+      var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
 
+      window
+        .$(innerDoc)
+        .find(':root')
+        .css(that.property, that.input.value);
     };
 
     if (!this.input) {
@@ -59,6 +85,5 @@ module.exports = require('./PropertyIntegerView').extend({
       this.input = this.$input.get(0);
       this.inputInst = input;
     }
-  },
-
+  }
 });

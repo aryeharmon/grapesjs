@@ -28,18 +28,23 @@ module.exports = {
     var template = _.template(that.template);
 
     for (var i = 0; i < editor.CssComposer.getAll().models.length; i++) {
-        if (editor.CssComposer.getAll().models[i].attributes.selectorsAdd === ':root') {
-            var root_style = editor.CssComposer.getAll().models[i];
-        }
+      if (
+        editor.CssComposer.getAll().models[i].attributes.selectorsAdd ===
+        ':root'
+      ) {
+        var root_style = editor.CssComposer.getAll().models[i];
+      }
     }
 
     this.modal = editor.Modal || null;
     this.modal.setTitle('Color Manager');
 
-    this.modal.setContent(template({
-      styles: root_style.attributes.style,
-      editor_settings: editor_settings,
-    }));
+    this.modal.setContent(
+      template({
+        styles: root_style.attributes.style,
+        editor_settings: editor_settings
+      })
+    );
 
     function setValue(that, color) {
       var property = $(that).data('property');
@@ -53,13 +58,14 @@ module.exports = {
       innerDoc.documentElement.style.setProperty(property, color);
     }
 
-    $(".colorpicker").each(function() {
+    $('.colorpicker').each(function() {
       var that = this;
 
       $(this).spectrum({
         color: $(this).data('color'),
-        preferredFormat: "hex",
+        preferredFormat: 'hex',
         showInput: true,
+        showAlpha: true,
         showPalette: true,
         move: function(color) {
           setValue(that, color);
@@ -72,7 +78,7 @@ module.exports = {
         },
         hide: function(color) {
           setValue(that, color);
-        },
+        }
       });
     });
 
@@ -83,8 +89,8 @@ module.exports = {
         root_style.setStyle(root_style.attributes.style, {});
         that.render(editor);
       }
-    })
+    });
 
     this.modal.open();
-  },
+  }
 };

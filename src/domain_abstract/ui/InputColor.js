@@ -35,8 +35,15 @@ module.exports = Input.extend({
     var original_val = val;
 
     if (window.editor) {
-      for (var i = 0; i < window.editor.CssComposer.getAll().models.length; i++) {
-        if (window.editor.CssComposer.getAll().models[i].attributes.selectorsAdd === ':root') {
+      for (
+        var i = 0;
+        i < window.editor.CssComposer.getAll().models.length;
+        i++
+      ) {
+        if (
+          window.editor.CssComposer.getAll().models[i].attributes
+            .selectorsAdd === ':root'
+        ) {
           var root_style = window.editor.CssComposer.getAll().models[i];
           if (val.indexOf('var(') > -1) {
             var variable = val.replace('var(', '').replace(')', '');
@@ -73,11 +80,14 @@ module.exports = Input.extend({
       var colorEl = $(`<div class="${this.ppfx}field-color-picker"></div>`);
       var cpStyle = colorEl.get(0).style;
       var elToAppend = this.em && this.em.config ? this.em.config.el : '';
-      var colorPickerConfig = this.em && this.em.getConfig && this.em.getConfig("colorPicker") || {};
+      var colorPickerConfig =
+        (this.em && this.em.getConfig && this.em.getConfig('colorPicker')) ||
+        {};
       const getColor = color => {
-        let cl = color.getAlpha() == 1 ? color.toHexString() : color.toRgbString();
+        let cl =
+          color.getAlpha() == 1 ? color.toHexString() : color.toRgbString();
         return cl.replace(/ /g, '');
-      }
+      };
 
       let changed = 0;
       let previousColor;
@@ -88,27 +98,31 @@ module.exports = Input.extend({
       var palette = [];
       var iframe = window.$('.gjs-frame')[0];
       if (iframe) {
-
-      var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-      var allCSS = [].slice.call(innerDoc.styleSheets)
-        .reduce(function(prev, styleSheet) {
-          if (!styleSheet.href) {
-            return prev + [].slice.call(styleSheet.cssRules)
-              .reduce(function(prev, cssRule) {
-                if (cssRule.selectorText == ':root') {
-                  var css = cssRule.cssText.split('{');
-                  css = css[1].replace('}','').split(';');
-                  for (var i = 0; i < css.length; i++) {
-                    var prop = css[i].split(':');
-                    if (prop.length == 2 && prop[0].indexOf('--') == 1) {
-                      palette.push(prop[1]);
-                      window.css_map[prop[1]] = prop[0];
+        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+        var allCSS = [].slice
+          .call(innerDoc.styleSheets)
+          .reduce(function(prev, styleSheet) {
+            if (!styleSheet.href) {
+              return (
+                prev +
+                [].slice
+                  .call(styleSheet.cssRules)
+                  .reduce(function(prev, cssRule) {
+                    if (cssRule.selectorText == ':root') {
+                      var css = cssRule.cssText.split('{');
+                      css = css[1].replace('}', '').split(';');
+                      for (var i = 0; i < css.length; i++) {
+                        var prop = css[i].split(':');
+                        if (prop.length == 2 && prop[0].indexOf('--') == 1) {
+                          palette.push(prop[1]);
+                          window.css_map[prop[1].replace(/\s/g, '')] = prop[0];
+                        }
+                      }
                     }
-                  }
-                }
-              }, '');
-          }
-        }, '');
+                  }, '')
+              );
+            }
+          }, '');
       }
       // end edits
 
@@ -117,25 +131,34 @@ module.exports = Input.extend({
         appendTo: elToAppend || 'body',
         maxSelectionSize: 8,
         showPalette: true,
-        showAlpha:   true,
+        showAlpha: true,
         chooseText: 'Ok',
         cancelText: '⨯',
-        palette: [
-            palette
-        ],
+        palette: [palette],
         // config expanded here so that the functions below are not overridden
         ...colorPickerConfig,
 
         move(color) {
           const cl = getColor(color);
           cpStyle.backgroundColor = cl;
-          model.setValueFromInput(window.css_map[cl] ? 'var(' + window.css_map[cl] + ')' : cl, 0);
+
+          model.setValueFromInput(
+            window.css_map[cl.replace(/\s/g, '')]
+              ? 'var(' + window.css_map[cl.replace(/\s/g, '')] + ')'
+              : cl,
+            0
+          );
         },
         change(color) {
           changed = 1;
           const cl = getColor(color);
+
           cpStyle.backgroundColor = cl;
-          model.setValueFromInput(window.css_map[cl] ? 'var(' + window.css_map[cl] + ')' : cl);
+          model.setValueFromInput(
+            window.css_map[cl.replace(/\s/g, '')]
+              ? 'var(' + window.css_map[cl.replace(/\s/g, '')] + ')'
+              : cl
+          );
           self.noneColor = 0;
         },
         show(color) {
@@ -143,14 +166,19 @@ module.exports = Input.extend({
           previousColor = getColor(color);
         },
         hide(color) {
-           if (!changed && previousColor) {
-             if (self.noneColor) {
-               previousColor = '';
-             }
-             cpStyle.backgroundColor = previousColor;
-             colorEl.spectrum('set', previousColor);
-             model.setValueFromInput( window.css_map[previousColor] ? 'var(' + window.css_map[previousColor] + ')' : previousColor , 0);
-           }
+          if (!changed && previousColor) {
+            if (self.noneColor) {
+              previousColor = '';
+            }
+            cpStyle.backgroundColor = previousColor;
+            colorEl.spectrum('set', previousColor);
+            model.setValueFromInput(
+              window.css_map[previousColor]
+                ? 'var(' + window.css_map[previousColor] + ')'
+                : previousColor,
+              0
+            );
+          }
         }
       });
 
@@ -165,5 +193,4 @@ module.exports = Input.extend({
     this.getColorEl();
     return this;
   }
-
 });
