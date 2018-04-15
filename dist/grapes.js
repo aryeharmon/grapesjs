@@ -17025,7 +17025,7 @@ module.exports = Input.extend({
       var colorEl = $('<div class="' + this.ppfx + 'field-color-picker"></div>');
       var cpStyle = colorEl.get(0).style;
       var elToAppend = this.em && this.em.config ? this.em.config.el : '';
-      var colorPickerConfig = this.em && this.em.getConfig && this.em.getConfig("colorPicker") || {};
+      var colorPickerConfig = this.em && this.em.getConfig && this.em.getConfig('colorPicker') || {};
       var getColor = function getColor(color) {
         var cl = color.getAlpha() == 1 ? color.toHexString() : color.toRgbString();
         return cl.replace(/ /g, '');
@@ -17040,7 +17040,6 @@ module.exports = Input.extend({
       var palette = [];
       var iframe = window.$('.gjs-frame')[0];
       if (iframe) {
-
         var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
         var allCSS = [].slice.call(innerDoc.styleSheets).reduce(function (prev, styleSheet) {
           if (!styleSheet.href) {
@@ -17052,7 +17051,7 @@ module.exports = Input.extend({
                   var prop = css[i].split(':');
                   if (prop.length == 2 && prop[0].indexOf('--') == 1) {
                     palette.push(prop[1]);
-                    window.css_map[prop[1].replace(/\s/g, '')] = prop[0];
+                    window.css_map[prop[1].replace(/\s/g, '')] = prop[0].replace(/\s/g, '');
                   }
                 }
               }
@@ -17084,6 +17083,7 @@ module.exports = Input.extend({
 
           cpStyle.backgroundColor = cl;
           model.setValueFromInput(window.css_map[cl.replace(/\s/g, '')] ? 'var(' + window.css_map[cl.replace(/\s/g, '')] + ')' : cl);
+          window.aryeh = model;
           self.noneColor = 0;
         },
         show: function show(color) {
@@ -17097,7 +17097,7 @@ module.exports = Input.extend({
             }
             cpStyle.backgroundColor = previousColor;
             colorEl.spectrum('set', previousColor);
-            model.setValueFromInput(window.css_map[previousColor] ? 'var(' + window.css_map[previousColor] + ')' : previousColor, 0);
+            model.setValueFromInput(window.css_map[previousColor.replace(/\s/g, '')] ? 'var(' + window.css_map[previousColor.replace(/\s/g, '')] + ')' : previousColor.replace(/\s/g, ''), 0);
           }
         }
       }));
@@ -26157,7 +26157,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.108',
+    version: '0.14.118',
 
     /**
      * Initializes an editor based on passed options
@@ -39493,7 +39493,6 @@ module.exports = __webpack_require__(10).extend({
     var editor = em ? em.get('Editor') : '';
 
     this.onChange = function (target, that, opt, value) {
-
       for (var i = 0; i < editor.CssComposer.getAll().models.length; i++) {
         if (editor.CssComposer.getAll().models[i].attributes.selectorsAdd === ':root') {
           var root_style = editor.CssComposer.getAll().models[i];
@@ -40086,7 +40085,6 @@ var $ = Backbone.$;
 
 module.exports = __webpack_require__(5).extend({
   targetUpdated: function targetUpdated() {
-
     var values = ['bounce', 'flash', 'pulse', 'rubberBand', 'shake', 'swing', 'tada', 'wobble', 'jello', 'bounceIn', 'bounceInDown', 'bounceInLeft', 'bounceInRight', 'bounceInUp', 'bounceOut', 'bounceOutDown', 'bounceOutLeft', 'bounceOutRight', 'bounceOutUp', 'fadeIn', 'fadeInDown', 'fadeInDownBig', 'fadeInLeft', 'fadeInLeftBig', 'fadeInRight', 'fadeInRightBig', 'fadeInUp', 'fadeInUpBig', 'fadeOut', 'fadeOutDown', 'fadeOutDownBig', 'fadeOutLeft', 'fadeOutLeftBig', 'fadeOutRight', 'fadeOutRightBig', 'fadeOutUp', 'fadeOutUpBig', 'flip', 'flipInX', 'flipInY', 'flipOutX', 'flipOutY', 'lightSpeedIn', 'lightSpeedOut', 'rotateIn', 'rotateInDownLeft', 'rotateInDownRight', 'rotateInUpLeft', 'rotateInUpRight', 'rotateOut', 'rotateOutDownLeft', 'rotateOutDownRight', 'rotateOutUpLeft', 'rotateOutUpRight', 'slideInUp', 'slideInDown', 'slideInLeft', 'slideInRight', 'slideOutUp', 'slideOutDown', 'slideOutLeft', 'slideOutRight', 'zoomIn', 'zoomInDown', 'zoomInLeft', 'zoomInRight', 'zoomInUp', 'zoomOut', 'zoomOutDown', 'zoomOutLeft', 'zoomOutRight', 'zoomOutUp', 'hinge', 'jackInTheBox', 'rollIn', 'rollOut'];
 
     if (window.editor) {
@@ -48717,12 +48715,12 @@ module.exports = {
       innerDoc.documentElement.style.setProperty(property, color);
     }
 
-    $(".colorpicker").each(function () {
+    $('.colorpicker').each(function () {
       var that = this;
 
       $(this).spectrum({
         color: $(this).data('color'),
-        preferredFormat: "hex",
+        preferredFormat: 'hex',
         showInput: true,
         showAlpha: true,
         showPalette: true,
@@ -49366,7 +49364,7 @@ module.exports = Backbone.View.extend({
   },
 
 
-  template: _.template('\n    <style>\n      .dropdown {\n        position: absolute;\n        top: 20px;\n        left: 0;\n        width: 168px;\n        z-index: 6666666;\n        background: #c1baba;\n      }\n      .dropdown-item {\n        display: block;\n        width: 160px;\n        height: 160px;\n        background-size: 100%;\n      }\n    </style>\n    <div class="<%= className %>-label" style="position: relative;">\n      <% if (children.length > 0) { %>\n      <div class="dropdown" style="display: none;">\n        <ul style="padding: 0;list-style: none;max-height: 150px;overflow: scroll;">\n          <% _.each(children, function(child, index){ %>\n            <li data-id="<%= index %>"  class="dropdown-item" style="background:url(<%= child.img %>)"><%= child.name %></li>\n          <% }); %>\n        </ul>\n      </div>\n      <% } %>\n      <%= label %>\n    </div>\n  '),
+  template: _.template('\n    <style>\n      .dropdown {\n        position: fixed;\n        top: 40px;\n        right: 253px;\n        left: auto;\n        width: 241px;\n        z-index: 6666666;\n        background: #f00b0b42;\n      }\n      .dropdown-item {\n          display: block;\n          width: 247px;\n          height: 160px;\n          margin-bottom: 10px;\n          background-repeat: no-repeat;\n          background-size: 100% 100%;\n      }\n    </style>\n    <div class="<%= className %>-label" style="position: relative;">\n      <% if (children.length > 0) { %>\n      <div class="dropdown" style="display: none;">\n        <ul style="padding: 0;list-style: none;height: 100%;overflow: scroll;">\n          <% _.each(children, function(child, index){ %>\n            <li data-id="<%= index %>"  class="dropdown-item" style="background-image:url(<%= child.img %>)"><%= child.name %></li>\n          <% }); %>\n        </ul>\n      </div>\n      <% } %>\n      <%= label %>\n    </div>\n  '),
 
   render: function render() {
     var children = this.model.get('children');

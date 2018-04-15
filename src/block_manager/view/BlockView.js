@@ -2,10 +2,9 @@ import { isObject } from 'underscore';
 import { on, off, hasDnd } from 'utils/mixins';
 
 module.exports = Backbone.View.extend({
-
   events: {
     mousedown: 'startDrag',
-    dblclick: 'test',
+    dblclick: 'test'
   },
 
   test: function(e) {
@@ -29,7 +28,7 @@ module.exports = Backbone.View.extend({
       return;
     }
 
-    if(!this.config.getSorter) {
+    if (!this.config.getSorter) {
       return;
     }
 
@@ -37,7 +36,6 @@ module.exports = Backbone.View.extend({
 
     this.config.em.refreshCanvas();
     var sorter = this.config.getSorter();
-
 
     if (e.target.tagName === 'LI') {
       sorter.setDragHelper(e.target, e);
@@ -48,7 +46,6 @@ module.exports = Backbone.View.extend({
     }
 
     sorter.startSort(this.el);
-
 
     on(document, 'mouseup', this.endDrag);
   },
@@ -72,26 +69,29 @@ module.exports = Backbone.View.extend({
   template: _.template(`
     <style>
       .dropdown {
-        position: absolute;
-        top: 20px;
-        left: 0;
-        width: 168px;
+        position: fixed;
+        top: 40px;
+        right: 253px;
+        left: auto;
+        width: 241px;
         z-index: 6666666;
-        background: #c1baba;
+        background: #f00b0b42;
       }
       .dropdown-item {
-        display: block;
-        width: 160px;
-        height: 160px;
-        background-size: 100%;
+          display: block;
+          width: 247px;
+          height: 160px;
+          margin-bottom: 10px;
+          background-repeat: no-repeat;
+          background-size: 100% 100%;
       }
     </style>
     <div class="<%= className %>-label" style="position: relative;">
       <% if (children.length > 0) { %>
       <div class="dropdown" style="display: none;">
-        <ul style="padding: 0;list-style: none;max-height: 150px;overflow: scroll;">
+        <ul style="padding: 0;list-style: none;height: 100%;overflow: scroll;">
           <% _.each(children, function(child, index){ %>
-            <li data-id="<%= index %>"  class="dropdown-item" style="background:url(<%= child.img %>)"><%= child.name %></li>
+            <li data-id="<%= index %>"  class="dropdown-item" style="background-image:url(<%= child.img %>)"><%= child.name %></li>
           <% }); %>
         </ul>
       </div>
@@ -109,9 +109,9 @@ module.exports = Backbone.View.extend({
     this.el.innerHTML = this.template({
       className: className,
       label: this.model.get('label'),
-      children: children,
+      children: children
     });
 
     return this;
-  },
+  }
 });

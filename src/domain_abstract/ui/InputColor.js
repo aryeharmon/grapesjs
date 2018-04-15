@@ -115,7 +115,9 @@ module.exports = Input.extend({
                         var prop = css[i].split(':');
                         if (prop.length == 2 && prop[0].indexOf('--') == 1) {
                           palette.push(prop[1]);
-                          window.css_map[prop[1].replace(/\s/g, '')] = prop[0];
+                          window.css_map[
+                            prop[1].replace(/\s/g, '')
+                          ] = prop[0].replace(/\s/g, '');
                         }
                       }
                     }
@@ -159,6 +161,7 @@ module.exports = Input.extend({
               ? 'var(' + window.css_map[cl.replace(/\s/g, '')] + ')'
               : cl
           );
+          window.aryeh = model;
           self.noneColor = 0;
         },
         show(color) {
@@ -173,9 +176,11 @@ module.exports = Input.extend({
             cpStyle.backgroundColor = previousColor;
             colorEl.spectrum('set', previousColor);
             model.setValueFromInput(
-              window.css_map[previousColor]
-                ? 'var(' + window.css_map[previousColor] + ')'
-                : previousColor,
+              window.css_map[previousColor.replace(/\s/g, '')]
+                ? 'var(' +
+                  window.css_map[previousColor.replace(/\s/g, '')] +
+                  ')'
+                : previousColor.replace(/\s/g, ''),
               0
             );
           }
