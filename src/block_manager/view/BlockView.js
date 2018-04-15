@@ -8,7 +8,15 @@ module.exports = Backbone.View.extend({
   },
 
   test: function(e) {
-    $(this.$el.find('.dropdown')).toggle();
+    var that = this;
+    $(that.$el.find('.dropdown')).toggle();
+
+    var event = function() {
+      $(that.$el.find('.dropdown')).toggle();
+      $(that.$el.find('.dropdown .close')).off('click', event);
+    };
+
+    $(that.$el.find('.dropdown .close')).on('click', event);
   },
 
   initialize(o, config = {}) {
@@ -85,10 +93,16 @@ module.exports = Backbone.View.extend({
           background-repeat: no-repeat;
           background-size: 100% 100%;
       }
+      .close {
+        font-size: 44px;
+        display: inline;
+        cursor: pointer;
+      }
     </style>
     <div class="<%= className %>-label" style="position: relative;">
       <% if (children.length > 0) { %>
       <div class="dropdown" style="display: none;">
+        <div class="close">x</div>
         <ul style="padding: 0;list-style: none;height: 100%;overflow: scroll;">
           <% _.each(children, function(child, index){ %>
             <li data-id="<%= index %>"  class="dropdown-item" style="background-image:url(<%= child.img %>)"><%= child.name %></li>

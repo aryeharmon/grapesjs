@@ -26157,7 +26157,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.118',
+    version: '0.14.122',
 
     /**
      * Initializes an editor based on passed options
@@ -49294,14 +49294,21 @@ var _underscore = __webpack_require__(1);
 var _mixins = __webpack_require__(4);
 
 module.exports = Backbone.View.extend({
-
   events: {
     mousedown: 'startDrag',
     dblclick: 'test'
   },
 
   test: function test(e) {
-    $(this.$el.find('.dropdown')).toggle();
+    var that = this;
+    $(that.$el.find('.dropdown')).toggle();
+
+    var event = function event() {
+      $(that.$el.find('.dropdown')).toggle();
+      $(that.$el.find('.dropdown .close')).off('click', event);
+    };
+
+    $(that.$el.find('.dropdown .close')).on('click', event);
   },
 
   initialize: function initialize(o) {
@@ -49364,7 +49371,7 @@ module.exports = Backbone.View.extend({
   },
 
 
-  template: _.template('\n    <style>\n      .dropdown {\n        position: fixed;\n        top: 40px;\n        right: 253px;\n        left: auto;\n        width: 241px;\n        z-index: 6666666;\n        background: #f00b0b42;\n      }\n      .dropdown-item {\n          display: block;\n          width: 247px;\n          height: 160px;\n          margin-bottom: 10px;\n          background-repeat: no-repeat;\n          background-size: 100% 100%;\n      }\n    </style>\n    <div class="<%= className %>-label" style="position: relative;">\n      <% if (children.length > 0) { %>\n      <div class="dropdown" style="display: none;">\n        <ul style="padding: 0;list-style: none;height: 100%;overflow: scroll;">\n          <% _.each(children, function(child, index){ %>\n            <li data-id="<%= index %>"  class="dropdown-item" style="background-image:url(<%= child.img %>)"><%= child.name %></li>\n          <% }); %>\n        </ul>\n      </div>\n      <% } %>\n      <%= label %>\n    </div>\n  '),
+  template: _.template('\n    <style>\n      .dropdown {\n        position: fixed;\n        top: 40px;\n        right: 253px;\n        left: auto;\n        width: 241px;\n        z-index: 6666666;\n        background: #f00b0b42;\n      }\n      .dropdown-item {\n          display: block;\n          width: 247px;\n          height: 160px;\n          margin-bottom: 10px;\n          background-repeat: no-repeat;\n          background-size: 100% 100%;\n      }\n      .close {\n        font-size: 44px;\n        display: inline;\n        cursor: pointer;\n      }\n    </style>\n    <div class="<%= className %>-label" style="position: relative;">\n      <% if (children.length > 0) { %>\n      <div class="dropdown" style="display: none;">\n        <div class="close">x</div>\n        <ul style="padding: 0;list-style: none;height: 100%;overflow: scroll;">\n          <% _.each(children, function(child, index){ %>\n            <li data-id="<%= index %>"  class="dropdown-item" style="background-image:url(<%= child.img %>)"><%= child.name %></li>\n          <% }); %>\n        </ul>\n      </div>\n      <% } %>\n      <%= label %>\n    </div>\n  '),
 
   render: function render() {
     var children = this.model.get('children');
