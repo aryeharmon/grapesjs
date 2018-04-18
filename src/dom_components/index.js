@@ -79,19 +79,24 @@ module.exports = () => {
       view: require('./view/ComponentMapView')
     },
     {
+      id: 'gragh',
+      model: require('./model/ComponentGragh'),
+      view: require('./view/ComponentGraghView')
+    },
+    {
       id: 'layout',
       model: require('./model/ComponentLayout'),
-      view: require('./view/ComponentLayoutView'),
+      view: require('./view/ComponentLayoutView')
     },
     {
       id: 'full-width',
       model: require('./model/ComponentFullWidth'),
-      view: require('./view/ComponentFullWidthView'),
+      view: require('./view/ComponentFullWidthView')
     },
     {
       id: 'section1050',
       model: require('./model/ComponentSection1050'),
-      view: require('./view/ComponentSection1050View'),
+      view: require('./view/ComponentSection1050View')
     },
     {
       id: 'link',
@@ -111,7 +116,7 @@ module.exports = () => {
     {
       id: 'region',
       model: require('./model/ComponentRegion'),
-      view: require('./view/ComponentRegionView'),
+      view: require('./view/ComponentRegionView')
     },
     {
       id: 'script',

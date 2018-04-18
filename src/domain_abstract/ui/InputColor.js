@@ -45,7 +45,7 @@ module.exports = Input.extend({
             .selectorsAdd === ':root'
         ) {
           var root_style = window.editor.CssComposer.getAll().models[i];
-          if (val.indexOf('var(') > -1) {
+          if (val && val.indexOf('var(') > -1) {
             var variable = val.replace('var(', '').replace(')', '');
             val = root_style.attributes.style[variable];
           }
