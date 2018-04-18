@@ -25,7 +25,10 @@ module.exports = require('backbone').Model.extend({
     if ((!avoidInline || isWrapper) && style) {
       let selector = `#${model.getId()}`;
       selector = wrappesIsBody && isWrapper ? 'body' : selector;
-      code = `${selector}{${style}}`;
+
+      if (selector.indexOf('#tab') === -1) {
+        code = `${selector}{${style}}`;
+      }
     }
 
     const components = model.components();
@@ -95,7 +98,6 @@ module.exports = require('backbone').Model.extend({
       return false;
     }
 
-
     // This will not render a rule if there is no its component
     rule.get('selectors').each(selector => {
       const name = selector.getFullName();
@@ -105,10 +107,10 @@ module.exports = require('backbone').Model.extend({
     });
 
     // if ((selectorStrNoAdd && found) || selectorsAdd || singleAtRule) {
-      const block = rule.getDeclaration();
-      block && (result += block);
+    const block = rule.getDeclaration();
+    block && (result += block);
     // } else {
-      // dump.push(rule);
+    // dump.push(rule);
     // }
 
     return result;
