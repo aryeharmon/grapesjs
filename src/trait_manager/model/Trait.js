@@ -54,7 +54,6 @@ module.exports = require('backbone').Model.extend({
     } else {
       const attrs = { ...target.get('attributes') };
       attrs[name] = value;
-      alert(123);
       target.set('attributes', attrs);
     }
   },

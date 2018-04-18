@@ -23350,6 +23350,8 @@ module.exports = PropertyCompositeView.extend({
     } else {
       this.checkVisibility();
     }
+
+    this.refreshLayers();
   },
 
 
@@ -26157,7 +26159,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.131',
+    version: '0.14.124',
 
     /**
      * Initializes an editor based on passed options
@@ -35981,7 +35983,6 @@ module.exports = __webpack_require__(0).Model.extend({
     this.compCls = [];
     this.ids = [];
     var code = this.buildFromModel(model, opts);
-    console.log(code, 777);
 
     if (cssc) {
       (function () {
@@ -43579,7 +43580,6 @@ module.exports = __webpack_require__(0).Model.extend({
     } else {
       var attrs = _extends({}, target.get('attributes'));
       attrs[name] = value;
-      alert(123);
       target.set('attributes', attrs);
     }
   },
