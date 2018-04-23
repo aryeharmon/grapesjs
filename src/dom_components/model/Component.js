@@ -557,23 +557,29 @@ const Component = Backbone.Model.extend(Styleable).extend(
           });
         }
 
-        if (model.getName() === 'Group' || model.getName() === 'Layout') {
-          tb.push({
-            attributes: { class: 'fa fa-floppy-o' },
-            command: 'save'
-          });
-        }
-        if (model.getName() === 'Layout') {
-          tb.push({
-            attributes: { class: 'fa fa-unlink' },
-            command: function(editor) {
-              var attr = editor.getSelected().getAttributes();
-              delete attr['data-layout'];
-              editor.getSelected().setAttributes(attr);
-              editor.getSelected().view.$el.removeAttr('data-layout');
+        // if (model.getName() === 'Group' || model.getName() === 'Layout') {
+        tb.push({
+          attributes: { class: 'fa fa-floppy-o' },
+          command: 'save'
+        });
+        // }
+        // console.log(model, model.view)
+        // window.fff = model;
+        // if (model.view && model.view.$el && ) {
+        tb.push({
+          attributes: { class: 'fa fa-unlink' },
+          command: function(editor) {
+            if (!model.view.$el.attr('data-layout')) {
+              alert('not a layout!');
+              return;
             }
-          });
-        }
+            var attr = editor.getSelected().getAttributes();
+            delete attr['data-layout'];
+            editor.getSelected().setAttributes(attr);
+            editor.getSelected().view.$el.removeAttr('data-layout');
+          }
+        });
+        // }
 
         tb.push({
           attributes: { class: 'fa fa-text-height' },

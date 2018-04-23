@@ -83,11 +83,11 @@ module.exports = () => {
       model: require('./model/ComponentGragh'),
       view: require('./view/ComponentGraghView')
     },
-    {
-      id: 'layout',
-      model: require('./model/ComponentLayout'),
-      view: require('./view/ComponentLayoutView')
-    },
+    // {
+    //   id: 'layout',
+    //   model: require('./model/ComponentLayout'),
+    //   view: require('./view/ComponentLayoutView')
+    // },
     {
       id: 'full-width',
       model: require('./model/ComponentFullWidth'),
