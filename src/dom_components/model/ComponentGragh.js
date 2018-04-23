@@ -74,26 +74,26 @@ module.exports = Component.extend(
         },
         {
           type: 'color',
-          label: 'defaultBackgroundfillcolor',
-          name: 'defaultBackgroundfillcolor'
+          label: 'defaultbackgroundfillcolor',
+          name: 'defaultbackgroundfillcolor'
           // changeProp: 1,
         },
         {
           type: 'color',
-          label: 'defaultBackgroundstroke',
-          name: 'defaultBackgroundstroke'
+          label: 'defaultbackgroundstroke',
+          name: 'defaultbackgroundstroke'
           // changeProp: 1,
         },
         {
           type: 'text',
-          label: 'defaultBackgroundcornertype',
-          name: 'defaultBackgroundcornertype'
+          label: 'defaultbackgroundcornertype',
+          name: 'defaultbackgroundcornertype'
           // changeProp: 1,
         },
         {
           type: 'number',
-          label: 'defaultBackgroundfillcorners',
-          name: 'defaultBackgroundfillcorners'
+          label: 'defaultbackgroundfillcorners',
+          name: 'defaultbackgroundfillcorners'
           // changeProp: 1,
         },
         {
@@ -287,6 +287,185 @@ module.exports = Component.extend(
           label: 'defaultlegenddisabledfillcolor',
           name: 'defaultlegenddisabledfillcolor'
           // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'defaultaxisstrokecolor',
+          name: 'defaultaxisstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'defaultaxisticksstrokecolor',
+          name: 'defaultaxisticksstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'defaultaxisminorticksstrokecolor',
+          name: 'defaultaxisminorticksstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'defaultgridsettingsstrokecolor',
+          name: 'defaultgridsettingsstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'defaultminorgridsettingsstrokecolor',
+          name: 'defaultminorgridsettingsstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'defaultseparatorfillcolor',
+          name: 'defaultseparatorfillcolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'defaulttooltipbackgroundfillcolor',
+          name: 'defaulttooltipbackgroundfillcolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'defaulttooltipbackgroundstrokecolor',
+          name: 'defaulttooltipbackgroundstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingsbaseselectedfillcolor',
+          name: 'chartdefaultseriessettingsbaseselectedfillcolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingsbaseselectedstrokecolor',
+          name: 'chartdefaultseriessettingsbaseselectedstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingslinelikeselectedstrokecolor',
+          name: 'chartdefaultseriessettingslinelikeselectedstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingslinelikeselectedmarkersfillcolor',
+          name: 'chartdefaultseriessettingslinelikeselectedmarkersfillcolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingslinelikeselectedmarkersstrokecolor',
+          name: 'chartdefaultseriessettingslinelikeselectedmarkersstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingsarealikeselectedstrokecolor',
+          name: 'chartdefaultseriessettingsarealikeselectedstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingsarealikeselectedmarkersfillcolor',
+          name: 'chartdefaultseriessettingsarealikeselectedmarkersfillcolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingsarealikeselectedmarkersstrokecolor',
+          name: 'chartdefaultseriessettingsarealikeselectedmarkersstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingscandlesticknormalrisingfillcolor',
+          name: 'chartdefaultseriessettingscandlesticknormalrisingfillcolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingscandlesticknormalrisingstrokecolor',
+          name: 'chartdefaultseriessettingscandlesticknormalrisingstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingscandlesticknormalfallingfillcolor',
+          name: 'chartdefaultseriessettingscandlesticknormalfallingfillcolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label:
+            'chartdefaultseriessettingscandlesticknormalfallingstrokecolor',
+          name: 'chartdefaultseriessettingscandlesticknormalfallingstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label:
+            'chartdefaultseriessettingscandlestickselectedrisingstrokecolor',
+          name: 'chartdefaultseriessettingscandlestickselectedrisingstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label:
+            'chartdefaultseriessettingscandlestickselectedfallingstrokecolor',
+          name:
+            'chartdefaultseriessettingscandlestickselectedfallingstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingscandlestickselectedrisingfillcolor',
+          name: 'chartdefaultseriessettingscandlestickselectedrisingfillcolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label:
+            'chartdefaultseriessettingscandlestickselectedfallingfillcolor',
+          name: 'chartdefaultseriessettingscandlestickselectedfallingfillcolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingsohlcnormalrisingstrokecolor',
+          name: 'chartdefaultseriessettingsohlcnormalrisingstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingsohlcnormalfallingstrokecolor',
+          name: 'chartdefaultseriessettingsohlcnormalfallingstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingsohlcselectedrisingstrokecolor',
+          name: 'chartdefaultseriessettingsohlcselectedrisingstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'chartdefaultseriessettingsohlcselectedfallingstrokecolor',
+          name: 'chartdefaultseriessettingsohlcselectedfallingstrokecolor'
+          // changeProp: 1,
+        },
+        {
+          type: 'color',
+          label: 'charttitlefontcolorcolor',
+          name: 'charttitlefontcolorcolor'
+          // changeProp: 1,
         }
         // {
         //   label: 'Zoom',
@@ -307,152 +486,294 @@ module.exports = Component.extend(
       window.ffff = this;
 
       this.set('fontcolor', this.attributes.attributes.fontcolor);
-      this.set('fontfamily', this.attributes.attributes.fontcolor);
-      this.set('fontsize', this.attributes.attributes.fontcolor);
+      this.set('fontfamily', this.attributes.attributes.fontfamily);
+      this.set('fontsize', this.attributes.attributes.fontsize);
       this.set(
         'blendedHueprogressioncolor1',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.blendedHueprogressioncolor1
       );
       this.set(
         'blendedhueprogressioncolor2',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.blendedhueprogressioncolor2
       );
       this.set(
         'defaultlinearcolorscalecolor1',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultlinearcolorscalecolor1
       );
       this.set(
         'defaultlinearcolorscalecolor2',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultlinearcolorscalecolor2
       );
       this.set(
-        'defaultBackgroundfillcolor',
-        this.attributes.attributes.fontcolor
-      );
-      this.set('defaultBackgroundstroke', this.attributes.attributes.fontcolor);
-      this.set(
-        'defaultBackgroundcornertype',
-        this.attributes.attributes.fontcolor
+        'defaultbackgroundfillcolor',
+        this.attributes.attributes.defaultbackgroundfillcolor
       );
       this.set(
-        'defaultBackgroundfillcorners',
-        this.attributes.attributes.fontcolor
+        'defaultbackgroundstroke',
+        this.attributes.attributes.defaultbackgroundstroke
+      );
+      this.set(
+        'defaultbackgroundcornertype',
+        this.attributes.attributes.defaultbackgroundcornertype
+      );
+      this.set(
+        'defaultbackgroundfillcorners',
+        this.attributes.attributes.defaultbackgroundfillcorners
       );
       this.set(
         'defaulttooltiptitlefontColor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaulttooltiptitlefontColor
       );
       this.set(
         'defaulttooltiptextfontColor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaulttooltiptextfontColor
       );
       this.set(
         'defaulttooltipbackgroundcorners',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaulttooltipbackgroundcorners
       );
-      this.set('defaulttooltop', this.attributes.attributes.fontcolor);
-      this.set('defaulttoolright', this.attributes.attributes.fontcolor);
-      this.set('defaulttoolbottom', this.attributes.attributes.fontcolor);
-      this.set('defaulttoolleft', this.attributes.attributes.fontcolor);
+      this.set('defaulttooltop', this.attributes.attributes.defaulttooltop);
+      this.set('defaulttoolright', this.attributes.attributes.defaulttoolright);
+      this.set(
+        'defaulttoolbottom',
+        this.attributes.attributes.defaulttoolbottom
+      );
+      this.set('defaulttoolleft', this.attributes.attributes.defaulttoolleft);
       this.set(
         'defaultcolorrangestrokecolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangestrokecolor
       );
       this.set(
         'defaultcolorrangeticksstrokecolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangeticksstrokecolor
       );
       this.set(
         'defaultcolorrangeticksposition',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangeticksposition
       );
       this.set(
         'defaultcolorrangetickslength',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangetickslength
       );
       this.set(
         'defaultcolorrangeminorticksstrokecolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangeminorticksstrokecolor
       );
       this.set(
         'defaultcolorrangeminorticksposition',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangeminorticksposition
       );
       this.set(
         'defaultcolorrangeminortickslength',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangeminortickslength
       );
       this.set(
         'defaultcolorrangemarkerpaddingtop',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangemarkerpaddingtop
       );
       this.set(
         'defaultcolorrangemarkerpaddingright',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangemarkerpaddingright
       );
       this.set(
         'defaultcolorrangemarkerpaddingbottom',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangemarkerpaddingbottom
       );
       this.set(
         'defaultcolorrangemarkerpaddingleft',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangemarkerpaddingleft
       );
       this.set(
         'defaultcolorrangemarkerfillcolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultcolorrangemarkerfillcolor
       );
       this.set(
         'defaultscrollerfillcolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultscrollerfillcolor
       );
       this.set(
         'defaultscrollerselectedfillcolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultscrollerselectedfillcolor
       );
       this.set(
         'defaultscrollerthumbsfillcolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultscrollerthumbsfillcolor
       );
       this.set(
         'defaultscrollerthumbsstrokecolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultscrollerthumbsstrokecolor
       );
       this.set(
         'defaultscrollerthumbshoveredfillcolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultscrollerthumbshoveredfillcolor
       );
       this.set(
         'defaultscrollerthumbshoveredstrokecolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultscrollerthumbshoveredstrokecolor
       );
       this.set(
         'defaultlegendnormalstrokecolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultlegendnormalstrokecolor
       );
       this.set(
         'defaultlegendnormalfillcolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultlegendnormalfillcolor
       );
       this.set(
         'defaultlegendhoverstrokecolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultlegendhoverstrokecolor
       );
       this.set(
         'defaultlegendhoverfillcolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultlegendhoverfillcolor
       );
       this.set(
         'defaultlegendpushedstrokecolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultlegendpushedstrokecolor
       );
       this.set(
         'defaultlegendpushedfillcolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultlegendpushedfillcolor
       );
       this.set(
         'defaultlegenddisabledfillcolor',
-        this.attributes.attributes.fontcolor
+        this.attributes.attributes.defaultlegenddisabledfillcolor
+      );
+      this.set(
+        'defaultaxisstrokecolor',
+        this.attributes.attributes.defaultaxisstrokecolor
+      );
+      this.set(
+        'defaultaxisticksstrokecolor',
+        this.attributes.attributes.defaultaxisticksstrokecolor
+      );
+      this.set(
+        'defaultaxisminorticksstrokecolor',
+        this.attributes.attributes.defaultaxisminorticksstrokecolor
+      );
+      this.set(
+        'defaultgridsettingsstrokecolor',
+        this.attributes.attributes.defaultgridsettingsstrokecolor
+      );
+      this.set(
+        'defaultminorgridsettingsstrokecolor',
+        this.attributes.attributes.defaultminorgridsettingsstrokecolor
+      );
+      this.set(
+        'defaultseparatorfillcolor',
+        this.attributes.attributes.defaultseparatorfillcolor
+      );
+      this.set(
+        'defaulttooltipbackgroundfillcolor',
+        this.attributes.attributes.defaulttooltipbackgroundfillcolor
+      );
+      this.set(
+        'defaulttooltipbackgroundstrokecolor',
+        this.attributes.attributes.defaulttooltipbackgroundstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingsbaseselectedfillcolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingsbaseselectedfillcolor
+      );
+      this.set(
+        'chartdefaultseriessettingsbaseselectedstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingsbaseselectedstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingslinelikeselectedstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingslinelikeselectedstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingslinelikeselectedmarkersfillcolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingslinelikeselectedmarkersfillcolor
+      );
+      this.set(
+        'chartdefaultseriessettingslinelikeselectedmarkersstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingslinelikeselectedmarkersstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingsarealikeselectedstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingsarealikeselectedstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingsarealikeselectedmarkersfillcolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingsarealikeselectedmarkersfillcolor
+      );
+      this.set(
+        'chartdefaultseriessettingsarealikeselectedmarkersstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingsarealikeselectedmarkersstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingscandlesticknormalrisingfillcolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingscandlesticknormalrisingfillcolor
+      );
+      this.set(
+        'chartdefaultseriessettingscandlesticknormalrisingstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingscandlesticknormalrisingstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingscandlesticknormalfallingfillcolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingscandlesticknormalfallingfillcolor
+      );
+      this.set(
+        'chartdefaultseriessettingscandlesticknormalfallingstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingscandlesticknormalfallingstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingscandlestickselectedrisingstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingscandlestickselectedrisingstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingscandlestickselectedfallingstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingscandlestickselectedfallingstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingscandlestickselectedrisingfillcolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingscandlestickselectedrisingfillcolor
+      );
+      this.set(
+        'chartdefaultseriessettingscandlestickselectedfallingfillcolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingscandlestickselectedfallingfillcolor
+      );
+      this.set(
+        'chartdefaultseriessettingsohlcnormalrisingstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingsohlcnormalrisingstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingsohlcnormalfallingstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingsohlcnormalfallingstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingsohlcselectedrisingstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingsohlcselectedrisingstrokecolor
+      );
+      this.set(
+        'chartdefaultseriessettingsohlcselectedfallingstrokecolor',
+        this.attributes.attributes
+          .chartdefaultseriessettingsohlcselectedfallingstrokecolor
+      );
+      this.set(
+        'charttitlefontcolorcolor',
+        this.attributes.attributes.charttitlefontcolorcolor
       );
 
       setTimeout(function() {
@@ -496,6 +817,8 @@ module.exports = Component.extend(
           // alert(555);
           iframe.contentWindow.test(data);
         });
+
+        // $(parent.editor.Canvas.getBody())
 
         iframe.contentWindow.test(data);
       }, 3000);
