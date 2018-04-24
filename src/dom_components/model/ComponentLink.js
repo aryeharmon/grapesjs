@@ -6,8 +6,15 @@ module.exports = Component.extend(
       ...Component.prototype.defaults,
       type: 'link',
       tagName: 'a',
-      traits: ['title', 'href', 'target', 'data-angular', {type: 'text', name: 'ng-repeat', label: 'repeat'}],
-  },
+      traits: [
+        'title',
+        'href',
+        'target',
+        'data-angular',
+        { type: 'text', name: 'ng-repeat', label: 'repeat' },
+        { type: 'text', name: 'ng-init', label: 'init' }
+      ]
+    },
 
     /**
      * Returns object of attributes for HTML
