@@ -112,7 +112,9 @@ module.exports = () => {
       //custom
       defaultCommands['build-component'] = require('./view/BuildComponent');
       defaultCommands['open-table-editor'] = require('./view/OpenTableEditor');
-      defaultCommands['open-region-editor'] = require('./view/OpenRegionEditor');
+      defaultCommands[
+        'open-region-editor'
+      ] = require('./view/OpenRegionEditor');
 
       defaultCommands['tlb-delete'] = {
         run(ed) {
@@ -128,20 +130,11 @@ module.exports = () => {
         }
       };
 
-
-
-
-
       defaultCommands['maincolor'] = require('./view/mainColorPicker');
 
       defaultCommands['save'] = {
         run(editor) {
-
-
-
-
-
-var assetTemplate = `
+          var assetTemplate = `
 
 <div style="overflow: hidden;">
   <div style="float: left; width: 50%;">
@@ -560,22 +553,21 @@ var assetTemplate = `
 </div>
 `;
 
-var template = _.template(assetTemplate);
+          var template = _.template(assetTemplate);
 
-    // var config = editor.getConfig();
-    var modal = editor.Modal;
+          // var config = editor.getConfig();
+          var modal = editor.Modal;
 
-    modal.setTitle('Save Layout Or Block');
+          modal.setTitle('Save Layout Or Block');
 
-    var content = template({
-      categories:categories,
-      blocks:blocks,
-    });
+          var content = template({
+            categories: categories,
+            blocks: blocks
+          });
 
+          modal.setContent(content);
 
-    modal.setContent(content);
-
-    modal.open();
+          modal.open();
 
           var sel = editor.getSelected();
           var html = sel.toHTML();
@@ -584,108 +576,114 @@ var template = _.template(assetTemplate);
           var allElements = sel.view.el.querySelectorAll('*');
 
           for (var i = 0; i < allElements.length; i++) {
+            if (
+              allElements[i].className.toString() ==
+              '[object SVGAnimatedString]'
+            ) {
+              continue;
+            }
             var classes = allElements[i].className.toString().split(/\s+/);
             for (var j = 0; j < classes.length; j++) {
               var cls = classes[j];
-              if (cls && allClasses.indexOf(cls) === -1)
-                allClasses.push(cls);
+              if (cls && allClasses.indexOf(cls) === -1) allClasses.push(cls);
             }
           }
 
           function elem_css(a, o) {
-              var iframe = window.$('.gjs-frame')[0];
-              var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+            var iframe = window.$('.gjs-frame')[0];
+            var innerDoc =
+              iframe.contentDocument || iframe.contentWindow.document;
 
+            var a = $(innerDoc).find('.' + a)[0];
 
-          	var a = $(innerDoc).find('.' + a)[0]
-
-              var sheets = innerDoc.styleSheets, o = o || [];
-              a.matches = a.matches || a.webkitMatchesSelector || a.mozMatchesSelector || a.msMatchesSelector || a.oMatchesSelector;
-              for (var i in sheets) {
-                if (!sheets[i].href) {
-                  var rules = sheets[i].rules || sheets[i].cssRules;
-                  if (rules) {
-                    for (var r in rules) {
-                      if (a.matches(rules[r].selectorText)) {
-                        if (rules[r].cssText.indexOf('*') > -1 || rules[r].cssText.indexOf('.gjs') > -1) {
-                        	continue;
+            var sheets = innerDoc.styleSheets,
+              o = o || [];
+            a.matches =
+              a.matches ||
+              a.webkitMatchesSelector ||
+              a.mozMatchesSelector ||
+              a.msMatchesSelector ||
+              a.oMatchesSelector;
+            for (var i in sheets) {
+              if (!sheets[i].href) {
+                var rules = sheets[i].rules || sheets[i].cssRules;
+                if (rules) {
+                  for (var r in rules) {
+                    if (a.matches(rules[r].selectorText)) {
+                      if (
+                        rules[r].cssText.indexOf('*') > -1 ||
+                        rules[r].cssText.indexOf('.gjs') > -1
+                      ) {
+                        continue;
+                      }
+                      if (o.indexOf(rules[r].cssText) === -1) {
+                        if (
+                          rules[r].cssText[0] == '.' ||
+                          rules[r].cssText[0] == '#'
+                        ) {
+                          o.push(rules[r].cssText);
                         }
-                        if (o.indexOf(rules[r].cssText) === -1) {
-                        	if (rules[r].cssText[0] == '.' || rules[r].cssText[0] == '#') {
-                     		  o.push(rules[r].cssText);
-                        	}
-                        }
-
                       }
                     }
                   }
                 }
               }
-              return o;
+            }
+            return o;
           }
 
-          	var result = [];
+          var result = [];
           for (var i = 0; i < allClasses.length; i++) {
-          	elem_css(allClasses[i], result);
+            elem_css(allClasses[i], result);
           }
 
-          var css = result.join('\n')
+          var css = result.join('\n');
 
-          $("#NewLayoutForm").submit(function(e) {
-              e.preventDefault();
-              var formData = new FormData(this);
-              formData.set('html', html)
-              formData.set('css', css)
+          $('#NewLayoutForm').submit(function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            formData.set('html', html);
+            formData.set('css', css);
 
-              $.ajax({
-                  url: base_url + '/save-layout',
-                  type: 'POST',
-                  data: formData,
-                  success: function (data) {
+            $.ajax({
+              url: base_url + '/save-layout',
+              type: 'POST',
+              data: formData,
+              success: function(data) {
+                var attr = editor.getSelected().getAttributes();
+                attr['data-layout'] = data.id;
+                editor.getSelected().setAttributes(attr);
 
-                      var attr = editor.getSelected().getAttributes();
-                      attr['data-layout'] = data.id;
-                      editor.getSelected().setAttributes(attr);
-
-
-                      modal.close();
-                  },
-                  cache: false,
-                  contentType: false,
-                  processData: false
-              });
+                modal.close();
+              },
+              cache: false,
+              contentType: false,
+              processData: false
+            });
           });
 
-          $("form#NewBlockForm").submit(function(e) {
-              e.preventDefault();
-              var data = {};
-              var formData = new FormData(this);
+          $('form#NewBlockForm').submit(function(e) {
+            e.preventDefault();
+            var data = {};
+            var formData = new FormData(this);
 
-              for (var pair of formData.entries()) {
-                data[pair[0]] = pair[1];
+            for (var pair of formData.entries()) {
+              data[pair[0]] = pair[1];
+            }
+            data.html = html;
+            data.css = css;
+
+            $.ajax({
+              url: base_url + '/save-block',
+              type: 'POST',
+              data: data,
+              success: function(data) {
+                modal.close();
               }
-              data.html = html;
-              data.css = css;
-
-              $.ajax({
-                  url: base_url + '/save-block',
-                  type: 'POST',
-                  data: data,
-                  success: function (data) {
-                      modal.close();
-                  }
-              });
+            });
           });
-
-        },
+        }
       };
-
-
-
-
-
-
-
 
       defaultCommands['tlb-clone'] = {
         run(ed) {

@@ -26165,7 +26165,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.198',
+    version: '0.14.201',
 
     /**
      * Initializes an editor based on passed options
@@ -47037,6 +47037,9 @@ module.exports = function () {
           var allElements = sel.view.el.querySelectorAll('*');
 
           for (var i = 0; i < allElements.length; i++) {
+            if (allElements[i].className.toString() == '[object SVGAnimatedString]') {
+              continue;
+            }
             var classes = allElements[i].className.toString().split(/\s+/);
             for (var j = 0; j < classes.length; j++) {
               var cls = classes[j];
