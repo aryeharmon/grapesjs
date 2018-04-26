@@ -84,6 +84,8 @@ module.exports = Backbone.View.extend({
         width: 241px;
         z-index: 6666666;
         background: #f00b0b42;
+        overflow-y: scroll;
+        max-height: 100%;
       }
       .dropdown-item {
           display: block;
