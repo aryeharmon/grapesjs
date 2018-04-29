@@ -154,10 +154,6 @@ module.exports = () => {
         <input type="text" name="name" required="required">
       </div>
       <div class="form_item">
-        <label>Image <i style="color: red;">*</i></label>
-        <input type="file" name="image" required="required">
-      </div>
-      <div class="form_item">
         <label>Updatable <i style="color: red;">*</i></label>
         <input type="checkbox" name="is_updatable">
       </div>
