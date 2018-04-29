@@ -100,11 +100,9 @@ module.exports = Backbone.View.extend({
       }
       .dropdown-item {
           display: block;
-          width: 247px;
-          height: 160px;
           margin-bottom: 10px;
           background-repeat: no-repeat;
-          background-size: 100% 100%;
+          background-size: contain;
       }
       .close {
         font-size: 44px;
@@ -118,7 +116,7 @@ module.exports = Backbone.View.extend({
         <div class="close">x</div>
         <ul style="padding: 0;list-style: none;height: 100%;overflow: scroll;">
           <% _.each(children, function(child, index){ %>
-            <li data-id="<%= index %>"  class="dropdown-item" style="background-image:url(<%= child.img %>)"><%= child.name %></li>
+            <li data-id="<%= index %>"  class="dropdown-item" style="background-image:url(<%= child.img %>)"><%= child.name %><img src="<%= child.img %>" style="visibility: hidden;    width: 100%;" /></li>
           <% }); %>
         </ul>
       </div>
