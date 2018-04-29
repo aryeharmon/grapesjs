@@ -47,9 +47,20 @@ module.exports = Backbone.View.extend({
 
     if (e.target.tagName === 'LI') {
       sorter.setDragHelper(e.target, e);
-      sorter.setDropContent(children[$(e.target).data('id')].content);
+
+      if (window.allow_input_layout) {
+        sorter.setDropContent(children[$(e.target).data('id')].content);
+      } else {
+        sorter.setDropContent(
+          children[$(e.target).data('id')].content.replace(
+            /data-layout="\d+"/,
+            ''
+          )
+        );
+      }
     } else {
       sorter.setDragHelper(this.el, e);
+
       sorter.setDropContent(this.model.get('content'));
     }
 

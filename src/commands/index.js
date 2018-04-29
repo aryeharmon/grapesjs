@@ -138,7 +138,7 @@ module.exports = () => {
 
 <div style="overflow: hidden;">
   <div style="float: left; width: 50%;">
-    <h4>New. Layout</h4>
+    <h4>New Layout</h4>
 
     <form id="NewLayoutForm" enctype="multipart/form-data">
       <div class="form_item">
@@ -154,8 +154,12 @@ module.exports = () => {
         <input type="text" name="name" required="required">
       </div>
       <div class="form_item">
-        <label>Name <i style="color: red;">*</i></label>
+        <label>Image <i style="color: red;">*</i></label>
         <input type="file" name="image" required="required">
+      </div>
+      <div class="form_item">
+        <label>Updatable <i style="color: red;">*</i></label>
+        <input type="checkbox" name="is_updatable">
       </div>
       <div class="form_item">
         <input type="submit" name="Save Layout">
