@@ -205,9 +205,9 @@ module.exports = Backbone.View.extend({
 
           window.editor.old_model = editor.pt.model;
 
-          var SelectorsAdd = editor.CssComposer.getBySelectorsAdd(
-            $el.data('rule')
-          );
+          var SelectorsAdd =
+            editor.CssComposer.getBySelectorsAdd($el.data('rule')) ||
+            editor.CssComposer.getClassRule($el.data('rule').replace('.', ''));
 
           if (SelectorsAdd) {
             window.editor.pt.model = SelectorsAdd;

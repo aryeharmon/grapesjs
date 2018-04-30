@@ -26167,7 +26167,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.224',
+    version: '0.14.225',
 
     /**
      * Initializes an editor based on passed options
@@ -34971,7 +34971,7 @@ module.exports = Backbone.View.extend({
 
           window.editor.old_model = editor.pt.model;
 
-          var SelectorsAdd = editor.CssComposer.getBySelectorsAdd($el.data('rule'));
+          var SelectorsAdd = editor.CssComposer.getBySelectorsAdd($el.data('rule')) || editor.CssComposer.getClassRule($el.data('rule').replace('.', ''));
 
           if (SelectorsAdd) {
             window.editor.pt.model = SelectorsAdd;
