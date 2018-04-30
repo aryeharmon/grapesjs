@@ -5352,6 +5352,8 @@ module.exports = Backbone.View.extend({
   isTargetStylable: function isTargetStylable(target) {
     var trg = target || this.getTarget();
     var model = this.model;
+    window.aaasss = target;
+    window.aaasss2 = this;
     var property = model.get('property');
     var toRequire = model.get('toRequire');
     var unstylable = trg.get('unstylable');
@@ -26165,7 +26167,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.215',
+    version: '0.14.224',
 
     /**
      * Initializes an editor based on passed options
@@ -34968,8 +34970,17 @@ module.exports = Backbone.View.extend({
           $el.addClass('selected');
 
           window.editor.old_model = editor.pt.model;
-          window.editor.pt.model = editor.CssComposer.getBySelectorsAdd($el.data('rule'));
-          window.editor.pt.trigger('update');
+
+          var SelectorsAdd = editor.CssComposer.getBySelectorsAdd($el.data('rule'));
+
+          if (SelectorsAdd) {
+            window.editor.pt.model = SelectorsAdd;
+            window.editor.pt.trigger('update');
+          } else {
+            window.editor.pt.model = editor.pt.model;
+            window.editor.pt.trigger('update');
+            $el.removeClass('selected');
+          }
         }
       });
     }

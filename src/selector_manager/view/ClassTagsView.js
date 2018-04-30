@@ -149,24 +149,30 @@ module.exports = Backbone.View.extend({
 
     // aryeh edit
     function css(a) {
-        var iframe = window.$('.gjs-frame')[0];
-        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+      var iframe = window.$('.gjs-frame')[0];
+      var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
 
-        var sheets = innerDoc.styleSheets, o = [];
-        a.matches = a.matches || a.webkitMatchesSelector || a.mozMatchesSelector || a.msMatchesSelector || a.oMatchesSelector;
-        for (var i in sheets) {
-          if (!sheets[i].href) {
-            var rules = sheets[i].rules || sheets[i].cssRules;
-            if (rules) {
-              for (var r in rules) {
-                if (a.matches(rules[r].selectorText)) {
-                  o.push(rules[r].cssText.split('{')[0].trim());
-                }
+      var sheets = innerDoc.styleSheets,
+        o = [];
+      a.matches =
+        a.matches ||
+        a.webkitMatchesSelector ||
+        a.mozMatchesSelector ||
+        a.msMatchesSelector ||
+        a.oMatchesSelector;
+      for (var i in sheets) {
+        if (!sheets[i].href) {
+          var rules = sheets[i].rules || sheets[i].cssRules;
+          if (rules) {
+            for (var r in rules) {
+              if (a.matches(rules[r].selectorText)) {
+                o.push(rules[r].cssText.split('{')[0].trim());
               }
             }
           }
         }
-        return o;
+      }
+      return o;
     }
 
     if (target) {
@@ -175,14 +181,19 @@ module.exports = Backbone.View.extend({
       for (var n = 0; n < styles.length; n++) {
         if (styles[n].indexOf('*') === -1) {
           if (styles[n].indexOf('gjs') === -1) {
-            $('.css-rule-list').append('<li><button data-rule="'+ styles[n] +'">'+ styles[n] +'</button></li>');
+            $('.css-rule-list').append(
+              '<li><button data-rule="' +
+                styles[n] +
+                '">' +
+                styles[n] +
+                '</button></li>'
+            );
           }
         }
       }
 
       $('.css-rule-list button').click(function() {
         var $el = $(this);
-
 
         if ($el.hasClass('selected')) {
           $('.css-rule-list button').removeClass('selected');
@@ -193,10 +204,20 @@ module.exports = Backbone.View.extend({
           $el.addClass('selected');
 
           window.editor.old_model = editor.pt.model;
-          window.editor.pt.model = editor.CssComposer.getBySelectorsAdd($el.data('rule'));
-          window.editor.pt.trigger('update');
-        }
 
+          var SelectorsAdd = editor.CssComposer.getBySelectorsAdd(
+            $el.data('rule')
+          );
+
+          if (SelectorsAdd) {
+            window.editor.pt.model = SelectorsAdd;
+            window.editor.pt.trigger('update');
+          } else {
+            window.editor.pt.model = editor.pt.model;
+            window.editor.pt.trigger('update');
+            $el.removeClass('selected');
+          }
+        }
       });
     }
     // end aryeh edit
@@ -206,9 +227,91 @@ module.exports = Backbone.View.extend({
       validSelectors = target.get('classes').getValid();
     }
 
-    this.collection.reset(validSelectors.filter(function(item){
-    	return ['animated', 'bounce','flash','pulse','rubberBand','shake','swing','tada','wobble','jello','bounceIn','bounceInDown','bounceInLeft','bounceInRight','bounceInUp','bounceOut','bounceOutDown','bounceOutLeft','bounceOutRight','bounceOutUp','fadeIn','fadeInDown','fadeInDownBig','fadeInLeft','fadeInLeftBig','fadeInRight','fadeInRightBig','fadeInUp','fadeInUpBig','fadeOut','fadeOutDown','fadeOutDownBig','fadeOutLeft','fadeOutLeftBig','fadeOutRight','fadeOutRightBig','fadeOutUp','fadeOutUpBig','flip','flipInX','flipInY','flipOutX','flipOutY','lightSpeedIn','lightSpeedOut','rotateIn','rotateInDownLeft','rotateInDownRight','rotateInUpLeft','rotateInUpRight','rotateOut','rotateOutDownLeft','rotateOutDownRight','rotateOutUpLeft','rotateOutUpRight','slideInUp','slideInDown','slideInLeft','slideInRight','slideOutUp','slideOutDown','slideOutLeft','slideOutRight','zoomIn','zoomInDown','zoomInLeft','zoomInRight','zoomInUp','zoomOut','zoomOutDown','zoomOutLeft','zoomOutRight','zoomOutUp','hinge','jackInTheBox','rollIn','rollOut'].indexOf(item.get('label')) === -1;
-    }));
+    this.collection.reset(
+      validSelectors.filter(function(item) {
+        return (
+          [
+            'animated',
+            'bounce',
+            'flash',
+            'pulse',
+            'rubberBand',
+            'shake',
+            'swing',
+            'tada',
+            'wobble',
+            'jello',
+            'bounceIn',
+            'bounceInDown',
+            'bounceInLeft',
+            'bounceInRight',
+            'bounceInUp',
+            'bounceOut',
+            'bounceOutDown',
+            'bounceOutLeft',
+            'bounceOutRight',
+            'bounceOutUp',
+            'fadeIn',
+            'fadeInDown',
+            'fadeInDownBig',
+            'fadeInLeft',
+            'fadeInLeftBig',
+            'fadeInRight',
+            'fadeInRightBig',
+            'fadeInUp',
+            'fadeInUpBig',
+            'fadeOut',
+            'fadeOutDown',
+            'fadeOutDownBig',
+            'fadeOutLeft',
+            'fadeOutLeftBig',
+            'fadeOutRight',
+            'fadeOutRightBig',
+            'fadeOutUp',
+            'fadeOutUpBig',
+            'flip',
+            'flipInX',
+            'flipInY',
+            'flipOutX',
+            'flipOutY',
+            'lightSpeedIn',
+            'lightSpeedOut',
+            'rotateIn',
+            'rotateInDownLeft',
+            'rotateInDownRight',
+            'rotateInUpLeft',
+            'rotateInUpRight',
+            'rotateOut',
+            'rotateOutDownLeft',
+            'rotateOutDownRight',
+            'rotateOutUpLeft',
+            'rotateOutUpRight',
+            'slideInUp',
+            'slideInDown',
+            'slideInLeft',
+            'slideInRight',
+            'slideOutUp',
+            'slideOutDown',
+            'slideOutLeft',
+            'slideOutRight',
+            'zoomIn',
+            'zoomInDown',
+            'zoomInLeft',
+            'zoomInRight',
+            'zoomInUp',
+            'zoomOut',
+            'zoomOutDown',
+            'zoomOutLeft',
+            'zoomOutRight',
+            'zoomOutUp',
+            'hinge',
+            'jackInTheBox',
+            'rollIn',
+            'rollOut'
+          ].indexOf(item.get('label')) === -1
+        );
+      })
+    );
     this.updateStateVis();
   },
 
@@ -300,8 +403,6 @@ module.exports = Backbone.View.extend({
   addToClasses(model, fragmentEl) {
     var fragment = fragmentEl || null;
 
-
-
     var view = new ClassTagView({
       model,
       config: this.config,
@@ -324,7 +425,88 @@ module.exports = Backbone.View.extend({
     var fragment = document.createDocumentFragment();
     window.aryeh = this.collection;
     this.collection.each(function(model) {
-      if (model && ['animated', 'bounce','flash','pulse','rubberBand','shake','swing','tada','wobble','jello','bounceIn','bounceInDown','bounceInLeft','bounceInRight','bounceInUp','bounceOut','bounceOutDown','bounceOutLeft','bounceOutRight','bounceOutUp','fadeIn','fadeInDown','fadeInDownBig','fadeInLeft','fadeInLeftBig','fadeInRight','fadeInRightBig','fadeInUp','fadeInUpBig','fadeOut','fadeOutDown','fadeOutDownBig','fadeOutLeft','fadeOutLeftBig','fadeOutRight','fadeOutRightBig','fadeOutUp','fadeOutUpBig','flip','flipInX','flipInY','flipOutX','flipOutY','lightSpeedIn','lightSpeedOut','rotateIn','rotateInDownLeft','rotateInDownRight','rotateInUpLeft','rotateInUpRight','rotateOut','rotateOutDownLeft','rotateOutDownRight','rotateOutUpLeft','rotateOutUpRight','slideInUp','slideInDown','slideInLeft','slideInRight','slideOutUp','slideOutDown','slideOutLeft','slideOutRight','zoomIn','zoomInDown','zoomInLeft','zoomInRight','zoomInUp','zoomOut','zoomOutDown','zoomOutLeft','zoomOutRight','zoomOutUp','hinge','jackInTheBox','rollIn','rollOut'].indexOf(model.get('label')) === -1) {
+      if (
+        model &&
+        [
+          'animated',
+          'bounce',
+          'flash',
+          'pulse',
+          'rubberBand',
+          'shake',
+          'swing',
+          'tada',
+          'wobble',
+          'jello',
+          'bounceIn',
+          'bounceInDown',
+          'bounceInLeft',
+          'bounceInRight',
+          'bounceInUp',
+          'bounceOut',
+          'bounceOutDown',
+          'bounceOutLeft',
+          'bounceOutRight',
+          'bounceOutUp',
+          'fadeIn',
+          'fadeInDown',
+          'fadeInDownBig',
+          'fadeInLeft',
+          'fadeInLeftBig',
+          'fadeInRight',
+          'fadeInRightBig',
+          'fadeInUp',
+          'fadeInUpBig',
+          'fadeOut',
+          'fadeOutDown',
+          'fadeOutDownBig',
+          'fadeOutLeft',
+          'fadeOutLeftBig',
+          'fadeOutRight',
+          'fadeOutRightBig',
+          'fadeOutUp',
+          'fadeOutUpBig',
+          'flip',
+          'flipInX',
+          'flipInY',
+          'flipOutX',
+          'flipOutY',
+          'lightSpeedIn',
+          'lightSpeedOut',
+          'rotateIn',
+          'rotateInDownLeft',
+          'rotateInDownRight',
+          'rotateInUpLeft',
+          'rotateInUpRight',
+          'rotateOut',
+          'rotateOutDownLeft',
+          'rotateOutDownRight',
+          'rotateOutUpLeft',
+          'rotateOutUpRight',
+          'slideInUp',
+          'slideInDown',
+          'slideInLeft',
+          'slideInRight',
+          'slideOutUp',
+          'slideOutDown',
+          'slideOutLeft',
+          'slideOutRight',
+          'zoomIn',
+          'zoomInDown',
+          'zoomInLeft',
+          'zoomInRight',
+          'zoomInUp',
+          'zoomOut',
+          'zoomOutDown',
+          'zoomOutLeft',
+          'zoomOutRight',
+          'zoomOutUp',
+          'hinge',
+          'jackInTheBox',
+          'rollIn',
+          'rollOut'
+        ].indexOf(model.get('label')) === -1
+      ) {
         this.addToClasses(model, fragment);
       } else {
         // this.collection.remove(model);

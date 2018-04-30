@@ -376,6 +376,8 @@ module.exports = Backbone.View.extend({
   isTargetStylable(target) {
     const trg = target || this.getTarget();
     const model = this.model;
+    window.aaasss = target;
+    window.aaasss2 = this;
     const property = model.get('property');
     const toRequire = model.get('toRequire');
     const unstylable = trg.get('unstylable');

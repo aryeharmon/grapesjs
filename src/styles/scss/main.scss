@@ -531,3 +531,7 @@ $prefix: $app-prefix;
 .gjs-trt-trait {
     display: block;
 }
+
+.css-rule-list .selected{
+  background: red;
+}
