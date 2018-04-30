@@ -650,6 +650,8 @@ module.exports = () => {
             }
             data.html = html;
             data.css = css;
+            data.width = editor.getSelected().view.$el.width();
+            data.height = editor.getSelected().view.$el.height();
 
             $.ajax({
               url: base_url + '/save-layout',

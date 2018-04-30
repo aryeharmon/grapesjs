@@ -26165,7 +26165,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.213',
+    version: '0.14.214',
 
     /**
      * Initializes an editor based on passed options
@@ -47117,6 +47117,8 @@ module.exports = function () {
 
             data.html = html;
             data.css = css;
+            data.width = editor.getSelected().view.$el.width();
+            data.height = editor.getSelected().view.$el.height();
 
             $.ajax({
               url: base_url + '/save-layout',
