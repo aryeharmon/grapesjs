@@ -140,7 +140,7 @@ module.exports = () => {
   <div style="float: left; width: 50%;">
     <h4>New Layout</h4>
 
-    <form id="NewLayoutForm" enctype="multipart/form-data">
+    <form id="NewLayoutForm">
       <div class="form_item">
         <label>Block <i style="color: red;">*</i></label>
         <select name="block_id" required="required">
