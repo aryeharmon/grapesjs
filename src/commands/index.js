@@ -663,10 +663,7 @@ module.exports = () => {
                 editor.getSelected().setAttributes(attr);
 
                 modal.close();
-              },
-              cache: false,
-              contentType: false,
-              processData: false
+              }
             });
           });
 

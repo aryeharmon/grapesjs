@@ -26165,7 +26165,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.214',
+    version: '0.14.215',
 
     /**
      * Initializes an editor based on passed options
@@ -47130,10 +47130,7 @@ module.exports = function () {
                 editor.getSelected().setAttributes(attr);
 
                 modal.close();
-              },
-              cache: false,
-              contentType: false,
-              processData: false
+              }
             });
           });
 
