@@ -641,14 +641,20 @@ module.exports = () => {
 
           $('#NewLayoutForm').submit(function(e) {
             e.preventDefault();
+
+            var data = {};
             var formData = new FormData(this);
-            formData.set('html', html);
-            formData.set('css', css);
+
+            for (var pair of formData.entries()) {
+              data[pair[0]] = pair[1];
+            }
+            data.html = html;
+            data.css = css;
 
             $.ajax({
               url: base_url + '/save-layout',
               type: 'POST',
-              data: formData,
+              data: data,
               success: function(data) {
                 var attr = editor.getSelected().getAttributes();
                 attr['data-layout'] = data.id;
