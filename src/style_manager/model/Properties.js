@@ -96,6 +96,16 @@ module.exports = require('backbone')
         }
       },
       {
+        id: 'new-border',
+        model: require('./PropertyNewBorder'),
+        view: require('./../view/PropertyNewBorderView'),
+        isType(value) {
+          if (value && value.type == 'new-border') {
+            return value;
+          }
+        }
+      },
+      {
         id: 'integer',
         model: require('./PropertyInteger'),
         view: require('./../view/PropertyIntegerView'),
