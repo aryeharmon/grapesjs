@@ -4039,7 +4039,7 @@ var Component = Backbone.Model.extend(_Styleable2.default).extend({
     script: '',
 
     // Traits
-    traits: ['id', 'title', 'data-angular', { type: 'text', name: 'ng-repeat', label: 'repeat' }, { type: 'text', name: 'ng-init', label: 'init' }],
+    traits: ['id', 'title', 'data-angular', { type: 'text', name: 'ng-if', label: 'if' }, { type: 'text', name: 'ng-repeat', label: 'repeat' }, { type: 'text', name: 'ng-init', label: 'init' }],
 
     // Indicates an array of properties which will be inhereted by
     // all NEW appended children
@@ -26176,7 +26176,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.300',
+    version: '0.14.302',
 
     /**
      * Initializes an editor based on passed options
@@ -40269,7 +40269,6 @@ module.exports = Property.extend({
   defaults: _extends({}, Property.prototype.defaults, {
     showInput: 1
   })
-
 });
 
 /***/ }),
@@ -40391,17 +40390,13 @@ module.exports = Property.extend({
     // var style = modelToStyle.getStyle();
     //
     // alert(JSON.stringify(style))
-
-
     // this.getSliderEl().value = value;
     // this.inputInst.setValue(value, { silent: 1 });
   },
   onRender: function onRender() {
-
     // window.editor.on('component:update:content', model => {
     //   alert(123);
     // })
-
     // style['border-width'] = 0;
     //
     // var width = (model.view.$el.find('[name=border-width]').val() || 0) + 'px';
@@ -40428,8 +40423,6 @@ module.exports = Property.extend({
     // }
     //
     // modelToStyle.setStyle(style, {avoidStore: 0});
-
-
     // Property.prototype.onRender.apply(this, arguments);
     //
     // if (!this.model.get('showInput')) {
