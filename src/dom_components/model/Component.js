@@ -118,8 +118,8 @@ const Component = Backbone.Model.extend(Styleable).extend(
         'data-angular',
         {
           type: 'text',
-          name: 'data-sections',
-          label: 'sections (comma seperated)'
+          name: 'data-section',
+          label: 'Section Name'
         },
         { type: 'text', name: 'ng-if', label: 'if' },
         { type: 'text', name: 'ng-repeat', label: 'repeat' },
