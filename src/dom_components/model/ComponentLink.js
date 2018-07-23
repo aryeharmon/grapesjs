@@ -12,7 +12,8 @@ module.exports = Component.extend(
         'target',
         'data-angular',
         { type: 'text', name: 'ng-repeat', label: 'repeat' },
-        { type: 'text', name: 'ng-init', label: 'init' }
+        { type: 'text', name: 'ng-init', label: 'init' },
+        { type: 'text', name: 'ng-click', label: 'click' }
       ]
     },
 

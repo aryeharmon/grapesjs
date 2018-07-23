@@ -123,7 +123,8 @@ const Component = Backbone.Model.extend(Styleable).extend(
         },
         { type: 'text', name: 'ng-if', label: 'if' },
         { type: 'text', name: 'ng-repeat', label: 'repeat' },
-        { type: 'text', name: 'ng-init', label: 'init' }
+        { type: 'text', name: 'ng-init', label: 'init' },
+        { type: 'text', name: 'ng-click', label: 'click' }
       ],
 
       // Indicates an array of properties which will be inhereted by
