@@ -1,5 +1,6 @@
 var Backbone = require('backbone');
 var CodeMirror = require('codemirror/lib/codemirror');
+var CodeMirrorSearch = require('codemirror/addon/search/search.js');
 var htmlMode = require('codemirror/mode/htmlmixed/htmlmixed');
 var cssMode = require('codemirror/mode/css/css');
 var formatting = require('codemirror-formatting');

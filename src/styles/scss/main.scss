@@ -535,3 +535,10 @@ $prefix: $app-prefix;
 .css-rule-list .selected{
   background: red;
 }
+
+.CodeMirror-dialog {
+  top: 0;
+  position: absolute;
+  background: red;
+  opacity: 1;
+}
