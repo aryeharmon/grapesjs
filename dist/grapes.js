@@ -4043,7 +4043,7 @@ var Component = Backbone.Model.extend(_Styleable2.default).extend({
       type: 'text',
       name: 'data-section',
       label: 'Section Name'
-    }, { type: 'text', name: 'ng-if', label: 'if' }, { type: 'text', name: 'ng-repeat', label: 'repeat' }, { type: 'text', name: 'ng-init', label: 'init' }, { type: 'text', name: 'ng-click', label: 'click' }],
+    }, { type: 'text', name: 'ng-if', label: 'if' }, { type: 'text', name: 'ng-show', label: 'show' }, { type: 'text', name: 'ng-repeat', label: 'repeat' }, { type: 'text', name: 'ng-init', label: 'init' }, { type: 'text', name: 'ng-click', label: 'click' }],
 
     // Indicates an array of properties which will be inhereted by
     // all NEW appended children
@@ -26180,7 +26180,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.312',
+    version: '0.14.313',
 
     /**
      * Initializes an editor based on passed options
