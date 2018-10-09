@@ -22,14 +22,14 @@ module.exports = require('backbone').Model.extend({
     // Let's know what classes I've found
     classes.each(model => this.compCls.push(model.getFullName()));
 
-    if ((!avoidInline || isWrapper) && style) {
-      let selector = `#${model.getId()}`;
-      selector = wrappesIsBody && isWrapper ? 'body' : selector;
+    // if ((!avoidInline || isWrapper) && style) {
+    //   let selector = `#${model.getId()}`;
+    //   selector = wrappesIsBody && isWrapper ? 'body' : selector;
 
-      if (selector.indexOf('#tab') === -1) {
-        code = `${selector}{${style}}`;
-      }
-    }
+    //   if (selector.indexOf('#tab') === -1) {
+    //     code = `${selector}{${style}}`;
+    //   }
+    // }
 
     const components = model.components();
     components.each(model => (code += this.buildFromModel(model, opts)));

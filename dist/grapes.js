@@ -26180,7 +26180,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.314',
+    version: '0.14.315',
 
     /**
      * Initializes an editor based on passed options
@@ -35987,14 +35987,14 @@ module.exports = __webpack_require__(0).Model.extend({
       return _this.compCls.push(model.getFullName());
     });
 
-    if ((!avoidInline || isWrapper) && style) {
-      var selector = '#' + model.getId();
-      selector = wrappesIsBody && isWrapper ? 'body' : selector;
+    // if ((!avoidInline || isWrapper) && style) {
+    //   let selector = `#${model.getId()}`;
+    //   selector = wrappesIsBody && isWrapper ? 'body' : selector;
 
-      if (selector.indexOf('#tab') === -1) {
-        code = selector + '{' + style + '}';
-      }
-    }
+    //   if (selector.indexOf('#tab') === -1) {
+    //     code = `${selector}{${style}}`;
+    //   }
+    // }
 
     var components = model.components();
     components.each(function (model) {
