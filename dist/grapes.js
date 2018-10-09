@@ -26180,7 +26180,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.313',
+    version: '0.14.314',
 
     /**
      * Initializes an editor based on passed options
@@ -35980,7 +35980,7 @@ module.exports = __webpack_require__(0).Model.extend({
     var classes = model.get('classes');
     var wrappesIsBody = opts.wrappesIsBody;
     var isWrapper = model.get('wrapper');
-    this.ids.push('#' + model.getId());
+    // this.ids.push(`#${model.getId()}`);
 
     // Let's know what classes I've found
     classes.each(function (model) {
