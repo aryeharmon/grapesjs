@@ -1,6 +1,6 @@
 var assetTemplate = `
 <form id="TableEdit">
-  
+
   <strong>Desktop</strong>
 
   <div>
@@ -32,8 +32,41 @@ var assetTemplate = `
   pagination-class: <input name="pagination_class" class="pagination-class" value="<%= pagination_class %>" placefolder="pagination class">
   </div>
   <div>
-  pagination-per-page: <input name="pagination_per_page" type="number" class="pagination-per-page" value="<%= pagination_per_page %>" placefolder="10">
+  pagination-per-page: <input name="pagination_per_page" type="number" class="pagination-per-page" placefolder="10">
   </div>
+  <div>
+  API exist : <input type="checkbox" name="api-exist" class="api-exist" <% if (api_exist == 'true') { %> checked="checked"<% } %>>
+  </div>
+    <div id="api_div" hidden>
+        <div>
+        API URL : <input name="api_url" class="api-url" placeholder="api url" value="<%= api_url %>">
+        </div>
+        <div>
+        API Methods : <select name="api_method" class="api-method">
+                          <option value="get" <%= api_method == "get" ? 'selected="selected"' : '' %>>GET</option>
+                          <option value="post" <%= api_method == "post" ? 'selected="selected"' : '' %>>POST</option>
+                      </select>
+        </div>
+        API Params :
+        <table id="api_table" width="100">
+          <tr>
+            <td><strong>Key</strong></td>
+            <td><strong>Value</strong></td>
+          </tr>
+        <% _.each(api_params, function(col, index) { %>
+          <tr data-row="<%= index %>">
+            <td><input name="param_key[<%= index %>]"  placeholder="param key" value="<%= col.param_key %>"></td>
+            <td><input name="param_value[<%= index %>]"  placeholder="param value" value="<%= col.param_value %>"></td>
+            <td>
+              <button type="button" class="remove-param" data-index="<%= index %>">Remove</button>
+            </td>
+          <tr>
+        <% }); %>
+          </table>
+          <button id="addParamBtn" type="button" class="btn btn-primary">Add Param</button>
+    </div>
+
+
 
   <table width="100">
     <tr>
@@ -46,7 +79,7 @@ var assetTemplate = `
       <td><strong>Class</strong></td>
       <td><strong>Actuons</strong></td>
     </tr>
-    <% _.each(columns, function(col, index) { %> 
+    <% _.each(columns, function(col, index) { %>
     <tr data-row="<%= index %>">
       <td><%= index + 1 %></td>
       <td>
@@ -85,7 +118,6 @@ var assetTemplate = `
 `;
 
 module.exports = {
-
   template: _.template(assetTemplate),
 
   run(editor, sender, opts) {
@@ -97,17 +129,37 @@ module.exports = {
 
     that.modal.setTitle(that.opt.modalTitle || 'Table Editor');
 
-    var cols = atob(that.opt.target.get('attributes').datatable || 'W10=')
-    var ng_click = atob(that.opt.target.get('attributes').ng_click || 'IA==')
-    var ng_if = atob(that.opt.target.get('attributes').ng_if || 'IA==')
-    var ng_class = atob(that.opt.target.get('attributes').ng_class || 'IA==')
-    var has_search = atob(that.opt.target.get('attributes').has_search || 'IA==')
-    var search_class = atob(that.opt.target.get('attributes').search_class || 'IA==')
-    var has_pagination = atob(that.opt.target.get('attributes').has_pagination || 'IA==')
-    var pagination_class = atob(that.opt.target.get('attributes').pagination_class || 'IA==')
-    var pagination_per_page = atob(that.opt.target.get('attributes').pagination_per_page || 'IA==')
+    var cols = atob(that.opt.target.get('attributes').datatable || 'W10=');
+    var ng_click = atob(that.opt.target.get('attributes').ng_click || 'IA==');
+    var ng_if = atob(that.opt.target.get('attributes').ng_if || 'IA==');
+    var ng_class = atob(that.opt.target.get('attributes').ng_class || 'IA==');
+    var has_search = atob(
+      that.opt.target.get('attributes').has_search || 'IA=='
+    );
+    var search_class = atob(
+      that.opt.target.get('attributes').search_class || 'IA=='
+    );
+    var has_pagination = atob(
+      that.opt.target.get('attributes').has_pagination || 'IA=='
+    );
+    var pagination_class = atob(
+      that.opt.target.get('attributes').pagination_class || 'IA=='
+    );
+    var pagination_per_page = atob(
+      that.opt.target.get('attributes').pagination_per_page || 'IA=='
+    );
+    var api_exist = atob(that.opt.target.get('attributes').api_exist || 'IA==');
+    var api_url = atob(that.opt.target.get('attributes').api_url || 'IA==');
+    var api_method = atob(
+      that.opt.target.get('attributes').api_method || 'W10='
+    );
+    var api_params = atob(
+      that.opt.target.get('attributes').api_params || 'W10='
+    );
 
     that.columns = cols ? JSON.parse(cols) : [{}];
+
+    that.api_params = api_params ? JSON.parse(api_params) : [];
 
     var content = this.template({
       columns: that.columns,
@@ -121,6 +173,10 @@ module.exports = {
       has_pagination: has_pagination,
       pagination_class: pagination_class,
       pagination_per_page: pagination_per_page,
+      api_exist: api_exist,
+      api_url: api_url,
+      api_method: api_method,
+      api_params: that.api_params
     });
 
     // $(that.modal.getContentEl()).html(content);
@@ -135,8 +191,9 @@ module.exports = {
 
     $('#addColBtn').click(function(e) {
       that.mapColumn();
+      that.mapParams();
 
-      setTimeout(function() {      
+      setTimeout(function() {
         that.columns.push({});
 
         var content = that.template({
@@ -151,6 +208,10 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
+          api_exist: $('#TableEdit .api-exist')[0].checked,
+          api_url: $('#TableEdit .api-url').val(),
+          api_method: $('#TableEdit .api-method').val(),
+          api_params: that.api_params
         });
 
         // $(that.modal.getContentEl()).html(content);
@@ -163,8 +224,9 @@ module.exports = {
     $('.remove-col').click(function(e) {
       var j = $(this);
       that.mapColumn();
+      that.mapParams();
 
-      setTimeout(function() { 
+      setTimeout(function() {
         that.columns.splice(parseInt(j.data('index')), 1);
 
         var content = that.template({
@@ -179,7 +241,10 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
-
+          api_exist: $('#TableEdit .api-exist')[0].checked,
+          api_url: $('#TableEdit .api-url').val(),
+          api_method: $('#TableEdit .api-method').val(),
+          api_params: that.api_params
         });
 
         that.modal.setContent($('<div>').html(content));
@@ -189,27 +254,146 @@ module.exports = {
       }, 1);
     });
 
+    $('.api-exist').change(function() {
+      if (this.checked) {
+        $('#api_div').show();
+      } else {
+        $('#api_div').hide();
+      }
+    });
+
+    $('#addParamBtn').click(function(e) {
+      that.mapParams();
+
+      setTimeout(function() {
+        that.api_params.push({ param_key: '', param_value: '' });
+
+        var content = that.template({
+          api_params: that.api_params,
+          columns: that.columns,
+          repeat: $('#TableEdit .repeat').val(),
+          data_in: $('#TableEdit .in').val(),
+          ng_click: $('#TableEdit .ng-click').val(),
+          ng_if: $('#TableEdit .ng-if').val(),
+          ng_class: $('#TableEdit .ng-class').val(),
+          has_search: $('#TableEdit .has-search')[0].checked,
+          search_class: $('#TableEdit .search-class').val(),
+          has_pagination: $('#TableEdit .has-pagination')[0].checked,
+          pagination_class: $('#TableEdit .pagination-class').val(),
+          pagination_per_page: $('#TableEdit .pagination-per-page').val(),
+          api_exist: $('#TableEdit .api-exist')[0].checked,
+          api_url: $('#TableEdit .api-url').val(),
+          api_method: $('#TableEdit .api-method').val()
+        });
+
+        that.modal.setContent($('<div>').html(content));
+        that.events();
+        $('#api_div').show();
+      }, 0);
+    });
+
+    $('.remove-param').click(function(e) {
+      var j = $(this);
+      that.mapParams();
+
+      setTimeout(function() {
+        that.api_params.splice(parseInt(j.data('index')), 1);
+
+        var content = that.template({
+          api_params: that.api_params,
+          columns: that.columns,
+          repeat: $('#TableEdit .repeat').val(),
+          data_in: $('#TableEdit .in').val(),
+          ng_click: $('#TableEdit .ng-click').val(),
+          ng_if: $('#TableEdit .ng-if').val(),
+          ng_class: $('#TableEdit .ng-class').val(),
+          has_search: $('#TableEdit .has-search')[0].checked,
+          search_class: $('#TableEdit .search-class').val(),
+          has_pagination: $('#TableEdit .has-pagination')[0].checked,
+          pagination_class: $('#TableEdit .pagination-class').val(),
+          pagination_per_page: $('#TableEdit .pagination-per-page').val(),
+          api_exist: $('#TableEdit .api-exist')[0].checked,
+          api_url: $('#TableEdit .api-url').val(),
+          api_method: $('#TableEdit .api-method').val()
+        });
+
+        that.modal.setContent($('<div>').html(content));
+        that.events();
+        $('#api_div').show();
+      }, 1);
+    });
+
     // alert(that.opt.target.get('datatable'));
 
     $('#addTableBtn').click(function(e) {
       that.mapColumn();
-      setTimeout(function() { 
-        that.opt.target.get('attributes').datatable = btoa(JSON.stringify(that.columns));
-        that.opt.target.get('attributes').repeat = $('#TableEdit .repeat').val();
+      that.mapParams();
+
+      setTimeout(function() {
+        that.opt.target.get('attributes').datatable = btoa(
+          JSON.stringify(that.columns)
+        );
+        that.opt.target.get('attributes').repeat = $(
+          '#TableEdit .repeat'
+        ).val();
         that.opt.target.get('attributes').in = $('#TableEdit .in').val();
-        
-        that.opt.target.get('attributes').ng_click = btoa($('#TableEdit .ng-click').val());
-        that.opt.target.get('attributes').ng_if = btoa($('#TableEdit .ng-if').val());
-        that.opt.target.get('attributes').ng_class = btoa($('#TableEdit .ng-class').val());
-        that.opt.target.get('attributes').has_search = btoa($('#TableEdit .has-search')[0].checked);
-        that.opt.target.get('attributes').search_class = btoa($('#TableEdit .search-class').val());
-        that.opt.target.get('attributes').has_pagination = btoa($('#TableEdit .has-pagination')[0].checked);
-        that.opt.target.get('attributes').pagination_class = btoa($('#TableEdit .pagination-class').val());
-        that.opt.target.get('attributes').pagination_per_page = btoa($('#TableEdit .pagination-per-page').val());
+
+        that.opt.target.get('attributes').ng_click = btoa(
+          $('#TableEdit .ng-click').val()
+        );
+        that.opt.target.get('attributes').ng_if = btoa(
+          $('#TableEdit .ng-if').val()
+        );
+        that.opt.target.get('attributes').ng_class = btoa(
+          $('#TableEdit .ng-class').val()
+        );
+        that.opt.target.get('attributes').has_search = btoa(
+          $('#TableEdit .has-search')[0].checked
+        );
+        that.opt.target.get('attributes').search_class = btoa(
+          $('#TableEdit .search-class').val()
+        );
+        that.opt.target.get('attributes').has_pagination = btoa(
+          $('#TableEdit .has-pagination')[0].checked
+        );
+        that.opt.target.get('attributes').pagination_class = btoa(
+          $('#TableEdit .pagination-class').val()
+        );
+        that.opt.target.get('attributes').pagination_per_page = btoa(
+          $('#TableEdit .pagination-per-page').val()
+        );
+        that.opt.target.get('attributes').api_exist = btoa(
+          $('#TableEdit .api-exist')[0].checked
+        );
+        that.opt.target.get('attributes').api_url = btoa(
+          $('#TableEdit .api-url').val()
+        );
+        that.opt.target.get('attributes').api_method = btoa(
+          $('#TableEdit .api-method').val()
+        );
+        that.opt.target.get('attributes').api_params = btoa(
+          JSON.stringify(that.api_params)
+        );
         e.preventDefault();
         that.modal.close();
       }, 1);
     });
+  },
+  mapParams: function() {
+    var that = this;
+    var form = $.extend({}, $('#TableEdit').serializeArray());
+
+    var fields = {};
+
+    for (var n in form) {
+      fields[form[n].name] = form[n].value;
+    }
+
+    for (var n = 0; n < that.api_params.length; n++) {
+      var col = that.api_params[n];
+      col.param_key = fields['param_key[' + n + ']'];
+      col.param_value = fields['param_value[' + n + ']'];
+    }
   },
   mapColumn: function() {
     var that = this;
@@ -231,5 +415,5 @@ module.exports = {
       col.editor = fields['editor[' + n + ']'];
       col.name = fields['name[' + n + ']'];
     }
-  },
+  }
 };
