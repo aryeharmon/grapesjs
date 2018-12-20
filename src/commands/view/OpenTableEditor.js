@@ -37,7 +37,7 @@ var assetTemplate = `
   <div>
   API exist : <input type="checkbox" name="api-exist" class="api-exist" <% if (api_exist == 'true') { %> checked="checked"<% } %>>
   </div>
-    <div id="api_div" hidden>
+    <div id="api_div" <% if (api_exist == 'false') { %> hidden <% } %>>
         <div>
         API URL : <input name="api_url" class="api-url" placeholder="api url" value="<%= api_url %>">
         </div>
@@ -52,11 +52,13 @@ var assetTemplate = `
           <tr>
             <td><strong>Key</strong></td>
             <td><strong>Value</strong></td>
+            <td><strong>Default Value</strong></td>
           </tr>
         <% _.each(api_params, function(col, index) { %>
           <tr data-row="<%= index %>">
             <td><input name="param_key[<%= index %>]"  placeholder="param key" value="<%= col.param_key %>"></td>
             <td><input name="param_value[<%= index %>]"  placeholder="param value" value="<%= col.param_value %>"></td>
+            <td><input name="param_default[<%= index %>]"  placeholder="default value" value="<%= col.param_default %>"></td>
             <td>
               <button type="button" class="remove-param" data-index="<%= index %>">Remove</button>
             </td>
@@ -148,10 +150,12 @@ module.exports = {
     var pagination_per_page = atob(
       that.opt.target.get('attributes').pagination_per_page || 'IA=='
     );
-    var api_exist = atob(that.opt.target.get('attributes').api_exist || 'IA==');
+    var api_exist = atob(
+      that.opt.target.get('attributes').api_exist || 'ZmFsc2U='
+    );
     var api_url = atob(that.opt.target.get('attributes').api_url || 'IA==');
     var api_method = atob(
-      that.opt.target.get('attributes').api_method || 'W10='
+      that.opt.target.get('attributes').api_method || 'Z2V0'
     );
     var api_params = atob(
       that.opt.target.get('attributes').api_params || 'W10='
@@ -266,7 +270,11 @@ module.exports = {
       that.mapParams();
 
       setTimeout(function() {
-        that.api_params.push({ param_key: '', param_value: '' });
+        that.api_params.push({
+          param_key: '',
+          param_value: '',
+          param_default: ''
+        });
 
         var content = that.template({
           api_params: that.api_params,
@@ -393,6 +401,7 @@ module.exports = {
       var col = that.api_params[n];
       col.param_key = fields['param_key[' + n + ']'];
       col.param_value = fields['param_value[' + n + ']'];
+      col.param_default = fields['param_default[' + n + ']'];
     }
   },
   mapColumn: function() {
