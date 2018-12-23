@@ -32,7 +32,7 @@ var assetTemplate = `
   pagination-class: <input name="pagination_class" class="pagination-class" value="<%= pagination_class %>" placefolder="pagination class">
   </div>
   <div>
-  pagination-per-page: <input name="pagination_per_page" type="number" class="pagination-per-page" placefolder="10">
+  pagination-per-page: <input name="pagination_per_page" type="number" class="pagination-per-page" value="<%= pagination_per_page %>" placefolder="10">
   </div>
   <div>
   API exist : <input type="checkbox" name="api-exist" class="api-exist" <% if (api_exist == 'true') { %> checked="checked"<% } %>>
