@@ -66,7 +66,20 @@ var assetTemplate = `
         <% }); %>
           </table>
           <button id="addParamBtn" type="button" class="btn btn-primary">Add Param</button>
+  
+    <div class="print-template">
+      <label>Print Template</label>
+      <select name="print_template">
+      pdf_templates
+        <option>None</option>
+        <% _.each(pdf_templates, function(temp, index) { %>
+          <option value="<%= temp.id %>" <%= selected_print_template == temp.id ? 'selected="selected"' : '' %> ><%= temp.name %></option>
+        <% }); %>
+      
+      </select>
     </div>
+
+  </div>
 
 
 
@@ -150,6 +163,10 @@ module.exports = {
     var pagination_per_page = atob(
       that.opt.target.get('attributes').pagination_per_page || 'IA=='
     );
+
+    var selected_print_template = that.opt.target.get('attributes')
+      .selected_print_template;
+
     var api_exist = atob(
       that.opt.target.get('attributes').api_exist || 'ZmFsc2U='
     );
@@ -165,30 +182,36 @@ module.exports = {
 
     that.api_params = api_params ? JSON.parse(api_params) : [];
 
-    var content = this.template({
-      columns: that.columns,
-      repeat: that.opt.target.get('attributes').repeat,
-      data_in: that.opt.target.get('attributes').in,
-      ng_click: ng_click,
-      ng_if: ng_if,
-      ng_class: ng_class,
-      has_search: has_search,
-      search_class: search_class,
-      has_pagination: has_pagination,
-      pagination_class: pagination_class,
-      pagination_per_page: pagination_per_page,
-      api_exist: api_exist,
-      api_url: api_url,
-      api_method: api_method,
-      api_params: that.api_params
+    jQuery.getJSON('/pdf-template-list', function(data) {
+      that.pdf_templates = data;
+
+      var content = that.template({
+        columns: that.columns,
+        repeat: that.opt.target.get('attributes').repeat,
+        data_in: that.opt.target.get('attributes').in,
+        ng_click: ng_click,
+        ng_if: ng_if,
+        ng_class: ng_class,
+        has_search: has_search,
+        search_class: search_class,
+        has_pagination: has_pagination,
+        pagination_class: pagination_class,
+        pagination_per_page: pagination_per_page,
+        api_exist: api_exist,
+        api_url: api_url,
+        api_method: api_method,
+        api_params: that.api_params,
+        pdf_templates: that.pdf_templates,
+        selected_print_template: selected_print_template
+      });
+
+      // $(that.modal.getContentEl()).html(content);
+      that.modal.setContent($('<div>').html(content));
+
+      that.modal.open();
+
+      that.events();
     });
-
-    // $(that.modal.getContentEl()).html(content);
-    that.modal.setContent($('<div>').html(content));
-
-    that.modal.open();
-
-    that.events();
   },
   events: function() {
     var that = this;
@@ -215,7 +238,9 @@ module.exports = {
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
           api_method: $('#TableEdit .api-method').val(),
-          api_params: that.api_params
+          api_params: that.api_params,
+          pdf_templates: that.pdf_templates,
+          selected_print_template: $('#TableEdit [name=print_template]').val()
         });
 
         // $(that.modal.getContentEl()).html(content);
@@ -248,7 +273,9 @@ module.exports = {
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
           api_method: $('#TableEdit .api-method').val(),
-          api_params: that.api_params
+          api_params: that.api_params,
+          pdf_templates: that.pdf_templates,
+          selected_print_template: $('#TableEdit [name=print_template]').val()
         });
 
         that.modal.setContent($('<div>').html(content));
@@ -291,7 +318,9 @@ module.exports = {
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
-          api_method: $('#TableEdit .api-method').val()
+          api_method: $('#TableEdit .api-method').val(),
+          pdf_templates: that.pdf_templates,
+          selected_print_template: $('#TableEdit [name=print_template]').val()
         });
 
         that.modal.setContent($('<div>').html(content));
@@ -322,7 +351,9 @@ module.exports = {
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
-          api_method: $('#TableEdit .api-method').val()
+          api_method: $('#TableEdit .api-method').val(),
+          pdf_templates: that.pdf_templates,
+          selected_print_template: $('#TableEdit [name=print_template]').val()
         });
 
         that.modal.setContent($('<div>').html(content));
@@ -370,6 +401,10 @@ module.exports = {
         that.opt.target.get('attributes').pagination_per_page = btoa(
           $('#TableEdit .pagination-per-page').val()
         );
+        that.opt.target.get('attributes').selected_print_template = $(
+          '#TableEdit [name=print_template]'
+        ).val();
+
         that.opt.target.get('attributes').api_exist = btoa(
           $('#TableEdit .api-exist')[0].checked
         );
