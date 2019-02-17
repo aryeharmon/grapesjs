@@ -1,4 +1,9 @@
 var assetTemplate = `
+<div ng-app="myShoppingList" ng-controller="myCtrl">
+  <ul>
+    <li ng-repeat="x in products">{{x}}</li>
+  </ul>
+</div>
 <form id="TableEdit">
 
   <strong>Desktop</strong>
@@ -20,13 +25,13 @@ var assetTemplate = `
   ng-class: <input name="ng_class" class="ng-class" value="<%= ng_class %>" placefolder="ng class">
   </div>
   <div>
-  Has search: <input type="checkbox" name="has_search" class="has-search"<% if (has_search == 'true') { %> checked="checked"<% } %>>
+  Has search: <input type="checkbox" name="has_search" class="has-search"<% if (has_search == 'true' || has_search === true) { %> checked="checked"<% } %>>
   </div>
   <div>
   search-class: <input name="search_class" class="search-class" value="<%= search_class %>" placefolder="search class">
   </div>
   <div>
-  Has pagination: <input type="checkbox" name="has_pagination" class="has-pagination" <% if (has_pagination == 'true') { %> checked="checked"<% } %>>
+  Has pagination: <input type="checkbox" name="has_pagination" class="has-pagination" <% if (has_pagination == 'true' || has_pagination === true) { %> checked="checked"<% } %>>
   </div>
   <div>
   pagination-class: <input name="pagination_class" class="pagination-class" value="<%= pagination_class %>" placefolder="pagination class">
@@ -35,7 +40,7 @@ var assetTemplate = `
   pagination-per-page: <input name="pagination_per_page" type="number" class="pagination-per-page" value="<%= pagination_per_page %>" placefolder="10">
   </div>
   <div>
-  API exist : <input type="checkbox" name="api-exist" class="api-exist" <% if (api_exist == 'true') { %> checked="checked"<% } %>>
+  API exist : <input type="checkbox" name="api-exist" class="api-exist" <% if (api_exist == 'true' || api_exist === true) { %> checked="checked"<% } %>>
   </div>
     <div id="api_div" <% if (api_exist == 'false') { %> hidden <% } %>>
         <div>
@@ -209,6 +214,13 @@ module.exports = {
       that.modal.setContent($('<div>').html(content));
 
       that.modal.open();
+
+      var app = angular.module('myShoppingList', []);
+      app.controller('myCtrl', function($scope) {
+        $scope.products = ['Milk', 'Bread', 'Cheese'];
+        alert('got here');
+      });
+      window.fffff2 = app;
 
       that.events();
     });
