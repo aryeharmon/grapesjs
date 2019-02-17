@@ -1,9 +1,5 @@
 var assetTemplate = `
-<div ng-app="myShoppingList" ng-controller="myCtrl">
-  <ul>
-    <li ng-repeat="x in products">{{x}}</li>
-  </ul>
-</div>
+
 <form id="TableEdit">
 
   <strong>Desktop</strong>
@@ -214,13 +210,6 @@ module.exports = {
       that.modal.setContent($('<div>').html(content));
 
       that.modal.open();
-
-      var app = angular.module('myShoppingList', []);
-      app.controller('myCtrl', function($scope) {
-        $scope.products = ['Milk', 'Bread', 'Cheese'];
-        alert('got here');
-      });
-      window.fffff2 = app;
 
       that.events();
     });
