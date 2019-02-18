@@ -67,20 +67,19 @@ var assetTemplate = `
         <% }); %>
           </table>
           <button id="addParamBtn" type="button" class="btn btn-primary">Add Param</button>
-  
+  </div>
+
     <div class="print-template">
       <label>Print Template</label>
       <select name="print_template">
       pdf_templates
-        <option>None</option>
+        <option value="">None</option>
         <% _.each(pdf_templates, function(temp, index) { %>
           <option value="<%= temp.id %>" <%= selected_print_template == temp.id ? 'selected="selected"' : '' %> ><%= temp.name %></option>
         <% }); %>
       
       </select>
     </div>
-
-  </div>
 
 
 
