@@ -26180,7 +26180,7 @@ module.exports = function () {
     plugins: plugins,
 
     // Will be replaced on build
-    version: '0.14.465',
+    version: '0.14.466',
 
     /**
      * Initializes an editor based on passed options
@@ -49936,6 +49936,11 @@ module.exports = {
 
   run: function run(editor, sender, opts) {
     var that = this;
+
+    if (window.type === 'buildernewletters') {
+      return;
+    }
+
     that.opt = opts || {};
 
     // var config = editor.getConfig();

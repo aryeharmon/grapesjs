@@ -138,6 +138,11 @@ module.exports = {
 
   run(editor, sender, opts) {
     var that = this;
+
+    if (window.type === 'buildernewletters') {
+      return;
+    }
+
     that.opt = opts || {};
 
     // var config = editor.getConfig();
