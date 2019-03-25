@@ -36,6 +36,9 @@ var assetTemplate = `
   pagination-per-page: <input name="pagination_per_page" type="number" class="pagination-per-page" value="<%= pagination_per_page %>" placefolder="10">
   </div>
   <div>
+  pagination-per-page-mobile: <input name="pagination_per_page_mobile" type="number" class="pagination-per-page-mobile" value="<%= pagination_per_page_mobile %>" placefolder="10">
+  </div>
+  <div>
   API exist : <input type="checkbox" name="api-exist" class="api-exist" <% if (api_exist == 'true' || api_exist === true) { %> checked="checked"<% } %>>
   </div>
     <div id="api_div" <% if (api_exist == 'false') { %> hidden <% } %>>
@@ -98,11 +101,10 @@ var assetTemplate = `
     <tr data-row="<%= index %>">
       <td><%= index + 1 %></td>
       <td>
-        <select name="rank[<%= index %>]">
-          <option <%= col.rank == '1' ? 'selected="selected"' : '' %>>1</option>
-          <option <%= col.rank == '2' ? 'selected="selected"' : '' %>>2</option>
-          <option <%= col.rank == '3' ? 'selected="selected"' : '' %>>3</option>
-          <option <%= col.rank == '4' ? 'selected="selected"' : '' %>>4</option>
+        <select name="rank[<%= index %>]" class="rank-select">
+          <% for (var f = 1; f < 100; f++) { %>
+          <option <%= col.rank == f.toString() ? 'selected="selected"' : '' %> value="<%= f %>"><%= f %></option>
+          <% } %>
         </select>
       </td>
       <td>
@@ -168,6 +170,9 @@ module.exports = {
     var pagination_per_page = atob(
       that.opt.target.get('attributes').pagination_per_page || 'IA=='
     );
+    var pagination_per_page_mobile = atob(
+      that.opt.target.get('attributes').pagination_per_page_mobile || 'IA=='
+    );
 
     var selected_print_template = that.opt.target.get('attributes')
       .selected_print_template;
@@ -202,6 +207,7 @@ module.exports = {
         has_pagination: has_pagination,
         pagination_class: pagination_class,
         pagination_per_page: pagination_per_page,
+        pagination_per_page_mobile: pagination_per_page_mobile,
         api_exist: api_exist,
         api_url: api_url,
         api_method: api_method,
@@ -240,6 +246,7 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
+          pagination_per_page_mobile: $('#TableEdit .pagination-per-page-mobile').val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
           api_method: $('#TableEdit .api-method').val(),
@@ -254,6 +261,19 @@ module.exports = {
         that.events();
       }, 0);
     });
+
+    $('.rank-select').on('change', function() {
+        for (var i = 1; i < 100; i++) {
+            $(`.rank-select option[value=${i+1}]`).hide();
+
+            $('.rank-select').each(function() {
+                if ($(this).val() === `${i}`) {
+                    $(`.rank-select option[value=${i+1}]`).show();
+                }
+            })
+        }
+    });
+    $('.rank-select').trigger('change');
 
     $('.remove-col').click(function(e) {
       var j = $(this);
@@ -275,6 +295,7 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
+          pagination_per_page_mobile: $('#TableEdit .pagination-per-page-mobile').val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
           api_method: $('#TableEdit .api-method').val(),
@@ -321,6 +342,7 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
+          pagination_per_page_mobile: $('#TableEdit .pagination-per-page-mobile').val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
           api_method: $('#TableEdit .api-method').val(),
@@ -354,6 +376,7 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
+          pagination_per_page_mobile: $('#TableEdit .pagination-per-page-mobile').val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
           api_method: $('#TableEdit .api-method').val(),
@@ -405,6 +428,9 @@ module.exports = {
         );
         that.opt.target.get('attributes').pagination_per_page = btoa(
           $('#TableEdit .pagination-per-page').val()
+        );
+        that.opt.target.get('attributes').pagination_per_page_mobile = btoa(
+          $('#TableEdit .pagination-per-page-mobile').val()
         );
         that.opt.target.get('attributes').selected_print_template = $(
           '#TableEdit [name=print_template]'
