@@ -122,6 +122,7 @@ const Component = Backbone.Model.extend(Styleable).extend(
           label: 'Section Name'
         },
         { type: 'text', name: 'ng-if', label: 'if' },
+        { type: 'text', name: 'ng-class', label: 'ng-class' },
         { type: 'text', name: 'ng-show', label: 'show' },
         { type: 'text', name: 'ng-repeat', label: 'repeat' },
         { type: 'text', name: 'ng-init', label: 'init' },
