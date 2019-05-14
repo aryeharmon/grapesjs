@@ -84,6 +84,9 @@ var assetTemplate = `
       </select>
     </div>
 
+    <div>
+    Column locale: <input name="column_locale" class="column-locale" placeholder="Column locale" value="<%= column_locale %>">
+    </div>
 
 
   <table width="100">
@@ -181,6 +184,9 @@ module.exports = {
       that.opt.target.get('attributes').api_exist || 'ZmFsc2U='
     );
     var api_url = atob(that.opt.target.get('attributes').api_url || 'IA==');
+    var column_locale = atob(
+      that.opt.target.get('attributes').column_locale || 'IA=='
+    );
     var api_method = atob(
       that.opt.target.get('attributes').api_method || 'Z2V0'
     );
@@ -210,6 +216,7 @@ module.exports = {
         pagination_per_page_mobile: pagination_per_page_mobile,
         api_exist: api_exist,
         api_url: api_url,
+        column_locale: column_locale,
         api_method: api_method,
         api_params: that.api_params,
         pdf_templates: that.pdf_templates,
@@ -246,9 +253,12 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
-          pagination_per_page_mobile: $('#TableEdit .pagination-per-page-mobile').val(),
+          pagination_per_page_mobile: $(
+            '#TableEdit .pagination-per-page-mobile'
+          ).val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
+          column_locale: $('#TableEdit .column-locale').val(),
           api_method: $('#TableEdit .api-method').val(),
           api_params: that.api_params,
           pdf_templates: that.pdf_templates,
@@ -263,15 +273,15 @@ module.exports = {
     });
 
     $('.rank-select').on('change', function() {
-        for (var i = 1; i < 100; i++) {
-            $(`.rank-select option[value=${i+1}]`).hide();
+      for (var i = 1; i < 100; i++) {
+        $(`.rank-select option[value=${i + 1}]`).hide();
 
-            $('.rank-select').each(function() {
-                if ($(this).val() === `${i}`) {
-                    $(`.rank-select option[value=${i+1}]`).show();
-                }
-            })
-        }
+        $('.rank-select').each(function() {
+          if ($(this).val() === `${i}`) {
+            $(`.rank-select option[value=${i + 1}]`).show();
+          }
+        });
+      }
     });
     $('.rank-select').trigger('change');
 
@@ -295,9 +305,12 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
-          pagination_per_page_mobile: $('#TableEdit .pagination-per-page-mobile').val(),
+          pagination_per_page_mobile: $(
+            '#TableEdit .pagination-per-page-mobile'
+          ).val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
+          column_locale: $('#TableEdit .column-locale').val(),
           api_method: $('#TableEdit .api-method').val(),
           api_params: that.api_params,
           pdf_templates: that.pdf_templates,
@@ -342,9 +355,12 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
-          pagination_per_page_mobile: $('#TableEdit .pagination-per-page-mobile').val(),
+          pagination_per_page_mobile: $(
+            '#TableEdit .pagination-per-page-mobile'
+          ).val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
+          column_locale: $('#TableEdit .column-locale').val(),
           api_method: $('#TableEdit .api-method').val(),
           pdf_templates: that.pdf_templates,
           selected_print_template: $('#TableEdit [name=print_template]').val()
@@ -376,9 +392,12 @@ module.exports = {
           has_pagination: $('#TableEdit .has-pagination')[0].checked,
           pagination_class: $('#TableEdit .pagination-class').val(),
           pagination_per_page: $('#TableEdit .pagination-per-page').val(),
-          pagination_per_page_mobile: $('#TableEdit .pagination-per-page-mobile').val(),
+          pagination_per_page_mobile: $(
+            '#TableEdit .pagination-per-page-mobile'
+          ).val(),
           api_exist: $('#TableEdit .api-exist')[0].checked,
           api_url: $('#TableEdit .api-url').val(),
+          column_locale: $('#TableEdit .column-locale').val(),
           api_method: $('#TableEdit .api-method').val(),
           pdf_templates: that.pdf_templates,
           selected_print_template: $('#TableEdit [name=print_template]').val()
@@ -441,6 +460,9 @@ module.exports = {
         );
         that.opt.target.get('attributes').api_url = btoa(
           $('#TableEdit .api-url').val()
+        );
+        that.opt.target.get('attributes').column_locale = btoa(
+          $('#TableEdit .column-locale').val()
         );
         that.opt.target.get('attributes').api_method = btoa(
           $('#TableEdit .api-method').val()
