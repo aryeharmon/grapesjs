@@ -1,11 +1,12 @@
 {
-  "_from": "git+https://github.com/aryeharmon/grapesjs.git#master",
-  "_id": "grapesjs@0.14.477",
-  "_inBundle": false,
-  "_integrity": "",
-  "_location": "/grapesjs",
-  "_phantomChildren": {},
-  "_requested": {
+  "name": "grapesjs",
+  "description": "Free and Open Source Web Builder Framework",
+  "version": "0.14.477",
+  "author": "Artur Arseniev",
+  "license": "BSD-3-Clause",
+  "homepage": "http://grapesjs.com",
+  "main": "dist/grapes.js",
+  "repository": {
     "type": "git",
     "raw": "grapesjs@git+https://github.com/aryeharmon/grapesjs.git#master",
     "name": "grapesjs",
