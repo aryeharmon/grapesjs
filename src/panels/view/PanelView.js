@@ -1,17 +1,20 @@
-var Backbone = require('backbone');
-var ButtonsView = require('./ButtonsView');
+import Backbone from 'backbone';
+import ButtonsView from './ButtonsView';
 
-module.exports = Backbone.View.extend({
+export default Backbone.View.extend({
   initialize(o) {
     const config = o.config || {};
+    const model = this.model;
     this.config = config;
     this.pfx = config.stylePrefix || '';
     this.ppfx = config.pStylePrefix || '';
-    this.buttons = this.model.get('buttons');
+    this.buttons = model.get('buttons');
     this.className = this.pfx + 'panel';
-    this.id = this.pfx + this.model.get('id');
-    this.listenTo(this.model, 'change:appendContent', this.appendContent);
-    this.listenTo(this.model, 'change:content', this.updateContent);
+    this.id = this.pfx + model.get('id');
+    this.listenTo(model, 'change:appendContent', this.appendContent);
+    this.listenTo(model, 'change:content', this.updateContent);
+    this.listenTo(model, 'change:visible', this.toggleVisible);
+    model.view = this;
   },
 
   /**
@@ -26,6 +29,14 @@ module.exports = Backbone.View.extend({
    * */
   updateContent() {
     this.$el.html(this.model.get('content'));
+  },
+
+  toggleVisible() {
+    if (!this.model.get('visible')) {
+      this.$el.addClass(`${this.ppfx}hidden`);
+      return;
+    }
+    this.$el.removeClass(`${this.ppfx}hidden`);
   },
 
   attributes() {

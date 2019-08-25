@@ -1,5 +1,5 @@
-const ComponentImageView = require('dom_components/view/ComponentImageView');
-const Component = require('dom_components/model/Component');
+import ComponentImageView from 'dom_components/view/ComponentImageView';
+import Component from 'dom_components/model/ComponentImage';
 
 module.exports = {
   run() {
@@ -20,22 +20,21 @@ module.exports = {
         view.remove();
       });
 
-      it('Component empty', () => {
-        expect(view.el.getAttribute('onmousedown')).toEqual('return false');
+      test('Component empty', () => {
         expect(view.el.getAttribute('class')).toEqual(view.classEmpty);
       });
 
-      it('TagName is <img>', () => {
+      test('TagName is <img>', () => {
         expect(view.el.tagName).toEqual('IMG');
       });
 
-      it('Update src attribute', () => {
+      test('Update src attribute', () => {
         model.set('src', './');
         expect(view.el.getAttribute('src')).toEqual('./');
       });
 
-      it('Renders correctly', () => {
-        expect(view.render()).toExist();
+      test('Renders correctly', () => {
+        expect(view.render()).toBeTruthy();
       });
     });
   }

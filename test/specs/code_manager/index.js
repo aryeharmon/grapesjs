@@ -1,5 +1,5 @@
-var CodeManager = require('code_manager');
-var Models = require('./model/CodeModels');
+import CodeManager from 'code_manager';
+import Models from './model/CodeModels';
 
 describe('Code Manager', () => {
   describe('Main', () => {
@@ -13,24 +13,24 @@ describe('Code Manager', () => {
       obj = null;
     });
 
-    it('Object exists', () => {
-      expect(CodeManager).toExist();
+    test('Object exists', () => {
+      expect(CodeManager).toBeTruthy();
     });
 
-    it('No code generators inside', () => {
+    test('No code generators inside', () => {
       expect(obj.getGenerators()).toEqual({});
     });
 
-    it('No code viewers inside', () => {
+    test('No code viewers inside', () => {
       expect(obj.getViewers()).toEqual({});
     });
 
-    it('Add and get code generator', () => {
+    test('Add and get code generator', () => {
       obj.addGenerator('test', 'gen');
       expect(obj.getGenerator('test')).toEqual('gen');
     });
 
-    it('Add and get code viewer', () => {
+    test('Add and get code viewer', () => {
       obj.addViewer('test', 'view');
       expect(obj.getViewer('test')).toEqual('view');
     });

@@ -1,7 +1,7 @@
 {
   "name": "grapesjs",
   "description": "Free and Open Source Web Builder Framework",
-  "version": "0.14.479",
+  "version": "0.14.484",
   "author": {
     "name": "Artur Arseniev"
   },
@@ -97,7 +97,7 @@
     ]
   },
   "scripts": {
-    "build": "npm run check && npm run v:patch && npm run build-dev && webpack --env=prod",
+    "build": "npm run v:patch && npm run build-dev && webpack --env=prod",
     "build-dev": "webpack --env=dev && npm run build:css",
     "build-n": "npm run check && npm run build:css && webpack --env=prod",
     "build:css": "node-sass src/styles/scss/main.scss dist/css/grapes.min.css --output-style compressed",
@@ -106,7 +106,7 @@
     "lint": "eslint src",
     "precommit": "lint-staged",
     "start": "npm run build:css -- -w & webpack-dev-server --open --progress --colors",
-    "test": "cross-env NODE_PATH=./src mocha --compilers js:babel-core/register --require test/helper.js --timeout 10000 --recursive test/main.js",
+    "test": "cross-env NODE_PATH=./src mocha --compilers js:babel-core/register --timeout 10000 --recursive test/main.js",
     "test:dev": "npm test -- -R min -w",
     "v:patch": "npm version --no-git-tag-version patch"
   }

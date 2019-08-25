@@ -1,8 +1,10 @@
-import { extend } from 'underscore';
+import Backbone from 'backbone';
+import { extend, isString } from 'underscore';
+import { isTaggableNode } from 'utils/mixins';
+import { appendAtIndex } from 'utils/dom';
+import SectorView from './SectorView';
 
-const SectorView = require('./SectorView');
-
-module.exports = Backbone.View.extend({
+export default Backbone.View.extend({
   initialize(o = {}) {
     const config = o.config || {};
     this.pfx = config.stylePrefix || '';
@@ -21,7 +23,7 @@ module.exports = Backbone.View.extend({
     this.propTarget = target;
     const coll = this.collection;
     const events =
-      'change:selectedComponent component:update:classes component:update:state change:device';
+      'component:toggled component:update:classes component:update:state change:device';
     this.listenTo(coll, 'add', this.addTo);
     this.listenTo(coll, 'reset', this.render);
     this.listenTo(this.target, events, this.targetUpdated);
@@ -33,8 +35,8 @@ module.exports = Backbone.View.extend({
    * @return {Object}
    * @private
    * */
-  addTo(model) {
-    this.addToCollection(model);
+  addTo(model, coll, opts = {}) {
+    this.addToCollection(model, null, opts);
   },
 
   /**
@@ -57,7 +59,7 @@ module.exports = Backbone.View.extend({
     pt.helper = null;
 
     // Create computed style container
-    if (el) {
+    if (el && isTaggableNode(el)) {
       const stateStr = state ? `:${state}` : null;
       pt.computed = window.getComputedStyle(el, stateStr);
     }
@@ -90,35 +92,66 @@ module.exports = Backbone.View.extend({
   },
 
   /**
+   * Select different target for the Style Manager.
+   * It could be a Component, CSSRule, or a string of any CSS selector
+   * @param {Component|CSSRule|String} target
+   * @return {Styleable} A Component or CSSRule
+   */
+  setTarget(target, opts = {}) {
+    const em = this.target;
+    const config = em.get('Config');
+    const { targetIsClass, stylable } = opts;
+    let model = target;
+
+    if (isString(target)) {
+      let rule;
+      const rules = em.get('CssComposer').getAll();
+
+      if (targetIsClass) {
+        rule = rules.filter(
+          rule => rule.get('selectors').getFullString() === target
+        )[0];
+      }
+
+      if (!rule) {
+        rule = rules.filter(rule => rule.get('selectorsAdd') === target)[0];
+      }
+
+      if (!rule) {
+        rule = rules.add({ selectors: [], selectorsAdd: target });
+      }
+
+      stylable && rule.set({ stylable });
+      model = rule;
+    }
+
+    const state = !config.devicePreviewMode ? model.get('state') : '';
+    const pt = this.propTarget;
+    pt.model = model;
+    pt.trigger('styleManager:update', model);
+    return model;
+  },
+
+  /**
    * Add new object to collection
    * @param {Object} model Model
    * @param  {Object} fragmentEl collection
    * @return {Object} Object created
    * @private
    * */
-  addToCollection(model, fragmentEl) {
-    var fragment = fragmentEl || null;
-    var view = new SectorView({
+  addToCollection(model, fragmentEl, opts = {}) {
+    const { pfx, target, propTarget, config, el } = this;
+    const appendTo = fragmentEl || el;
+    const rendered = new SectorView({
       model,
-      id:
-        this.pfx +
-        model
-          .get('name')
-          .replace(' ', '_')
-          .toLowerCase(),
+      id: `${pfx}${model.get('id')}`,
       name: model.get('name'),
       properties: model.get('properties'),
-      target: this.target,
-      propTarget: this.propTarget,
-      config: this.config
-    });
-    var rendered = view.render().el;
-
-    if (fragment) {
-      fragment.appendChild(rendered);
-    } else {
-      this.$el.append(rendered);
-    }
+      target,
+      propTarget,
+      config
+    }).render().el;
+    appendAtIndex(appendTo, rendered, opts.at);
 
     return rendered;
   },

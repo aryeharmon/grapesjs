@@ -1,6 +1,7 @@
-const ItemView = require('./ItemView');
+import Backbone from 'backbone';
+import ItemView from './ItemView';
 
-module.exports = require('backbone').View.extend({
+export default Backbone.View.extend({
   initialize(o = {}) {
     this.opt = o;
     const config = o.config || {};
@@ -16,6 +17,7 @@ module.exports = require('backbone').View.extend({
     const coll = this.collection;
     this.listenTo(coll, 'add', this.addTo);
     this.listenTo(coll, 'reset resetNavigator', this.render);
+    this.listenTo(coll, 'remove', this.removeChildren);
     this.className = `${pfx}layers`;
     const em = config.em;
 
@@ -44,6 +46,12 @@ module.exports = require('backbone').View.extend({
     parent && this.$el.data('model', parent);
   },
 
+  removeChildren(removed) {
+    const view = removed.viewLayer;
+    if (!view) return;
+    view.remove.apply(view);
+  },
+
   /**
    * Add to collection
    * @param Object Model
@@ -67,10 +75,6 @@ module.exports = require('backbone').View.extend({
     const level = this.level;
     var fragment = fragmentEl || null;
     var viewObject = ItemView;
-
-    if (!this.isCountable(model, this.config.hideTextnode)) {
-      return;
-    }
 
     var view = new viewObject({
       level,

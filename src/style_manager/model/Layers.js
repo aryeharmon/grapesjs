@@ -1,6 +1,7 @@
-const Layer = require('./Layer');
+import Backbone from 'backbone';
+import Layer from './Layer';
 
-module.exports = Backbone.Collection.extend({
+export default Backbone.Collection.extend({
   model: Layer,
 
   initialize() {
@@ -15,6 +16,11 @@ module.exports = Backbone.Collection.extend({
 
   onReset() {
     this.idx = 1;
+  },
+
+  getSeparator() {
+    const { property } = this;
+    return property ? property.get('layerSeparator') : ', ';
   },
 
   /**
@@ -34,7 +40,7 @@ module.exports = Backbone.Collection.extend({
       var cleaned = match.replace(/,\s*/g, ',');
       value = value.replace(match, cleaned);
     });
-    const layerValues = value ? value.split(', ') : [];
+    const layerValues = value ? value.split(this.getSeparator()) : [];
     layerValues.forEach(layerValue => {
       layers.push({ properties: this.properties.parseValue(layerValue) });
     });
@@ -100,7 +106,7 @@ module.exports = Backbone.Collection.extend({
   getFullValue() {
     let result = [];
     this.each(layer => result.push(layer.getFullValue()));
-    return result.join(', ');
+    return result.join(this.getSeparator());
   },
 
   getPropertyValues(property) {

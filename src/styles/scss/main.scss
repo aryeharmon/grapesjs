@@ -50,8 +50,16 @@
 
 $prefix: $app-prefix;
 
+@import "gjs_status";
+
+$colorsAll: (one, $primaryColor),
+  (two, $secondaryColor),
+  (three, $tertiaryColor),
+  (four, $quaternaryColor),
+  (danger, $colorRed);
+
 .#{$prefix} {
-  @each $cnum, $ccol in (one, $primaryColor), (two, $secondaryColor), (three, $tertiaryColor), (four, $quaternaryColor) {
+  @each $cnum, $ccol in $colorsAll {
     &#{$cnum} {
       &-bg {
         background-color: $ccol;
@@ -213,12 +221,23 @@ $prefix: $app-prefix;
  	@include user-select(none);
 }
 
-.#{$app-prefix}editor {
-  font-family: $mainFont;
-  font-size: $fontSizeS;
-  position: relative;
-  box-sizing: border-box;
-  height: 100%;
+.#{$app-prefix} {
+  &no-touch-actions {
+    touch-action: none;
+  }
+
+  &disabled {
+    @include user-select(none);
+    @include opacity(0.50);
+  }
+
+  &editor {
+    font-family: $mainFont;
+    font-size: $fontSizeS;
+    position: relative;
+    box-sizing: border-box;
+    height: 100%;
+  }
 }
 
 .#{$app-prefix}freezed,

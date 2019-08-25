@@ -1,7 +1,7 @@
-const PropertyCompositeView = require('./PropertyCompositeView');
-const LayersView = require('./LayersView');
+import PropertyCompositeView from './PropertyCompositeView';
+import LayersView from './LayersView';
 
-module.exports = PropertyCompositeView.extend({
+export default PropertyCompositeView.extend({
   templateInput() {
     const pfx = this.pfx;
     const ppfx = this.ppfx;
@@ -117,10 +117,10 @@ module.exports = PropertyCompositeView.extend({
     const model = this.model;
     const layers = this.getLayers();
     const detached = model.get('detached');
+    const target = this.getTarget();
 
     // With detached layers values will be assigned to their properties
     if (detached) {
-      const target = this.getTarget();
       const style = target ? target.getStyle() : {};
       layersObj = layers.getLayersFromStyle(style);
     } else {
@@ -129,8 +129,9 @@ module.exports = PropertyCompositeView.extend({
       layersObj = layers.getLayersFromValue(value);
     }
 
+    const toAdd = model.getLayersFromTarget(target) || layersObj;
     layers.reset();
-    layers.add(layersObj);
+    layers.add(toAdd);
     model.set({ stackIndex: null }, { silent: true });
   },
 
@@ -138,7 +139,7 @@ module.exports = PropertyCompositeView.extend({
     const self = this;
     const model = this.model;
     const fieldEl = this.el.querySelector('[data-layers-wrapper]');
-    const PropertiesView = require('./PropertiesView');
+    const PropertiesView = require('./PropertiesView').default;
     const propsConfig = {
       target: this.target,
       propTarget: this.propTarget,

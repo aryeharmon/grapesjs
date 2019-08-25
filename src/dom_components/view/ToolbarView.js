@@ -1,8 +1,7 @@
-var Backbone = require('backbone');
-var DomainViews = require('domain_abstract/view/DomainViews');
-var ToolbarButtonView = require('./ToolbarButtonView');
+import DomainViews from 'domain_abstract/view/DomainViews';
+import ToolbarButtonView from './ToolbarButtonView';
 
-module.exports = DomainViews.extend({
+export default DomainViews.extend({
   itemView: ToolbarButtonView,
 
   initialize(opts) {

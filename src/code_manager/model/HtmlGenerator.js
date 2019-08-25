@@ -1,6 +1,6 @@
-var Backbone = require('backbone');
+import Backbone from 'backbone';
 
-module.exports = Backbone.Model.extend({
+export default Backbone.Model.extend({
   build(model, opts = {}) {
     const models = model.get('components');
 

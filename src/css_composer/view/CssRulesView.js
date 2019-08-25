@@ -1,7 +1,13 @@
-const CssRuleView = require('./CssRuleView');
-const CssGroupRuleView = require('./CssGroupRuleView');
+import Backbone from 'backbone';
+import CssRuleView from './CssRuleView';
+import CssGroupRuleView from './CssGroupRuleView';
 
-module.exports = require('backbone').View.extend({
+const $ = Backbone.$;
+
+const getBlockId = (pfx, order) =>
+  `${pfx}${order ? `-${parseFloat(order)}` : ''}`;
+
+export default Backbone.View.extend({
   initialize(o) {
     const config = o.config || {};
     this.atRules = {};
@@ -31,16 +37,20 @@ module.exports = require('backbone').View.extend({
    * @private
    * */
   addToCollection(model, fragmentEl) {
-    var fragment = fragmentEl || null;
-    var viewObject = CssRuleView;
-    var config = this.config;
-    let rendered, view;
+    // If the render is not yet started
+    if (!this.renderStarted) {
+      return;
+    }
+
+    const fragment = fragmentEl || null;
+    const { config } = this;
     const opts = { model, config };
+    let rendered, view;
 
     // I have to render keyframes of the same name together
     // Unfortunately at the moment I didn't find the way of appending them
     // if not staticly, via appendData
-    if (model.get('atRuleType') == 'keyframes') {
+    if (model.get('atRuleType') === 'keyframes') {
       const atRule = model.getAtRule();
       let atRuleEl = this.atRules[atRule];
 
@@ -61,22 +71,66 @@ module.exports = require('backbone').View.extend({
       rendered = view.render().el;
     }
 
+    const clsName = this.className;
+    const mediaText = model.get('mediaText');
+    const defaultBlockId = getBlockId(clsName);
+    let blockId = defaultBlockId;
+
+    // If the rule contains a media query it might have a different container
+    // for it (eg. rules created with Device Manager)
+    if (mediaText) {
+      blockId = getBlockId(clsName, this.getMediaWidth(mediaText));
+    }
+
     if (rendered) {
-      if (fragment) fragment.appendChild(rendered);
-      else this.$el.append(rendered);
+      const container = fragment || this.el;
+      let contRules;
+
+      // Try to find a specific container for the rule (if it
+      // containes a media query), otherwise get the default one
+      try {
+        contRules = container.querySelector(`#${blockId}`);
+      } catch (e) {}
+
+      if (!contRules) {
+        contRules = container.querySelector(`#${defaultBlockId}`);
+      }
+
+      contRules.appendChild(rendered);
     }
 
     return rendered;
   },
 
+  getMediaWidth(mediaText) {
+    return (
+      mediaText &&
+      mediaText
+        .replace(`(${this.em.getConfig('mediaCondition')}: `, '')
+        .replace(')', '')
+    );
+  },
+
   render() {
+    this.renderStarted = 1;
     this.atRules = {};
-    const $el = this.$el;
+    const { em, $el, className, collection } = this;
     const frag = document.createDocumentFragment();
     $el.empty();
-    this.collection.each(model => this.addToCollection(model, frag));
+
+    // Create devices related DOM structure, ensure also to have a default container
+    const prs = em
+      .get('DeviceManager')
+      .getAll()
+      .pluck('priority');
+    prs.every(pr => pr) && prs.unshift(0);
+    prs.forEach(pr =>
+      $(`<div id="${getBlockId(className, pr)}"></div>`).appendTo(frag)
+    );
+
+    collection.each(model => this.addToCollection(model, frag));
     $el.append(frag);
-    $el.attr('class', this.className);
+    $el.attr('class', className);
     return this;
   }
 });

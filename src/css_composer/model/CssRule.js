@@ -1,9 +1,10 @@
+import { map } from 'underscore';
+import Backbone from 'backbone';
 import Styleable from 'domain_abstract/model/Styleable';
+import { isEmpty, forEach } from 'underscore';
+import Selectors from 'selector_manager/model/Selectors';
 
-var Backbone = require('backbone');
-var Selectors = require('selector_manager/model/Selectors');
-
-module.exports = Backbone.Model.extend(Styleable).extend({
+export default Backbone.Model.extend(Styleable).extend({
   defaults: {
     // Css selectors
     selectors: {},
@@ -73,9 +74,12 @@ module.exports = Backbone.Model.extend(Styleable).extend({
    */
   selectorsToString(opts = {}) {
     const result = [];
+    const { em } = this;
     const state = this.get('state');
+    const wrapper = this.get('wrapper');
     const addSelector = this.get('selectorsAdd');
-    const selectors = this.get('selectors').getFullString();
+    const isBody = wrapper && em && em.getConfig('wrappesIsBody');
+    const selectors = isBody ? 'body' : this.get('selectors').getFullString();
     const stateStr = state ? `:${state}` : '';
     selectors && result.push(`${selectors}${stateStr}`);
     addSelector && !opts.skipAdd && result.push(addSelector);
@@ -118,6 +122,25 @@ module.exports = Backbone.Model.extend(Styleable).extend({
     return result;
   },
 
+  toJSON(...args) {
+    const obj = Backbone.Model.prototype.toJSON.apply(this, args);
+
+    if (this.em.getConfig('avoidDefaults')) {
+      const defaults = this.defaults;
+
+      forEach(defaults, (value, key) => {
+        if (obj[key] === value) {
+          delete obj[key];
+        }
+      });
+
+      if (isEmpty(obj.selectors)) delete obj.selectors;
+      if (isEmpty(obj.style)) delete obj.style;
+    }
+
+    return obj;
+  },
+
   /**
    * Compare the actual model with parameters
    * @param   {Object} selectors Collection of selectors
@@ -137,8 +160,8 @@ module.exports = Backbone.Model.extend(Styleable).extend({
     //var a2 = _.pluck(this.get('selectors').models, cId);
     if (!(selectors instanceof Array) && !selectors.models)
       selectors = [selectors];
-    var a1 = _.map(selectors.models || selectors, model => model.get('name'));
-    var a2 = _.map(this.get('selectors').models, model => model.get('name'));
+    var a1 = map(selectors.models || selectors, model => model.get('name'));
+    var a2 = map(this.get('selectors').models, model => model.get('name'));
     var f = false;
 
     if (a1.length !== a2.length) return f;

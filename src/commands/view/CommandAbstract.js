@@ -1,6 +1,7 @@
+import Backbone from 'backbone';
 const $ = Backbone.$;
 
-module.exports = Backbone.View.extend({
+export default Backbone.View.extend({
   /**
    * Initialize method that can't be removed
    * @param  {Object}  o Options
@@ -89,6 +90,51 @@ module.exports = Backbone.View.extend({
    * @private
    * */
   init(o) {},
+
+  /**
+   * Method that run command
+   * @param  {Object}  editor Editor instance
+   * @param  {Object}  [options={}] Options
+   * @private
+   * */
+  callRun(editor, options = {}) {
+    const id = this.id;
+    editor.trigger(`run:${id}:before`, options);
+
+    if (options && options.abort) {
+      editor.trigger(`abort:${id}`, options);
+      return;
+    }
+
+    const sender = options.sender || editor;
+    const result = this.run(editor, sender, options);
+    editor.trigger(`run:${id}`, result, options);
+    editor.trigger('run', id, result, options);
+    return result;
+  },
+
+  /**
+   * Method that run command
+   * @param  {Object}  editor Editor instance
+   * @param  {Object}  [options={}] Options
+   * @private
+   * */
+  callStop(editor, options = {}) {
+    const id = this.id;
+    const sender = options.sender || editor;
+    editor.trigger(`stop:${id}:before`, options);
+    const result = this.stop(editor, sender, options);
+    editor.trigger(`stop:${id}`, result, options);
+    editor.trigger('stop', id, result, options);
+    return result;
+  },
+
+  /**
+   * Stop current command
+   */
+  stopCommand() {
+    this.em.get('Commands').stop(this.id);
+  },
 
   /**
    * Method that run command

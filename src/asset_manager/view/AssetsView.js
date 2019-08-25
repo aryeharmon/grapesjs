@@ -1,8 +1,6 @@
-var AssetView = require('./AssetView');
-var AssetImageView = require('./AssetImageView');
-var FileUploader = require('./FileUploader');
+import Backbone from 'backbone';
 
-module.exports = Backbone.View.extend({
+export default Backbone.View.extend({
   events: {
     submit: 'handleSubmit'
   },
@@ -59,7 +57,7 @@ module.exports = Backbone.View.extend({
     this.getAssetsEl().scrollTop = 0;
 
     if (handleAdd) {
-      handleAdd(url);
+      handleAdd.bind(this)(url);
     } else {
       this.options.globalCollection.add(url, { at: 0 });
     }

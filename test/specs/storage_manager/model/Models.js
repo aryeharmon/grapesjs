@@ -1,7 +1,6 @@
 import 'whatwg-fetch';
-
-const LocalStorage = require('storage_manager/model/LocalStorage');
-const RemoteStorage = require('storage_manager/model/RemoteStorage');
+import LocalStorage from 'storage_manager/model/LocalStorage';
+import RemoteStorage from 'storage_manager/model/RemoteStorage';
 
 module.exports = {
   run() {
@@ -21,13 +20,13 @@ module.exports = {
         obj = null;
       });
 
-      it('Store and load items', () => {
+      test('Store and load items', () => {
         obj.store(data);
         var result = obj.load(['item1', 'item2']);
         expect(result).toEqual(data);
       });
 
-      it('Store, update and load items', () => {
+      test('Store, update and load items', () => {
         obj.store(data);
         obj.store({ item3: 'value3' });
         obj.store({ item2: 'value22' });
@@ -39,7 +38,7 @@ module.exports = {
         });
       });
 
-      it('Remove items', () => {
+      test('Remove items', () => {
         var items = ['item1', 'item2', 'item3'];
         obj.store(data);
         obj.remove(items);
@@ -83,18 +82,80 @@ module.exports = {
         obj = null;
       });
 
-      it('Store data', () => {
+      test('Store data', () => {
         obj.store(data);
         const callResult = obj.fetch;
         expect(callResult.called).toEqual(true);
         expect(callResult.firstCall.args[0]).toEqual(endpointStore);
       });
 
-      it('Load data', () => {
+      test('Load data', () => {
         obj.load(['item1', 'item2']);
         const callResult = obj.fetch;
         expect(callResult.called).toEqual(true);
         expect(callResult.firstCall.args[0]).toEqual(endpointLoad);
+      });
+
+      test("Load data with credentials option as 'include' by default", () => {
+        obj.load(['item1', 'item2']);
+        const callResult = obj.fetch;
+        expect(callResult.called).toEqual(true);
+        expect(callResult.firstCall.args[1]).toMatchObject({
+          credentials: 'include'
+        });
+      });
+
+      test("Store data with credentials option as 'include' by default", () => {
+        obj.store(data);
+        const callResult = obj.fetch;
+        expect(callResult.called).toEqual(true);
+        expect(callResult.firstCall.args[1]).toMatchObject({
+          credentials: 'include'
+        });
+      });
+
+      test('Store data with credentials option as false ', () => {
+        obj = new RemoteStorage({ ...storageOptions, credentials: false });
+        sinon
+          .stub(obj, 'fetch')
+          .returns(Promise.resolve(mockResponse({ data: 1 })));
+
+        obj.store(data);
+        const callResult = obj.fetch;
+        expect(callResult.called).toEqual(true);
+        expect(callResult.firstCall.args[1]).toMatchObject({
+          credentials: false
+        });
+      });
+
+      test('Load data with credentials option as false', () => {
+        obj = new RemoteStorage({ ...storageOptions, credentials: false });
+        sinon
+          .stub(obj, 'fetch')
+          .returns(Promise.resolve(mockResponse({ data: 1 })));
+        obj.load(['item1', 'item2']);
+        const callResult = obj.fetch;
+        expect(callResult.called).toEqual(true);
+        expect(callResult.firstCall.args[1]).toMatchObject({
+          credentials: false
+        });
+      });
+
+      test('Load data with custom fetch options as function', () => {
+        const customOpts = { customOpt: 'customValue' };
+        obj = new RemoteStorage({
+          ...storageOptions,
+          fetchOptions: () => {
+            return customOpts;
+          }
+        });
+        sinon
+          .stub(obj, 'fetch')
+          .returns(Promise.resolve(mockResponse({ data: 1 })));
+        obj.load(['item1', 'item2']);
+        const callResult = obj.fetch;
+        expect(callResult.called).toEqual(true);
+        expect(callResult.firstCall.args[1]).toMatchObject(customOpts);
       });
     });
   }

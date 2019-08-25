@@ -1,6 +1,6 @@
-var Component = require('./Component');
+import Component from './Component';
 
-module.exports = Component.extend(
+export default Component.extend(
   {
     defaults: {
       ...Component.prototype.defaults,

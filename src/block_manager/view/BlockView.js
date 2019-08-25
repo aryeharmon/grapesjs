@@ -1,9 +1,14 @@
+import Backbone from 'backbone';
 import { isObject } from 'underscore';
 import { on, off, hasDnd } from 'utils/mixins';
 
-module.exports = Backbone.View.extend({
+export default Backbone.View.extend({
   events: {
+    click: 'handleClick',
     mousedown: 'startDrag',
+    dragstart: 'handleDragStart',
+    drag: 'handleDrag',
+    dragend: 'handleDragEnd',
     dblclick: 'test'
   },
 
@@ -20,10 +25,47 @@ module.exports = Backbone.View.extend({
   },
 
   initialize(o, config = {}) {
+    const { model } = this;
+    this.em = config.em;
     this.config = config;
     this.endDrag = this.endDrag.bind(this);
     this.ppfx = config.pStylePrefix || '';
-    this.listenTo(this.model, 'destroy remove', this.remove);
+    this.listenTo(model, 'destroy remove', this.remove);
+    this.listenTo(model, 'change', this.render);
+  },
+
+  handleClick() {
+    const { config, model, em } = this;
+    if (!config.appendOnClick) return;
+    const sorter = config.getSorter();
+    const content = model.get('content');
+    const selected = em.getSelected();
+    sorter.setDropContent(content);
+    let target, valid;
+
+    // If there is a selected component, try first to append
+    // the block inside, otherwise, try to place it as a next sibling
+    if (selected) {
+      valid = sorter.validTarget(selected.getEl(), content);
+
+      if (valid.valid) {
+        target = selected;
+      } else {
+        const parent = selected.parent();
+        valid = sorter.validTarget(parent.getEl(), content);
+        if (valid.valid) target = parent;
+      }
+    }
+
+    // If no target found yet, try to append the block to the wrapper
+    if (!target) {
+      const wrapper = em.getWrapper();
+      valid = sorter.validTarget(wrapper.getEl(), content);
+      if (valid.valid) target = wrapper;
+    }
+
+    const result = target && target.append(content)[0];
+    result && em.setSelected(result, { scroll: 1 });
   },
 
   /**
@@ -31,42 +73,64 @@ module.exports = Backbone.View.extend({
    * @private
    */
   startDrag(e) {
+    const { config, em } = this;
     //Right or middel click
-    if (e.button !== 0) {
-      return;
-    }
-
-    if (!this.config.getSorter) {
-      return;
-    }
-
-    var children = this.model.get('children');
-
-    this.config.em.refreshCanvas();
-    var sorter = this.config.getSorter();
-
-    if (e.target.tagName === 'LI') {
-      sorter.setDragHelper(e.target, e);
-
-      if (window.allow_input_layout) {
-        sorter.setDropContent(children[$(e.target).data('id')].content);
-      } else {
-        sorter.setDropContent(
-          children[$(e.target).data('id')].content.replace(
-            /data-layout="\d+"/,
-            ''
-          )
-        );
-      }
-    } else {
-      sorter.setDragHelper(this.el, e);
-
-      sorter.setDropContent(this.model.get('content'));
-    }
-
+    if (e.button !== 0 || !config.getSorter || this.el.draggable) return;
+    em.refreshCanvas();
+    const sorter = config.getSorter();
+    sorter.setDragHelper(this.el, e);
+    sorter.setDropContent(this.model.get('content'));
     sorter.startSort(this.el);
-
     on(document, 'mouseup', this.endDrag);
+  },
+
+  handleDragStart(ev) {
+    const { em, model } = this;
+    const content = model.get('content');
+    const isObj = isObject(content);
+    const data = isObj ? JSON.stringify(content) : content;
+    em.set('dragResult');
+
+    // Note: data are not available on dragenter for security reason,
+    // we have to use dragContent as we need it for the Sorter context
+    // IE11 supports only 'text' data type
+    ev.dataTransfer.setData('text', data);
+    em.set('dragContent', content);
+    em.trigger('block:drag:start', model, ev);
+  },
+
+  handleDrag(ev) {
+    this.em.trigger('block:drag', this.model, ev);
+  },
+
+  handleDragEnd() {
+    const { em, model } = this;
+    const result = em.get('dragResult');
+
+    if (result) {
+      const oldKey = 'activeOnRender';
+      const oldActive = result.get && result.get(oldKey);
+
+      if (model.get('activate') || oldActive) {
+        result.trigger('active');
+        result.set(oldKey, 0);
+      }
+
+      if (model.get('select')) {
+        em.setSelected(result);
+      }
+
+      if (model.get('resetId')) {
+        result.onAll(model => model.resetId());
+      }
+    }
+
+    em.set({
+      dragResult: null,
+      dragContent: null
+    });
+
+    em.trigger('block:drag:stop', result, model);
   },
 
   /**
@@ -85,58 +149,21 @@ module.exports = Backbone.View.extend({
     sorter.endMove();
   },
 
-  template: _.template(`
-    <style>
-      .dropdown {
-        position: fixed;
-        top: 40px;
-        right: 253px;
-        left: auto;
-        width: 241px;
-        z-index: 6666666;
-        background: #f00b0b42;
-        overflow-y: scroll;
-        max-height: 100%;
-      }
-      .dropdown-item {
-          display: block;
-          margin-bottom: 10px;
-          background-repeat: no-repeat;
-          background-size: contain;
-      }
-      .close {
-        font-size: 44px;
-        display: inline;
-        cursor: pointer;
-      }
-    </style>
-    <div class="<%= className %>-label" style="position: relative;">
-      <% if (children.length > 0) { %>
-      <div class="dropdown" style="display: none;">
-        <div class="close">x</div>
-        <ul style="padding: 0;list-style: none;height: 100%;overflow: scroll;">
-          <% _.each(children, function(child, index){ %>
-            <li data-id="<%= index %>"  class="dropdown-item" style="background-image:url(<%= child.img %>)"><%= child.name %><img src="<%= child.img %>" style="visibility: hidden;    width: 100%;" /></li>
-          <% }); %>
-        </ul>
-      </div>
-      <% } %>
-      <%= label %>
-    </div>
-  `),
-
   render() {
-    var children = this.model.get('children');
-
-    var className = this.ppfx + 'block';
-    this.$el.addClass(className);
-
-    this.el.innerHTML = this.template({
-      className: className,
-      label: this.model.get('label'),
-      children: children
-    });
-
+    const { em, el, ppfx, model } = this;
+    const className = `${ppfx}block`;
+    const label = model.get('label');
+    const render = model.get('render');
+    const media = model.get('media');
+    el.className += ` ${className} ${ppfx}one-bg ${ppfx}four-color-h`;
+    el.innerHTML = `
+      ${media ? `<div class="${className}__media">${media}</div>` : ''}
+      <div class="${className}-label">${label}</div>
+    `;
+    el.title = el.textContent.trim();
+    hasDnd(em) && el.setAttribute('draggable', true);
+    const result = render && render({ el, model, className, prefix: ppfx });
+    if (result) el.innerHTML = result;
     return this;
   }
 });

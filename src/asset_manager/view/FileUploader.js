@@ -1,11 +1,13 @@
+import { template } from 'underscore';
+import Backbone from 'backbone';
 import fetch from 'utils/fetch';
 
-module.exports = Backbone.View.extend(
+export default Backbone.View.extend(
   {
-    template: _.template(`
+    template: template(`
   <form>
     <div id="<%= pfx %>title"><%= title %></div>
-    <input type="file" id="<%= uploadId %>" name="file" accept="image/*" <%= disabled ? 'disabled' : '' %> multiple/>
+    <input type="file" id="<%= uploadId %>" name="file" accept="*/*" <%= disabled ? 'disabled' : '' %> <%= multiUpload ? 'multiple' : '' %>/>
     <div style="clear:both;"></div>
   </form>
   `),
@@ -24,12 +26,13 @@ module.exports = Backbone.View.extend(
         c.disableUpload !== undefined
           ? c.disableUpload
           : !c.upload && !c.embedAsBase64;
+      this.multiUpload = c.multiUpload !== undefined ? c.multiUpload : true;
       this.events['change #' + this.uploadId] = 'uploadFile';
       let uploadFile = c.uploadFile;
 
       if (uploadFile) {
         this.uploadFile = uploadFile.bind(this);
-      } else if (c.embedAsBase64) {
+      } else if (!c.upload && c.embedAsBase64) {
         this.uploadFile = this.constructor.embedAsBase64;
       }
 
@@ -51,8 +54,11 @@ module.exports = Backbone.View.extend(
      * @private
      */
     onUploadEnd(res) {
-      const em = this.config.em;
+      const { $el, config } = this;
+      const em = config.em;
       em && em.trigger('asset:upload:end', res);
+      const input = $el.find('input');
+      input && input.val('');
     },
 
     /**
@@ -76,7 +82,13 @@ module.exports = Backbone.View.extend(
       const em = this.config.em;
       const config = this.config;
       const target = this.target;
-      const json = typeof text === 'string' ? JSON.parse(text) : text;
+      let json;
+      try {
+        json = typeof text === 'string' ? JSON.parse(text) : text;
+      } catch (e) {
+        json = text;
+      }
+
       em && em.trigger('asset:upload:response', json);
 
       if (config.autoAdd && target) {
@@ -95,16 +107,20 @@ module.exports = Backbone.View.extend(
      * */
     uploadFile(e, clb) {
       const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+      const { config } = this;
       const body = new FormData();
-      const config = this.config;
-      const params = config.params;
-
-      for (let i = 0; i < files.length; i++) {
-        body.append(`${config.uploadName}[]`, files[i]);
-      }
+      const { params, customFetch } = config;
 
       for (let param in params) {
         body.append(param, params[param]);
+      }
+
+      if (this.multiUpload) {
+        for (let i = 0; i < files.length; i++) {
+          body.append(`${config.uploadName}[]`, files[i]);
+        }
+      } else if (files.length) {
+        body.append(config.uploadName, files[0]);
       }
 
       var target = this.target;
@@ -118,18 +134,21 @@ module.exports = Backbone.View.extend(
 
       if (url) {
         this.onUploadStart();
-        return fetch(url, {
+        const fetchOpts = {
           method: 'post',
-          credentials: 'include',
+          credentials: config.credentials || 'include',
           headers,
           body
-        })
-          .then(
-            res =>
-              ((res.status / 200) | 0) == 1
-                ? res.text()
-                : res.text().then(text => Promise.reject(text))
-          )
+        };
+        const fetchResult = customFetch
+          ? customFetch(url, fetchOpts)
+          : fetch(url, fetchOpts).then(
+              res =>
+                ((res.status / 200) | 0) == 1
+                  ? res.text()
+                  : res.text().then(text => Promise.reject(text))
+            );
+        return fetchResult
           .then(text => this.onUploadResponse(text, clb))
           .catch(err => this.onUploadError(err));
       }
@@ -227,6 +246,7 @@ module.exports = Backbone.View.extend(
           title: this.config.uploadText,
           uploadId: this.uploadId,
           disabled: this.disabled,
+          multiUpload: this.multiUpload,
           pfx: this.pfx
         })
       );

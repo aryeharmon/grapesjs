@@ -1,11 +1,11 @@
-const Sector = require('style_manager/model/Sector');
-const Sectors = require('style_manager/model/Sectors');
-const Property = require('style_manager/model/Property');
-const PropertyInteger = require('style_manager/model/PropertyInteger');
-const Properties = require('style_manager/model/Properties');
-const Layer = require('style_manager/model/Layer');
-const Layers = require('style_manager/model/Layers');
-const PropertyFactory = require('style_manager/model/PropertyFactory');
+import Sector from 'style_manager/model/Sector';
+import Sectors from 'style_manager/model/Sectors';
+import Property from 'style_manager/model/Property';
+import PropertyInteger from 'style_manager/model/PropertyInteger';
+import Properties from 'style_manager/model/Properties';
+import Layer from 'style_manager/model/Layer';
+import Layers from 'style_manager/model/Layers';
+import PropertyFactory from 'style_manager/model/PropertyFactory';
 
 module.exports = {
   run() {
@@ -34,22 +34,22 @@ module.exports = {
         obj = null;
       });
 
-      it('Has id property', () => {
+      test('Has id property', () => {
         expect(obj.has('id')).toEqual(true);
       });
 
-      it('Has no properties', () => {
+      test('Has no properties', () => {
         expect(obj.get('properties').length).toEqual(0);
       });
 
-      it('Init with properties', () => {
+      test('Init with properties', () => {
         obj = new Sector({
           properties: [{}, {}]
         });
         expect(obj.get('properties').length).toEqual(2);
       });
 
-      it('Build properties', () => {
+      test('Build properties', () => {
         var res = obj.buildProperties(['display', 'float']);
         expect(res.length).toEqual(2);
         expect(res[0]).toEqual({
@@ -60,12 +60,13 @@ module.exports = {
             { value: 'block' },
             { value: 'inline' },
             { value: 'inline-block' },
+            { value: 'flex' },
             { value: 'none' }
           ]
         });
       });
 
-      it('Extend properties', () => {
+      test('Extend properties', () => {
         obj = new Sector(confToExt);
         expect(obj.get('properties').length).toEqual(3);
         var prop0 = obj.get('properties').at(0);
@@ -73,7 +74,7 @@ module.exports = {
         expect(prop0.get('defaults')).toEqual('block');
       });
 
-      it('Do not extend properties', () => {
+      test('Do not extend properties', () => {
         confToExt.extendBuilded = 0;
         obj = new Sector(confToExt);
         expect(obj.get('properties').length).toEqual(3);
@@ -82,7 +83,7 @@ module.exports = {
         expect(prop0.get('defaults')).toEqual('');
       });
 
-      it('Extend composed properties', () => {
+      test('Extend composed properties', () => {
         obj = new Sector({
           buildProps: ['margin', 'float'],
           properties: [
@@ -123,8 +124,8 @@ module.exports = {
         obj = null;
       });
 
-      it('Object exists', () => {
-        expect(obj).toExist();
+      test('Object exists', () => {
+        expect(obj).toBeTruthy();
       });
     });
 
@@ -139,25 +140,37 @@ module.exports = {
         obj = null;
       });
 
-      it('Has property field', () => {
+      test('Has property field', () => {
         expect(obj.has('property')).toEqual(true);
       });
 
-      it('parseValue', () => {
+      test('parseValue', () => {
         const result = { value: 'testValue' };
         expect(obj.parseValue('testValue')).toEqual(result);
       });
 
-      it('parseValue with function but without functionName', () => {
+      test('parseValue with function but without functionName', () => {
         const result = { value: 'fn(testValue)' };
         expect(obj.parseValue('fn(testValue)')).toEqual(result);
       });
 
-      it('parseValue with function and functionName', () => {
+      test('parseValue with function and functionName', () => {
         obj = new Property({ functionName: 'fn' });
-        const result = { value: 'testValue' };
+        const result = { value: 'testValue', functionName: 'fn' };
         expect(obj.parseValue('fn(testValue)')).toEqual(result);
         expect(obj.parseValue('fn(testValue')).toEqual(result);
+      });
+
+      test('Parse correctly a value with !important', () => {
+        const result = { value: 'red', important: 1 };
+        expect(obj.parseValue('red !important ')).toEqual(result);
+      });
+
+      test('getFullValue', () => {
+        obj = new Property({ functionName: 'fn', value: 'red' });
+        expect(obj.getFullValue()).toEqual('fn(red)');
+        obj = new Property({ functionName: 'fn', value: '#123', important: 1 });
+        expect(obj.getFullValue()).toEqual('fn(#123) !important');
       });
     });
 
@@ -172,28 +185,28 @@ module.exports = {
         obj = null;
       });
 
-      it('parseValue with units', () => {
+      test('parseValue with units', () => {
         const result = { value: 20, unit: 'px' };
         expect(obj.parseValue('20px')).toEqual(result);
       });
 
-      it('parse input value with function', () => {
+      test('parse input value with function', () => {
         obj = new PropertyInteger({
           units: ['px', 'deg'],
           functionName: 'test'
         });
-        const result = { value: 55, unit: 'deg' };
+        const result = { value: 55, unit: 'deg', functionName: 'test' };
         expect(obj.parseValue('test(55deg)')).toEqual(result);
       });
 
-      it('parse input value with min', () => {
+      test('parse input value with min', () => {
         obj = new PropertyInteger({ units: ['px'], min: 10 });
         const result = { value: 10, unit: 'px' };
         expect(obj.parseValue('1px')).toEqual(result);
         expect(obj.parseValue('15px')).toEqual({ value: 15, unit: 'px' });
       });
 
-      it('parse input value with max', () => {
+      test('parse input value with max', () => {
         obj = new PropertyInteger({ units: ['px'], max: 100 });
         const result = { value: 100, unit: 'px' };
         expect(obj.parseValue('200px')).toEqual(result);
@@ -212,8 +225,8 @@ module.exports = {
         obj = null;
       });
 
-      it('Object exists', () => {
-        expect(obj).toExist();
+      test('Object exists', () => {
+        expect(obj).toBeTruthy();
       });
     });
 
@@ -233,26 +246,26 @@ module.exports = {
         obj = null;
       });
 
-      it('Has index property', () => {
+      test('Has index property', () => {
         expect(obj.has('index')).toEqual(true);
       });
 
-      it('Is not active', () => {
+      test('Is not active', () => {
         expect(obj.get('active')).toEqual(false);
       });
 
-      it('Has no properties', () => {
+      test('Has no properties', () => {
         expect(obj.get('properties').length).toEqual(0);
       });
 
-      it('Get correct values from properties', () => {
+      test('Get correct values from properties', () => {
         obj = new Layer({
           properties
         });
         expect(obj.getFullValue()).toEqual('val1 val2 test(val3)');
       });
 
-      it('Get correct value from properties', () => {
+      test('Get correct value from properties', () => {
         obj = new Layer({ properties });
         expect(obj.getPropertyValue()).toEqual('');
         expect(obj.getPropertyValue('no-prop')).toEqual('');
@@ -276,22 +289,22 @@ module.exports = {
         obj = null;
       });
 
-      it('Object exists', () => {
-        expect(obj).toExist();
+      test('Object exists', () => {
+        expect(obj).toBeTruthy();
       });
 
-      it('Init index on add', () => {
+      test('Init index on add', () => {
         var model = obj.add({});
         expect(model.get('index')).toEqual(1);
       });
 
-      it('Increment index', () => {
+      test('Increment index', () => {
         var model = obj.add({});
         var model2 = obj.add({});
         expect(model2.get('index')).toEqual(2);
       });
 
-      it('Cache index', () => {
+      test('Cache index', () => {
         var model = obj.add({});
         var model2 = obj.add({});
         obj.remove(model2);
@@ -299,21 +312,21 @@ module.exports = {
         expect(model3.get('index')).toEqual(3);
       });
 
-      it('Reset index on reset', () => {
+      test('Reset index on reset', () => {
         var model = obj.add({});
         var model2 = obj.add({});
         obj.reset();
         expect(obj.idx).toEqual(1);
       });
 
-      it('getFullValue from layers', () => {
+      test('getFullValue from layers', () => {
         obj = new Layers([{ properties }, { properties }, { properties }]);
         expect(obj.getFullValue()).toEqual(
           'val1 val2 test(val3), val1 val2 test(val3), val1 val2 test(val3)'
         );
       });
 
-      it('getPropertyValues from layers', () => {
+      test('getPropertyValues from layers', () => {
         obj = new Layers([{ properties }, { properties }, { properties }]);
         expect(obj.getPropertyValues('prop3')).toEqual(
           'test(val3), test(val3), test(val3)'
@@ -332,11 +345,11 @@ module.exports = {
         obj = null;
       });
 
-      it('Object exists', () => {
-        expect(obj).toExist();
+      test('Object exists', () => {
+        expect(obj).toBeTruthy();
       });
 
-      it('Build single prop', () => {
+      test('Build single prop', () => {
         expect(obj.build('float')).toEqual([
           {
             property: 'float',
@@ -347,7 +360,7 @@ module.exports = {
         ]);
       });
 
-      it('Build display', () => {
+      test('Build display', () => {
         expect(obj.build('display')).toEqual([
           {
             property: 'display',
@@ -357,13 +370,122 @@ module.exports = {
               { value: 'block' },
               { value: 'inline' },
               { value: 'inline-block' },
+              { value: 'flex' },
               { value: 'none' }
             ]
           }
         ]);
       });
 
-      it('Build position', () => {
+      test('Build flex-direction', () => {
+        expect(obj.build('flex-direction')).toEqual([
+          {
+            property: 'flex-direction',
+            type: 'select',
+            defaults: 'row',
+            list: [
+              { value: 'row' },
+              { value: 'row-reverse' },
+              { value: 'column' },
+              { value: 'column-reverse' }
+            ],
+            requires: { display: ['flex'] }
+          }
+        ]);
+      });
+
+      test('Build flex-wrap', () => {
+        expect(obj.build('flex-wrap')).toEqual([
+          {
+            property: 'flex-wrap',
+            type: 'select',
+            defaults: 'nowrap',
+            list: [
+              { value: 'nowrap' },
+              { value: 'wrap' },
+              { value: 'wrap-reverse' }
+            ],
+            requires: { display: ['flex'] }
+          }
+        ]);
+      });
+
+      test('Build justify-content', () => {
+        expect(obj.build('justify-content')).toEqual([
+          {
+            property: 'justify-content',
+            type: 'select',
+            defaults: 'flex-start',
+            list: [
+              { value: 'flex-start' },
+              { value: 'flex-end' },
+              { value: 'center' },
+              { value: 'space-between' },
+              { value: 'space-around' },
+              { value: 'space-evenly' }
+            ],
+            requires: { display: ['flex'] }
+          }
+        ]);
+      });
+
+      test('Build align-items', () => {
+        expect(obj.build('align-items')).toEqual([
+          {
+            property: 'align-items',
+            type: 'select',
+            defaults: 'stretch',
+            list: [
+              { value: 'flex-start' },
+              { value: 'flex-end' },
+              { value: 'center' },
+              { value: 'baseline' },
+              { value: 'stretch' }
+            ],
+            requires: { display: ['flex'] }
+          }
+        ]);
+      });
+
+      test('Build align-content', () => {
+        expect(obj.build('align-content')).toEqual([
+          {
+            property: 'align-content',
+            type: 'select',
+            defaults: 'stretch',
+            list: [
+              { value: 'flex-start' },
+              { value: 'flex-end' },
+              { value: 'center' },
+              { value: 'space-between' },
+              { value: 'space-around' },
+              { value: 'stretch' }
+            ],
+            requires: { display: ['flex'] }
+          }
+        ]);
+      });
+
+      test('Build align-self', () => {
+        expect(obj.build('align-self')).toEqual([
+          {
+            property: 'align-self',
+            type: 'select',
+            defaults: 'auto',
+            list: [
+              { value: 'auto' },
+              { value: 'flex-start' },
+              { value: 'flex-end' },
+              { value: 'center' },
+              { value: 'baseline' },
+              { value: 'stretch' }
+            ],
+            requiresParent: { display: ['flex'] }
+          }
+        ]);
+      });
+
+      test('Build position', () => {
         expect(obj.build('position')).toEqual([
           {
             property: 'position',
@@ -379,45 +501,78 @@ module.exports = {
         ]);
       });
 
-      it('Build top, left, right, bottom', () => {
+      test('Build left, right', () => {
         var res = {
           type: 'integer',
-          units: ['px', '%'],
-          defaults: 0
+          units: ['px', '%', 'vw'],
+          defaults: 'auto',
+          fixedValues: ['initial', 'inherit', 'auto']
         };
-        res.property = 'top';
-        expect(obj.build('top')).toEqual([res]);
         res.property = 'right';
         expect(obj.build('right')).toEqual([res]);
-        res.property = 'bottom';
-        expect(obj.build('bottom')).toEqual([res]);
         res.property = 'left';
         expect(obj.build('left')).toEqual([res]);
       });
 
-      it('Build width and height family', () => {
+      test('Build top, bottom', () => {
         var res = {
           type: 'integer',
-          units: ['px', '%'],
+          units: ['px', '%', 'vh'],
+          defaults: 'auto',
+          fixedValues: ['initial', 'inherit', 'auto']
+        };
+        res.property = 'top';
+        expect(obj.build('top')).toEqual([res]);
+        res.property = 'bottom';
+        expect(obj.build('bottom')).toEqual([res]);
+      });
+
+      test('Build width family', () => {
+        var res = {
+          type: 'integer',
+          units: ['px', '%', 'vw'],
           defaults: 'auto',
           fixedValues: ['initial', 'inherit', 'auto'],
           min: 0
         };
         res.property = 'width';
         expect(obj.build('width')).toEqual([res]);
-        res.property = 'height';
-        expect(obj.build('height')).toEqual([res]);
-        res.property = 'min-height';
-        expect(obj.build('min-height')).toEqual([res]);
-        res.property = 'max-height';
-        expect(obj.build('max-height')).toEqual([res]);
         res.property = 'min-width';
         expect(obj.build('min-width')).toEqual([res]);
         res.property = 'max-width';
         expect(obj.build('max-width')).toEqual([res]);
       });
 
-      it('Build margin', () => {
+      test('Build flex-basis', () => {
+        var res = {
+          type: 'integer',
+          units: ['px', '%', 'vw', 'vh'],
+          defaults: 'auto',
+          fixedValues: ['initial', 'inherit', 'auto'],
+          requiresParent: { display: ['flex'] },
+          min: 0
+        };
+        res.property = 'flex-basis';
+        expect(obj.build('flex-basis')).toEqual([res]);
+      });
+
+      test('Build height family', () => {
+        var res = {
+          type: 'integer',
+          units: ['px', '%', 'vh'],
+          defaults: 'auto',
+          fixedValues: ['initial', 'inherit', 'auto'],
+          min: 0
+        };
+        res.property = 'height';
+        expect(obj.build('height')).toEqual([res]);
+        res.property = 'min-height';
+        expect(obj.build('min-height')).toEqual([res]);
+        res.property = 'max-height';
+        expect(obj.build('max-height')).toEqual([res]);
+      });
+
+      test('Build margin', () => {
         var res = {
           property: 'margin',
           type: 'composite',
@@ -426,28 +581,28 @@ module.exports = {
               fixedValues: ['initial', 'inherit', 'auto'],
               property: 'margin-top',
               type: 'integer',
-              units: ['px', '%'],
+              units: ['px', '%', 'vh'],
               defaults: 0
             },
             {
               fixedValues: ['initial', 'inherit', 'auto'],
               property: 'margin-right',
               type: 'integer',
-              units: ['px', '%'],
+              units: ['px', '%', 'vw'],
               defaults: 0
             },
             {
               fixedValues: ['initial', 'inherit', 'auto'],
               property: 'margin-bottom',
               type: 'integer',
-              units: ['px', '%'],
+              units: ['px', '%', 'vh'],
               defaults: 0
             },
             {
               fixedValues: ['initial', 'inherit', 'auto'],
               property: 'margin-left',
               type: 'integer',
-              units: ['px', '%'],
+              units: ['px', '%', 'vw'],
               defaults: 0
             }
           ]
@@ -455,7 +610,7 @@ module.exports = {
         expect(obj.build('margin')).toEqual([res]);
       });
 
-      it('Build padding', () => {
+      test('Build padding', () => {
         var res = {
           property: 'padding',
           type: 'composite',
@@ -464,7 +619,7 @@ module.exports = {
               property: 'padding-top',
               fixedValues: ['initial', 'inherit', 'auto'],
               type: 'integer',
-              units: ['px', '%'],
+              units: ['px', '%', 'vh'],
               defaults: 0,
               min: 0
             },
@@ -472,7 +627,7 @@ module.exports = {
               property: 'padding-right',
               fixedValues: ['initial', 'inherit', 'auto'],
               type: 'integer',
-              units: ['px', '%'],
+              units: ['px', '%', 'vw'],
               defaults: 0,
               min: 0
             },
@@ -480,7 +635,7 @@ module.exports = {
               property: 'padding-bottom',
               fixedValues: ['initial', 'inherit', 'auto'],
               type: 'integer',
-              units: ['px', '%'],
+              units: ['px', '%', 'vh'],
               defaults: 0,
               min: 0
             },
@@ -488,7 +643,7 @@ module.exports = {
               property: 'padding-left',
               fixedValues: ['initial', 'inherit', 'auto'],
               type: 'integer',
-              units: ['px', '%'],
+              units: ['px', '%', 'vw'],
               defaults: 0,
               min: 0
             }
@@ -497,7 +652,7 @@ module.exports = {
         expect(obj.build('padding')).toEqual([res]);
       });
 
-      it('Build font-family', () => {
+      test('Build font-family', () => {
         var ss = ', sans-serif';
         var ms = ', monospace';
         var res = {
@@ -526,7 +681,7 @@ module.exports = {
         expect(obj.build('font-family')).toEqual([res]);
       });
 
-      it('Build font-size', () => {
+      test('Build font-size', () => {
         var res = {
           type: 'integer',
           units: ['px', 'em', 'rem', '%'],
@@ -551,7 +706,7 @@ module.exports = {
         expect(obj.build('font-size')).toEqual([res]);
       });
 
-      it('Build letter-spacing', () => {
+      test('Build letter-spacing', () => {
         var res = {
           type: 'integer',
           units: ['px', 'em', 'rem', '%'],
@@ -562,7 +717,7 @@ module.exports = {
         expect(obj.build('letter-spacing')).toEqual([res]);
       });
 
-      it('Build font-weight', () => {
+      test('Build font-weight', () => {
         var res = {
           type: 'select',
           defaults: '400',
@@ -582,7 +737,7 @@ module.exports = {
         expect(obj.build('font-weight')).toEqual([res]);
       });
 
-      it('Build color', () => {
+      test('Build color', () => {
         var res = {
           property: 'color',
           type: 'color',
@@ -591,7 +746,7 @@ module.exports = {
         expect(obj.build('color')).toEqual([res]);
       });
 
-      it('Build line-height', () => {
+      test('Build line-height', () => {
         var res = {
           type: 'integer',
           units: ['px', 'em', 'rem', '%'],
@@ -602,7 +757,7 @@ module.exports = {
         expect(obj.build('line-height')).toEqual([res]);
       });
 
-      it('Build text-align', () => {
+      test('Build text-align', () => {
         var res = {
           type: 'radio',
           defaults: 'left',
@@ -617,7 +772,7 @@ module.exports = {
         expect(obj.build('text-align')).toEqual([res]);
       });
 
-      it('Build text-shadow', () => {
+      test('Build text-shadow', () => {
         var res = {
           type: 'stack',
           preview: true,
@@ -653,7 +808,7 @@ module.exports = {
         expect(obj.build('text-shadow')).toEqual([res]);
       });
 
-      it('Build border-radius-c', () => {
+      test('Build border-radius-c', () => {
         var res = {
           type: 'integer',
           units: ['px', '%'],
@@ -664,7 +819,7 @@ module.exports = {
         expect(obj.build('border-radius-c')).toEqual([res]);
       });
 
-      it('Build border-radius', () => {
+      test('Build border-radius', () => {
         var res = {
           property: 'border-radius',
           type: 'composite',
@@ -673,7 +828,7 @@ module.exports = {
               property: 'border-top-left-radius',
               type: 'integer',
               units: ['px', '%'],
-              defaults: 0,
+              defaults: '0px',
               min: 0
             },
             {
@@ -681,21 +836,21 @@ module.exports = {
               type: 'integer',
               units: ['px', '%'],
               min: 0,
-              defaults: 0
-            },
-            {
-              property: 'border-bottom-left-radius',
-              type: 'integer',
-              units: ['px', '%'],
-              min: 0,
-              defaults: 0
+              defaults: '0px'
             },
             {
               property: 'border-bottom-right-radius',
               type: 'integer',
               units: ['px', '%'],
               min: 0,
-              defaults: 0
+              defaults: '0px'
+            },
+            {
+              property: 'border-bottom-left-radius',
+              type: 'integer',
+              units: ['px', '%'],
+              min: 0,
+              defaults: '0px'
             }
           ]
         };
@@ -703,7 +858,7 @@ module.exports = {
         expect(obj.build('border-radius')).toEqual([res]);
       });
 
-      it('Build background-color', () => {
+      test('Build background-color', () => {
         var res = {
           type: 'color',
           defaults: 'none'
@@ -712,7 +867,7 @@ module.exports = {
         expect(obj.build('background-color')).toEqual([res]);
       });
 
-      it('Build border', () => {
+      test('Build border', () => {
         var res = {
           property: 'border',
           type: 'composite',
@@ -750,7 +905,7 @@ module.exports = {
         expect(obj.build('border')).toEqual([res]);
       });
 
-      it('Build box-shadow', () => {
+      test('Build box-shadow', () => {
         var res = {
           property: 'box-shadow',
           type: 'stack',
@@ -800,7 +955,7 @@ module.exports = {
         expect(obj.build('box-shadow')).toEqual([res]);
       });
 
-      it('Build background', () => {
+      test('Build background', () => {
         var res = {
           property: 'background',
           type: 'stack',
@@ -865,7 +1020,7 @@ module.exports = {
         expect(obj.build('background')).toEqual([res]);
       });
 
-      it('Build transition', () => {
+      test('Build transition', () => {
         var res = {
           property: 'transition',
           type: 'stack',
@@ -908,7 +1063,7 @@ module.exports = {
         expect(obj.build('transition')).toEqual([res]);
       });
 
-      it('Build perspective', () => {
+      test('Build perspective', () => {
         var res = {
           property: 'perspective',
           type: 'integer',
@@ -919,7 +1074,7 @@ module.exports = {
         expect(obj.build('perspective')).toEqual([res]);
       });
 
-      it('Build transform', () => {
+      test('Build transform', () => {
         var res = {
           property: 'transform',
           type: 'composite',
@@ -968,7 +1123,7 @@ module.exports = {
         expect(obj.build('transform')).toEqual([res]);
       });
 
-      it('Build cursor', () => {
+      test('Build cursor', () => {
         var res = {
           type: 'select',
           property: 'cursor',
@@ -988,7 +1143,7 @@ module.exports = {
         expect(obj.build('cursor')).toEqual([res]);
       });
 
-      it('Build overflow', () => {
+      test('Build overflow', () => {
         var res = {
           type: 'select',
           property: 'overflow',
@@ -1001,6 +1156,36 @@ module.exports = {
           ]
         };
         expect(obj.build('overflow')).toEqual([res]);
+      });
+
+      test('Build overflow-x', () => {
+        var res = {
+          type: 'select',
+          property: 'overflow-x',
+          defaults: 'visible',
+          list: [
+            { value: 'visible' },
+            { value: 'hidden' },
+            { value: 'scroll' },
+            { value: 'auto' }
+          ]
+        };
+        expect(obj.build('overflow-x')).toEqual([res]);
+      });
+
+      test('Build overflow-y', () => {
+        var res = {
+          type: 'select',
+          property: 'overflow-y',
+          defaults: 'visible',
+          list: [
+            { value: 'visible' },
+            { value: 'hidden' },
+            { value: 'scroll' },
+            { value: 'auto' }
+          ]
+        };
+        expect(obj.build('overflow-y')).toEqual([res]);
       });
     });
   }

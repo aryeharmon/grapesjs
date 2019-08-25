@@ -1,7 +1,7 @@
-var Backbone = require('backbone');
-var CssRule = require('./CssRule');
+import Backbone from 'backbone';
+import CssRule from './CssRule';
 
-module.exports = Backbone.Collection.extend({
+export default Backbone.Collection.extend({
   initialize(models, opt) {
     // Inject editor
     if (opt && opt.em) this.editor = opt.em;

@@ -1,8 +1,9 @@
-var Backbone = require('backbone');
-var ClassTagView = require('./ClassTagView');
+import { template, debounce } from 'underscore';
+import Backbone from 'backbone';
+import ClassTagView from './ClassTagView';
 
-module.exports = Backbone.View.extend({
-  template: _.template(`
+export default Backbone.View.extend({
+  template: template(`
   <div id="<%= pfx %>up">
     <div id="<%= pfx %>label"><%= label %></div>
     <div id="<%= pfx %>status-c">
@@ -29,13 +30,7 @@ module.exports = Backbone.View.extend({
     <div id="<%= pfx %>label"><%= selectedLabel %></div>
     <div id="<%= pfx %>sel"></div>
     <div style="clear:both"></div>
-  </div>
-  <div>
-    <ul class="css-rule-list">
-      <li>123</li>
-    </ul>
-  <div>
-  `),
+  </div>`),
 
   events: {},
 
@@ -53,22 +48,31 @@ module.exports = Backbone.View.extend({
     this.events['blur #' + this.newInputId] = 'endNewTag';
     this.events['keyup #' + this.newInputId] = 'onInputKeyUp';
     this.events['change #' + this.stateInputId] = 'stateChanged';
-    window.asfsafsafsaf = this.collection;
+    const { em } = this.config;
+    const emitter = this.getStyleEmitter();
     this.target = this.config.em;
-    this.em = this.target;
+    this.em = em;
 
+    this.listenTo(emitter, 'styleManager:update', this.componentChanged);
     this.listenTo(
-      this.target,
-      'change:selectedComponent',
+      em,
+      'component:toggled component:update:classes',
       this.componentChanged
     );
-    this.listenTo(this.target, 'component:update:classes', this.updateSelector);
+    this.listenTo(em, 'component:update:classes', this.updateSelector);
 
     this.listenTo(this.collection, 'add', this.addNew);
     this.listenTo(this.collection, 'reset', this.renderClasses);
     this.listenTo(this.collection, 'remove', this.tagRemoved);
 
     this.delegateEvents();
+  },
+
+  getStyleEmitter() {
+    const { em } = this;
+    const sm = em && em.get('StyleManager');
+    const emitter = sm && sm.getEmitter();
+    return emitter || {};
   },
 
   /**
@@ -142,177 +146,24 @@ module.exports = Backbone.View.extend({
    * @param  {Object} e
    * @private
    */
-  componentChanged(e) {
-    this.compTarget = this.target.get('selectedComponent');
-    const target = this.compTarget;
+  componentChanged: debounce(function(target) {
+    target = target || this.getTarget();
+    this.compTarget = target;
     let validSelectors = [];
 
-    // aryeh edit
-    function css(a) {
-      var iframe = window.$('.gjs-frame')[0];
-      var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-
-      var sheets = innerDoc.styleSheets,
-        o = [];
-      a.matches =
-        a.matches ||
-        a.webkitMatchesSelector ||
-        a.mozMatchesSelector ||
-        a.msMatchesSelector ||
-        a.oMatchesSelector;
-      for (var i in sheets) {
-        if (!sheets[i].href) {
-          var rules = sheets[i].rules || sheets[i].cssRules;
-          if (rules) {
-            for (var r in rules) {
-              if (a.matches(rules[r].selectorText)) {
-                o.push(rules[r].cssText.split('{')[0].trim());
-              }
-            }
-          }
-        }
-      }
-      return o;
-    }
-
     if (target) {
-      var styles = css(target.view.el);
-      $('.css-rule-list').html('');
-      for (var n = 0; n < styles.length; n++) {
-        if (styles[n].indexOf('*') === -1) {
-          if (styles[n].indexOf('gjs') === -1) {
-            $('.css-rule-list').append(
-              '<li><button data-rule="' +
-                styles[n] +
-                '">' +
-                styles[n] +
-                '</button></li>'
-            );
-          }
-        }
-      }
-
-      $('.css-rule-list button').click(function() {
-        var $el = $(this);
-
-        if ($el.hasClass('selected')) {
-          $('.css-rule-list button').removeClass('selected');
-          window.editor.pt.model = window.editor.old_model;
-          window.editor.pt.trigger('update');
-        } else {
-          $('.css-rule-list button').removeClass('selected');
-          $el.addClass('selected');
-
-          window.editor.old_model = editor.pt.model;
-
-          var SelectorsAdd =
-            editor.CssComposer.getBySelectorsAdd($el.data('rule')) ||
-            editor.CssComposer.getClassRule($el.data('rule').replace('.', ''));
-
-          if (SelectorsAdd) {
-            window.editor.pt.model = SelectorsAdd;
-            window.editor.pt.trigger('update');
-          } else {
-            window.editor.pt.model = editor.pt.model;
-            window.editor.pt.trigger('update');
-            $el.removeClass('selected');
-          }
-        }
-      });
-    }
-    // end aryeh edit
-
-    if (target) {
-      this.getStates().val(target.get('state'));
-      validSelectors = target.get('classes').getValid();
+      const state = target.get('state');
+      state && this.getStates().val(state);
+      const selectors = target.getSelectors();
+      validSelectors = selectors.getValid();
     }
 
-    this.collection.reset(
-      validSelectors.filter(function(item) {
-        return (
-          [
-            'animated',
-            'bounce',
-            'flash',
-            'pulse',
-            'rubberBand',
-            'shake',
-            'swing',
-            'tada',
-            'wobble',
-            'jello',
-            'bounceIn',
-            'bounceInDown',
-            'bounceInLeft',
-            'bounceInRight',
-            'bounceInUp',
-            'bounceOut',
-            'bounceOutDown',
-            'bounceOutLeft',
-            'bounceOutRight',
-            'bounceOutUp',
-            'fadeIn',
-            'fadeInDown',
-            'fadeInDownBig',
-            'fadeInLeft',
-            'fadeInLeftBig',
-            'fadeInRight',
-            'fadeInRightBig',
-            'fadeInUp',
-            'fadeInUpBig',
-            'fadeOut',
-            'fadeOutDown',
-            'fadeOutDownBig',
-            'fadeOutLeft',
-            'fadeOutLeftBig',
-            'fadeOutRight',
-            'fadeOutRightBig',
-            'fadeOutUp',
-            'fadeOutUpBig',
-            'flip',
-            'flipInX',
-            'flipInY',
-            'flipOutX',
-            'flipOutY',
-            'lightSpeedIn',
-            'lightSpeedOut',
-            'rotateIn',
-            'rotateInDownLeft',
-            'rotateInDownRight',
-            'rotateInUpLeft',
-            'rotateInUpRight',
-            'rotateOut',
-            'rotateOutDownLeft',
-            'rotateOutDownRight',
-            'rotateOutUpLeft',
-            'rotateOutUpRight',
-            'slideInUp',
-            'slideInDown',
-            'slideInLeft',
-            'slideInRight',
-            'slideOutUp',
-            'slideOutDown',
-            'slideOutLeft',
-            'slideOutRight',
-            'zoomIn',
-            'zoomInDown',
-            'zoomInLeft',
-            'zoomInRight',
-            'zoomInUp',
-            'zoomOut',
-            'zoomOutDown',
-            'zoomOutLeft',
-            'zoomOutRight',
-            'zoomOutUp',
-            'hinge',
-            'jackInTheBox',
-            'rollIn',
-            'rollOut'
-          ].indexOf(item.get('label')) === -1
-        );
-      })
-    );
-    this.updateStateVis();
+    this.collection.reset(validSelectors);
+    this.updateStateVis(target);
+  }),
+
+  getTarget() {
+    return this.target.getSelected();
   },
 
   /**
@@ -320,36 +171,35 @@ module.exports = Backbone.View.extend({
    * inside collection
    * @private
    */
-  updateStateVis() {
+  updateStateVis(target) {
     const em = this.em;
     const avoidInline = em && em.getConfig('avoidInlineStyle');
-
-    if (this.collection.length || avoidInline)
-      this.getStatesC().css('display', 'block');
-    else this.getStatesC().css('display', 'none');
-    this.updateSelector();
+    const display = this.collection.length || avoidInline ? 'block' : 'none';
+    this.getStatesC().css('display', display);
+    this.updateSelector(target);
   },
 
   /**
-   * Udpate selector helper
+   * Update selector helper
    * @return {this}
    * @private
    */
-  updateSelector() {
-    const selected = this.target.getSelected();
+  updateSelector(target) {
+    const { pfx, collection, el } = this;
+    const selected = target || this.getTarget();
     this.compTarget = selected;
-
-    if (!selected || !selected.get) {
-      return;
-    }
+    if (!selected || !selected.get) return;
 
     const state = selected.get('state');
-    const coll = this.collection;
-    let result = coll.getFullString(coll.getStyleable());
-    result = result || `#${selected.getId()}`;
+    const coll = collection;
+    let result = coll.getFullString(selected.getSelectors().getStyleable());
+    result =
+      result ||
+      selected.get('selectorsAdd') ||
+      (selected.getId ? `#${selected.getId()}` : '');
     result += state ? `:${state}` : '';
-    const el = this.el.querySelector('#' + this.pfx + 'sel');
-    el && (el.innerHTML = result);
+    const elSel = el.querySelector(`#${pfx}sel`);
+    elSel && (elSel.innerHTML = result);
   },
 
   /**
@@ -379,13 +229,11 @@ module.exports = Backbone.View.extend({
 
     if (target) {
       const sm = target.get('SelectorManager');
-      var model = sm.add({ label });
+      const model = sm.add({ label });
 
       if (component) {
-        var compCls = component.get('classes');
-        var lenB = compCls.length;
+        const compCls = component.getSelectors();
         compCls.add(model);
-        var lenA = compCls.length;
         this.collection.add(model);
         this.updateStateVis();
       }
@@ -400,125 +248,30 @@ module.exports = Backbone.View.extend({
    * @return {Object} Object created
    * @private
    * */
-  addToClasses(model, fragmentEl) {
-    var fragment = fragmentEl || null;
-
-    var view = new ClassTagView({
+  addToClasses(model, fragmentEl = null) {
+    const fragment = fragmentEl;
+    const classes = this.getClasses();
+    const rendered = new ClassTagView({
       model,
       config: this.config,
       coll: this.collection
-    });
-    var rendered = view.render().el;
+    }).render().el;
 
-    if (fragment) fragment.appendChild(rendered);
-    else this.getClasses().append(rendered);
+    fragment ? fragment.appendChild(rendered) : classes.append(rendered);
 
     return rendered;
   },
 
   /**
    * Render the collection of classes
-   * @return {this}
    * @private
    */
   renderClasses() {
-    var fragment = document.createDocumentFragment();
-    window.aryeh = this.collection;
-    this.collection.each(function(model) {
-      if (
-        model &&
-        [
-          'animated',
-          'bounce',
-          'flash',
-          'pulse',
-          'rubberBand',
-          'shake',
-          'swing',
-          'tada',
-          'wobble',
-          'jello',
-          'bounceIn',
-          'bounceInDown',
-          'bounceInLeft',
-          'bounceInRight',
-          'bounceInUp',
-          'bounceOut',
-          'bounceOutDown',
-          'bounceOutLeft',
-          'bounceOutRight',
-          'bounceOutUp',
-          'fadeIn',
-          'fadeInDown',
-          'fadeInDownBig',
-          'fadeInLeft',
-          'fadeInLeftBig',
-          'fadeInRight',
-          'fadeInRightBig',
-          'fadeInUp',
-          'fadeInUpBig',
-          'fadeOut',
-          'fadeOutDown',
-          'fadeOutDownBig',
-          'fadeOutLeft',
-          'fadeOutLeftBig',
-          'fadeOutRight',
-          'fadeOutRightBig',
-          'fadeOutUp',
-          'fadeOutUpBig',
-          'flip',
-          'flipInX',
-          'flipInY',
-          'flipOutX',
-          'flipOutY',
-          'lightSpeedIn',
-          'lightSpeedOut',
-          'rotateIn',
-          'rotateInDownLeft',
-          'rotateInDownRight',
-          'rotateInUpLeft',
-          'rotateInUpRight',
-          'rotateOut',
-          'rotateOutDownLeft',
-          'rotateOutDownRight',
-          'rotateOutUpLeft',
-          'rotateOutUpRight',
-          'slideInUp',
-          'slideInDown',
-          'slideInLeft',
-          'slideInRight',
-          'slideOutUp',
-          'slideOutDown',
-          'slideOutLeft',
-          'slideOutRight',
-          'zoomIn',
-          'zoomInDown',
-          'zoomInLeft',
-          'zoomInRight',
-          'zoomInUp',
-          'zoomOut',
-          'zoomOutDown',
-          'zoomOutLeft',
-          'zoomOutRight',
-          'zoomOutUp',
-          'hinge',
-          'jackInTheBox',
-          'rollIn',
-          'rollOut'
-        ].indexOf(model.get('label')) === -1
-      ) {
-        this.addToClasses(model, fragment);
-      } else {
-        // this.collection.remove(model);
-      }
-    }, this);
-
-    if (this.getClasses())
-      this.getClasses()
-        .empty()
-        .append(fragment);
-
-    return this;
+    const frag = document.createDocumentFragment();
+    const classes = this.getClasses();
+    classes.empty();
+    this.collection.each(model => this.addToClasses(model, frag));
+    classes.append(frag);
   },
 
   /**
@@ -527,9 +280,7 @@ module.exports = Backbone.View.extend({
    * @private
    */
   getClasses() {
-    if (!this.$classes)
-      this.$classes = this.$el.find('#' + this.pfx + 'tags-c');
-    return this.$classes;
+    return this.$el.find(`#${this.pfx}tags-c`);
   },
 
   /**

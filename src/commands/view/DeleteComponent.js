@@ -1,9 +1,12 @@
-const SelectComponent = require('./SelectComponent');
+import { extend, bindAll } from 'underscore';
+import Backbone from 'backbone';
+import SelectComponent from './SelectComponent';
+
 const $ = Backbone.$;
 
-module.exports = _.extend({}, SelectComponent, {
+export default extend({}, SelectComponent, {
   init(o) {
-    _.bindAll(this, 'startDelete', 'stopDelete', 'onDelete');
+    bindAll(this, 'startDelete', 'stopDelete', 'onDelete');
     this.hoverClass = this.pfx + 'hover-delete';
     this.badgeClass = this.pfx + 'badge-red';
   },

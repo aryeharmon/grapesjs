@@ -1,8 +1,9 @@
+import Backbone from 'backbone';
 const $ = Backbone.$;
 
-module.exports = Backbone.View.extend({
+export default Backbone.View.extend({
   initialize() {
-    const model = this.model;
+    const { model } = this;
     model.view = this;
     this.conf = model.config;
     this.pn = model.get('Panels');
@@ -10,7 +11,7 @@ module.exports = Backbone.View.extend({
       this.pn.active();
       this.pn.disableButtons();
       model.runDefault();
-      setTimeout(() => model.trigger('load'), 0);
+      setTimeout(() => model.trigger('load', model.get('Editor')));
     });
   },
 

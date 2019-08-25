@@ -1,6 +1,7 @@
+import Backbone from 'backbone';
 const $ = Backbone.$;
 
-module.exports = {
+export default {
   /**
    * Start select position event
    * @param {HTMLElement} trg
@@ -21,7 +22,8 @@ module.exports = {
         wmargin: 1,
         nested: 1,
         em: this.editorModel,
-        canvasRelative: 1
+        canvasRelative: 1,
+        scale: () => this.em.getZoomDecimal()
       });
     trg && this.sorter.startSort(trg);
   },

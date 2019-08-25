@@ -1,10 +1,12 @@
-var Component = require('./ComponentImage');
-var OComponent = require('./Component');
+import Component from './ComponentImage';
+import OComponent from './Component';
 
-module.exports = Component.extend(
+export default Component.extend(
   {
-    defaults: _.extend({}, Component.prototype.defaults, {
+    defaults: {
+      ...Component.prototype.defaults,
       type: 'map',
+      src: '',
       void: 0,
       mapUrl: 'https://maps.google.com/maps',
       tagName: 'iframe',
@@ -39,7 +41,7 @@ module.exports = Component.extend(
           changeProp: 1
         }
       ]
-    }),
+    },
 
     initialize(o, opt) {
       if (this.get('src')) this.parseFromSrc();

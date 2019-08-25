@@ -1,7 +1,9 @@
-const Layers = require('navigator');
+import Backbone from 'backbone';
+import Layers from 'navigator';
+
 const $ = Backbone.$;
 
-module.exports = {
+export default {
   run(editor) {
     const lm = editor.LayerManager;
     const pn = editor.Panels;
