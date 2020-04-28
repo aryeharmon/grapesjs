@@ -1,5 +1,5 @@
-var Backbone = require('backbone');
-var ComponentView = require('./ComponentView');
+import { isString } from 'underscore';
+import ComponentView from './ComponentView';
 
 module.exports = ComponentView.extend({
 
@@ -44,7 +44,7 @@ module.exports = ComponentView.extend({
   openModal(e) {
     var em = this.opts.config.em;
     var editor = em ? em.get('Editor') : '';
-
+alert(123);
     if(editor) {
       editor.runCommand('open-region-editor', {
         target: this.model,

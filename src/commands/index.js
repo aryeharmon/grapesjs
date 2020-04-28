@@ -110,6 +110,12 @@ export default () => {
         }
       };
 
+      defaultCommands['build-component'] = require('./view/BuildComponent');
+      defaultCommands['open-table-editor'] = require('./view/OpenTableEditor');
+      defaultCommands['maincolor'] = require('./view/mainColorPicker');
+      defaultCommands['open-region-editor'] = require('./view/OpenRegionEditor');
+
+
       defaultCommands['tlb-clone'] = {
         run(ed) {
           ed.runCommand('core:copy');

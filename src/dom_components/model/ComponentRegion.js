@@ -1,10 +1,10 @@
-var Component = require('./Component');
-
+import Component from './Component';
+window.aaaaaaaaaaaa = Component;
 module.exports = Component.extend({
 
   defaults: _.extend({}, Component.prototype.defaults, {
     type: 'region',
-    tagName: 'region',
+    // tagName: 'region',
     name: '',
     // void: 1,
     droppable: true,
@@ -97,7 +97,9 @@ module.exports = Component.extend({
    */
   isComponent(el) {
     var result = '';
-    if(el.tagName == 'REGION'){
+
+    if(el.tagName == 'REGION' || $(el).attr('region')){
+	console.log('got here')
       result = {type: 'region'};
     }
     return result;

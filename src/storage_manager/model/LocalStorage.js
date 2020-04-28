@@ -11,7 +11,7 @@ export default Backbone.Model.extend({
   store(data, clb) {
     this.checkStorageEnvironment();
 
-    for (var key in data) localStorage.setItem(key, data[key]);
+    //for (var key in data) localStorage.setItem(key, data[key]);
 
     if (typeof clb == 'function') {
       clb();
@@ -26,7 +26,7 @@ export default Backbone.Model.extend({
     var result = {};
 
     for (var i = 0, len = keys.length; i < len; i++) {
-      var value = localStorage.getItem(keys[i]);
+      var value = false; localStorage.getItem(keys[i]);
       if (value) result[keys[i]] = value;
     }
 
